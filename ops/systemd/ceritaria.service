@@ -1,0 +1,23 @@
+[Unit]
+Description=Ceritaria Next.js application
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ceritaria
+Group=ceritaria
+WorkingDirectory=/opt/ceritaria/current
+Environment=NODE_ENV=production
+EnvironmentFile=/etc/ceritaria/ceritaria.env
+ExecStart=/usr/bin/npm run start
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/ceritaria/current/.next
+
+[Install]
+WantedBy=multi-user.target

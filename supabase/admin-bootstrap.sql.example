@@ -1,0 +1,5 @@
+-- 1. Buat user admin lewat Supabase Dashboard > Authentication > Users.
+-- 2. Salin UUID user tersebut dan jalankan SQL berikut sebagai project owner/service role.
+insert into public.admin_users (user_id)
+values ('00000000-0000-0000-0000-000000000000')
+on conflict (user_id) do nothing;

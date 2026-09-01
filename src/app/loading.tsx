@@ -1,0 +1,1 @@
+export default function Loading() { return <div className="shell py-10" aria-live="polite"><div className="h-8 w-48 animate-pulse rounded-lg bg-zinc-800"/><div className="mt-6 h-64 animate-pulse rounded-3xl bg-zinc-900"/></div>; }
