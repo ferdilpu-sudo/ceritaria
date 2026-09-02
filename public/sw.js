@@ -39,7 +39,9 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.startsWith("/admin") || url.pathname.startsWith("/api") || url.pathname === "/sw.js") return;
 
   if (request.mode === "navigate") {
-    event.respondWith(fetch(request).catch(() => caches.match(OFFLINE_URL)));
+    event.respondWith(
+      fetch(request).catch(async () => (await caches.match(OFFLINE_URL)) ?? Response.error()),
+    );
     return;
   }
 
