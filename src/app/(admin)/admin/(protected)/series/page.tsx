@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { DeleteContentButton } from "@/features/admin/components/DeleteContentButton";
+import { AdminSavedNotice } from "@/features/admin/components/AdminSavedNotice";
 import { getAdminSeries } from "@/features/admin/services/admin-content";
 
-export default async function AdminSeriesPage() {
-  const series = await getAdminSeries();
+export default async function AdminSeriesPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  const [{ saved }, series] = await Promise.all([searchParams, getAdminSeries()]);
   const published = series.filter((item) => item.is_published).length;
 
   return (
     <div className="min-w-0">
+      <AdminSavedNotice kind="Series" state={saved} />
       <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
         <div className="min-w-0">
           <p className="text-xs font-black tracking-[0.18em] text-red-600">KATALOG</p>
@@ -24,15 +26,11 @@ export default async function AdminSeriesPage() {
           series.map((item) => (
             <article key={item.id} className="surface min-w-0 rounded-2xl p-4 sm:flex sm:items-center sm:gap-4 sm:p-5">
               <div className="flex min-w-0 items-start gap-3 sm:flex-1 sm:items-center sm:gap-4">
-                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-xs font-black text-[var(--muted)] sm:h-14 sm:w-14">
-                  S
-                </div>
+                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-xs font-black text-[var(--muted)] sm:h-14 sm:w-14">S</div>
                 <div className="min-w-0 flex-1">
                   <div className="flex min-w-0 flex-wrap items-center gap-2">
                     <h2 className="min-w-0 max-w-full truncate font-bold text-[var(--text)]">{item.title}</h2>
-                    <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black ${item.is_published ? "border border-emerald-200 bg-emerald-50 text-emerald-700" : "border border-zinc-200 bg-zinc-100 text-zinc-600"}`}>
-                      {item.is_published ? "PUBLISHED" : "DRAFT"}
-                    </span>
+                    <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black ${item.is_published ? "border border-emerald-200 bg-emerald-50 text-emerald-700" : "border border-zinc-200 bg-zinc-100 text-zinc-600"}`}>{item.is_published ? "PUBLISHED" : "DRAFT"}</span>
                     {item.is_featured && <span className="shrink-0 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-[10px] font-black text-rose-700">FEATURED</span>}
                   </div>
                   <p className="mt-1 truncate text-sm text-[var(--muted)]">/{item.slug}</p>
@@ -40,9 +38,7 @@ export default async function AdminSeriesPage() {
                 </div>
               </div>
               <div className="mt-4 grid min-w-0 grid-cols-2 gap-2 sm:mt-0 sm:flex sm:shrink-0">
-                <Link href={`/admin/series/${item.id}/edit`} className="min-h-11 min-w-0 rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-center text-sm font-bold text-[var(--text)] hover:bg-[var(--surface-2)] sm:px-4">
-                  Edit
-                </Link>
+                <Link href={`/admin/series/${item.id}/edit`} className="min-h-11 min-w-0 rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-center text-sm font-bold text-[var(--text)] hover:bg-[var(--surface-2)] sm:px-4">Edit</Link>
                 <DeleteContentButton id={item.id} kind="series" />
               </div>
             </article>
