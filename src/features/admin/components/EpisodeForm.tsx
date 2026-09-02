@@ -66,7 +66,7 @@ export function EpisodeForm({ series, initial }: { series: SeriesRow[]; initial?
 
       <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
         <div className="space-y-6">
-          <AdminFormSection title="Informasi Episode" description="Tentukan series, urutan episode, judul, dan ringkasan yang tampil ke penonton.">
+          <AdminFormSection guideId="episode-info" title="Informasi Episode" description="Tentukan series, urutan episode, judul, dan ringkasan yang tampil ke penonton.">
             <div className="grid gap-5 sm:grid-cols-2">
               <label className={label}>Series<select className={field} {...register("seriesId", { required: true })}>{series.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
               <label className={label}>Nomor episode<input type="number" min="1" className={field} {...register("episodeNumber", { required: true, valueAsNumber: true, min: 1 })} /></label>
@@ -76,7 +76,7 @@ export function EpisodeForm({ series, initial }: { series: SeriesRow[]; initial?
             </div>
           </AdminFormSection>
 
-          <AdminFormSection title="Video & Media" description="YouTube menjadi sumber utama. Sidebar kanan menampilkan preview sebelum data disimpan.">
+          <AdminFormSection guideId="episode-media" title="Video & Media" description="YouTube menjadi sumber utama. Sidebar kanan menampilkan preview sebelum data disimpan.">
             <div className="grid gap-5 sm:grid-cols-2">
               <label className={label}>Video source<select className={field} {...register("videoProvider")}><option value="youtube">YouTube</option><option value="facebook">Facebook (legacy)</option></select></label>
               <label className={label}>Durasi (detik)<input type="number" min="1" className={field} placeholder="600" {...register("durationSeconds")} /></label>
@@ -86,14 +86,14 @@ export function EpisodeForm({ series, initial }: { series: SeriesRow[]; initial?
             </div>
           </AdminFormSection>
 
-          <AdminFormSection title="Editorial" description="Recap dan momen penting membantu penonton mengikuti cerita dari episode ke episode.">
+          <AdminFormSection guideId="episode-editorial" title="Editorial" description="Recap dan momen penting membantu penonton mengikuti cerita dari episode ke episode.">
             <div className="grid gap-5">
               <label className={label}>Recap<textarea rows={8} className={field} {...register("recap", { maxLength: 20000 })} /></label>
               <label className={label}>Momen penting<textarea rows={5} className={field} placeholder={"Jejak kaki baru\nPencarian di garis pantai\nSiluet terlihat dari kejauhan"} {...register("highlights", { maxLength: 4000 })} /><small className="mt-1 block font-normal text-[var(--muted)]">Satu momen per baris.</small></label>
             </div>
           </AdminFormSection>
 
-          <AdminFormSection title="Publikasi & SEO" description="Simpan sebagai draft selama pengecekan, lalu aktifkan Published saat siap tayang.">
+          <AdminFormSection guideId="episode-publish" title="Publikasi & SEO" description="Simpan sebagai draft selama pengecekan, lalu aktifkan Published saat siap tayang.">
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="flex min-h-14 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)] sm:col-span-2"><input type="checkbox" className="h-4 w-4 accent-red-600" {...register("isPublished")} /> Published</label>
               <label className={label}>SEO title<input className={field} {...register("seoTitle", { maxLength: 200 })} /></label>
