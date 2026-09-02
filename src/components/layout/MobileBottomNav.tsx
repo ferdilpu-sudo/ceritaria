@@ -52,7 +52,13 @@ export function MobileBottomNav() {
         {items.map((item) => {
           const active = isActive(pathname, hash, item.key);
           return (
-            <Link key={item.key} href={item.href} aria-current={active ? "page" : undefined} className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-bold transition active:scale-95 ${active ? "text-white" : "text-zinc-400"}`}>
+            <Link
+              key={item.key}
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              onClick={() => setHash(item.key === "series" ? "#semua-series" : "")}
+              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-bold transition active:scale-95 ${active ? "text-white" : "text-zinc-400"}`}
+            >
               <span className={`grid h-8 w-11 place-items-center rounded-full transition ${active ? "bg-red-600/15 text-red-400" : ""}`}>
                 <NavIcon name={item.key} />
               </span>
