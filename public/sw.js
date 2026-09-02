@@ -1,6 +1,25 @@
-const CACHE = "ceritaria-static-v3";
+const CACHE = "ceritaria-static-v4";
+const OFFLINE_URL = "/offline.html";
+const CORE_ASSETS = [
+  OFFLINE_URL,
+  "/icon.svg",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/apple-touch-icon.png",
+];
 
-self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE).then((cache) => cache.addAll(CORE_ASSETS)).then(() => {
+      if (!self.registration.active) return self.skipWaiting();
+      return undefined;
+    }),
+  );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
+});
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
@@ -19,10 +38,16 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith("/admin") || url.pathname.startsWith("/api") || url.pathname === "/sw.js") return;
 
+  if (request.mode === "navigate") {
+    event.respondWith(fetch(request).catch(() => caches.match(OFFLINE_URL)));
+    return;
+  }
+
   const cacheable =
     url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/icons/") ||
-    url.pathname === "/icon.svg";
+    url.pathname === "/icon.svg" ||
+    url.pathname === OFFLINE_URL;
   if (!cacheable) return;
 
   event.respondWith(
