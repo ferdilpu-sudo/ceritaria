@@ -77,7 +77,7 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
       const duplicate = error.code === "23505";
       return {
         ok: false,
-        message: duplicate ? "Nomor episode ini sudah dipakai, atau alamat halamannya bentrok." : error.message,
+        message: duplicate ? "Nomor episode ini sudah dipakai, atau alamat halamannya bentrok." : "Episode belum berhasil disimpan. Coba lagi.",
         fieldErrors: duplicate ? { episodeNumber: "Coba cek nomor episode. Nomor ini mungkin sudah ada.", slug: "Coba gunakan alamat halaman yang berbeda." } : undefined,
       };
     }
@@ -95,9 +95,11 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
     if (oldSeries && (oldSeries.slug !== series?.slug || existing?.slug !== values.slug)) {
       revalidatePath(`/series/${oldSeries.slug}/${existing?.slug}`);
     }
-    return { ok: true, redirectTo: `/admin/episodes?saved=${values.id ? "updated" : "created"}` };
-  } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Episode belum berhasil disimpan. Coba lagi." };
+    const state = values.id ? "updated" : "created";
+    const view = series ? `&view=${encodeURIComponent(`/series/${series.slug}/${values.slug}`)}` : "";
+    return { ok: true, redirectTo: `/admin/episodes?saved=${state}${view}` };
+  } catch {
+    return { ok: false, message: "Episode belum berhasil disimpan. Coba lagi beberapa saat." };
   }
 }
 
@@ -109,7 +111,7 @@ export async function deleteEpisodeAction(id: string): Promise<ActionResult> {
       ? await supabase.from("series").select("slug").eq("id", existing.series_id).maybeSingle()
       : { data: null };
     const { error } = await supabase.from("episodes").update({ deleted_at: new Date().toISOString(), is_published: false }).eq("id", id);
-    if (error) return { ok: false, message: error.message };
+    if (error) return { ok: false, message: "Episode belum berhasil dihapus. Coba lagi." };
     updateTag("public-content");
     revalidatePath("/");
     if (series && existing) {
@@ -117,7 +119,7 @@ export async function deleteEpisodeAction(id: string): Promise<ActionResult> {
       revalidatePath(`/series/${series.slug}/${existing.slug}`);
     }
     return { ok: true, redirectTo: "/admin/episodes" };
-  } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Episode belum berhasil dihapus. Coba lagi." };
+  } catch {
+    return { ok: false, message: "Episode belum berhasil dihapus. Coba lagi beberapa saat." };
   }
 }
