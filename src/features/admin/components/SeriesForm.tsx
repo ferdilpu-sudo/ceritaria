@@ -103,7 +103,7 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
             </div>
           </AdminFormSection>
 
-          <AdminAdvancedSection guideId="series-advanced" title="SEO & Pengaturan Lanjutan" description="Edit slug, URL gambar manual, dan metadata pencarian jika diperlukan." defaultOpen={Boolean(initial?.seo_title || initial?.seo_description)}>
+          <AdminAdvancedSection guideId="series-advanced" title="SEO & Pengaturan Lanjutan" description="Edit slug, URL gambar manual, dan metadata pencarian jika diperlukan." defaultOpen={Boolean(errors.slug || initial?.seo_title || initial?.seo_description)}>
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={`${label} sm:col-span-2`}>Slug<input className={field} {...slugRegister} onChange={(event) => { void slugRegister.onChange(event); setSlugManual(true); }} />{errors.slug && <small className="mt-1 block text-red-600">{errors.slug.message}</small>}</label>
               <label className={label}>Cover URL{optional}<input type="url" className={field} placeholder="https://..." {...register("coverUrl")} /></label>
