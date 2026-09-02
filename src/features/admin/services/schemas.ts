@@ -2,7 +2,7 @@ import { z } from "zod";
 import { facebookPermalinkSchema } from "@/features/episode/services/facebook-url";
 import { youtubeVideoUrlSchema } from "@/features/episode/services/youtube-url";
 
-const slug = z.string().trim().min(2).max(160).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug harus lowercase-kebab-case");
+const slug = z.string().trim().min(2, "Alamat halaman terlalu pendek").max(160, "Alamat halaman terlalu panjang").regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Gunakan huruf kecil, angka, dan tanda minus saja");
 const optionalUrl = z.union([z.literal(""), z.url()]).transform((value) => value || null);
 const optionalText = (max: number) => z.string().trim().max(max).transform((value) => value || null);
 
@@ -15,13 +15,13 @@ function parseDuration(value: string) {
 
 const durationClock = z.string().trim().refine(
   (value) => value === "" || (Number.isFinite(parseDuration(value)) && parseDuration(value) > 0 && parseDuration(value) <= 86400),
-  "Durasi gunakan format menit:detik, contoh 10:30",
+  "Tulis durasi seperti 10:30 untuk 10 menit 30 detik",
 ).transform((value) => value ? parseDuration(value) : null);
 
 export const seriesFormSchema = z.object({
   id: z.string().uuid().optional(),
   slug,
-  title: z.string().trim().min(2).max(200),
+  title: z.string().trim().min(2, "Judul terlalu pendek").max(200, "Judul terlalu panjang"),
   shortSynopsis: optionalText(320),
   synopsis: optionalText(8000),
   genres: z.string().max(400),
@@ -36,14 +36,14 @@ export const seriesFormSchema = z.object({
 export const episodeFormSchema = z.object({
   id: z.string().uuid().optional(),
   seriesId: z.string().uuid(),
-  episodeNumber: z.coerce.number().int().positive().max(10000),
+  episodeNumber: z.coerce.number().int().positive("Nomor episode harus lebih dari 0").max(10000),
   slug,
-  title: z.string().trim().min(2).max(200),
+  title: z.string().trim().min(2, "Judul terlalu pendek").max(200, "Judul terlalu panjang"),
   shortSynopsis: optionalText(320),
   recap: optionalText(20000),
   highlights: z.string().max(4000),
   videoProvider: z.enum(["youtube", "facebook"]),
-  videoUrl: z.string().trim().min(1).max(2048),
+  videoUrl: z.string().trim().min(1, "Link video wajib diisi").max(2048),
   thumbnailUrl: optionalUrl,
   durationSeconds: durationClock,
   isPublished: z.boolean(),
@@ -56,8 +56,8 @@ export const episodeFormSchema = z.object({
       code: "custom",
       path: ["videoUrl"],
       message: value.videoProvider === "youtube"
-        ? "Gunakan URL YouTube yang valid"
-        : "Gunakan permalink video Facebook Public yang valid",
+        ? "Link YouTube belum dikenali. Coba salin ulang link videonya."
+        : "Link video Facebook belum dikenali. Pastikan videonya dapat dibuka publik.",
     });
   }
 });
