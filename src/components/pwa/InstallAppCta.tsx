@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import type { ReactNode } from "react";
 
 interface InstallAppCtaProps {
@@ -29,8 +28,8 @@ export function InstallAppCta({ onInstall, onDismiss }: InstallAppCtaProps) {
       <div className="h-1 bg-gradient-to-r from-red-700 via-red-500 to-rose-400" />
       <div className="p-4 sm:p-5">
         <div className="flex items-start gap-3.5">
-          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-[16px] border border-white/10 bg-black shadow-lg">
-            <Image src="/icons/icon-192.png" alt="" fill sizes="56px" className="object-cover" />
+          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-[16px] border border-white/10 bg-black shadow-lg">
+            <img src="/pwa/icon-192" alt="" width="56" height="56" className="h-full w-full object-cover" />
           </div>
 
           <div className="min-w-0 flex-1">
