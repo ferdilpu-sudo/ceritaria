@@ -6,6 +6,7 @@ import { adminGuideSteps } from "@/features/admin/components/admin-guide-steps";
 
 const SEEN_KEY = "ceritaria-admin-tour-seen-v2";
 const START_EVENT = "ceritaria-admin-guide-start";
+const VIEWPORT_GUTTER = 12;
 
 type Highlight = { top: number; left: number; width: number; height: number };
 
@@ -15,6 +16,24 @@ function findVisibleTarget(selector: string) {
     const style = window.getComputedStyle(element);
     return rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden";
   });
+}
+
+function getClampedHighlight(target: HTMLElement): Highlight {
+  const rect = target.getBoundingClientRect();
+  const padding = 6;
+  const viewportWidth = document.documentElement.clientWidth;
+  const viewportHeight = document.documentElement.clientHeight;
+  const left = Math.max(VIEWPORT_GUTTER, rect.left - padding);
+  const right = Math.min(viewportWidth - VIEWPORT_GUTTER, rect.right + padding);
+  const top = Math.max(VIEWPORT_GUTTER, rect.top - padding);
+  const bottom = Math.min(viewportHeight - VIEWPORT_GUTTER, rect.bottom + padding);
+
+  return {
+    top,
+    left,
+    width: Math.max(0, right - left),
+    height: Math.max(0, bottom - top),
+  };
 }
 
 export function AdminGuideTour() {
@@ -61,16 +80,7 @@ export function AdminGuideTour() {
 
       target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
       timeout = window.setTimeout(() => {
-        frame = window.requestAnimationFrame(() => {
-          const rect = target.getBoundingClientRect();
-          const padding = 6;
-          setHighlight({
-            top: Math.max(6, rect.top - padding),
-            left: Math.max(6, rect.left - padding),
-            width: Math.min(window.innerWidth - 12, rect.width + padding * 2),
-            height: Math.min(window.innerHeight - 12, rect.height + padding * 2),
-          });
-        });
+        frame = window.requestAnimationFrame(() => setHighlight(getClampedHighlight(target)));
       }, 240);
     };
 
@@ -90,7 +100,7 @@ export function AdminGuideTour() {
   const isLast = index === adminGuideSteps.length - 1;
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[60]" aria-live="polite">
+    <div className="pointer-events-none fixed inset-0 z-[60] overflow-hidden" aria-live="polite">
       {highlight ? (
         <div className="fixed rounded-2xl border-2 border-red-500 shadow-[0_0_0_9999px_rgba(15,23,42,0.62)] transition-all duration-200" style={highlight} />
       ) : (
@@ -101,31 +111,31 @@ export function AdminGuideTour() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="admin-tour-title"
-        className="pointer-events-auto fixed inset-x-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] mx-auto w-auto max-w-xl rounded-[24px] border border-[var(--border)] bg-white p-4 text-[var(--text)] shadow-2xl sm:bottom-6 sm:p-6"
+        className="pointer-events-auto fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-1/2 w-[calc(100%_-_2rem)] max-w-xl -translate-x-1/2 overflow-hidden rounded-[22px] border border-[var(--border)] bg-white p-4 text-[var(--text)] shadow-2xl sm:bottom-6 sm:p-6"
       >
-        <div className="flex items-start justify-between gap-4">
-          <div>
+        <div className="flex min-w-0 items-start justify-between gap-3">
+          <div className="min-w-0">
             <p className="text-[10px] font-black tracking-[0.16em] text-red-600 sm:text-xs">PANDUAN {index + 1}/{adminGuideSteps.length}</p>
-            <h2 id="admin-tour-title" className="mt-1 text-lg font-black sm:text-2xl">{step.title}</h2>
+            <h2 id="admin-tour-title" className="mt-1 break-words text-lg font-black sm:text-2xl">{step.title}</h2>
           </div>
           <button type="button" onClick={finish} className="min-h-10 shrink-0 px-2 text-sm font-bold text-[var(--muted)] hover:text-[var(--text)]">Lewati</button>
         </div>
 
-        <p className="mt-2.5 text-[13px] leading-5 text-[var(--muted)] sm:mt-3 sm:text-[15px] sm:leading-6">{step.body}</p>
+        <p className="mt-2.5 break-words text-[13px] leading-5 text-[var(--muted)] sm:mt-3 sm:text-[15px] sm:leading-6">{step.body}</p>
 
-        <div className="mt-4 flex items-center justify-between gap-3 sm:mt-5">
+        <div className="mt-4 flex items-center justify-between gap-2.5 sm:mt-5 sm:gap-3">
           <button
             type="button"
             disabled={isFirst}
             onClick={() => setIndex((current) => Math.max(0, current - 1))}
-            className="min-h-11 rounded-xl border border-[var(--border)] px-4 py-2.5 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-40"
+            className="min-h-11 min-w-0 rounded-xl border border-[var(--border)] px-3 py-2.5 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-40 sm:px-4"
           >
             ← Kembali
           </button>
           <button
             type="button"
             onClick={() => isLast ? finish() : setIndex((current) => current + 1)}
-            className="min-h-11 rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-black text-white hover:bg-[var(--primary-hover)]"
+            className="min-h-11 min-w-0 rounded-xl bg-[var(--primary)] px-4 py-2.5 text-sm font-black text-white hover:bg-[var(--primary-hover)] sm:px-5"
           >
             {isLast ? "Selesai" : "Next →"}
           </button>
