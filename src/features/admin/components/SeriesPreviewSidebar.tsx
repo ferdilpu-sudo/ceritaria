@@ -20,10 +20,10 @@ export function SeriesPreviewSidebar({ title, slug, genres, coverSrc, heroSrc, p
       <section className="surface min-w-0 rounded-2xl p-4 sm:p-5">
         <div className="flex min-w-0 items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-black tracking-[0.16em] text-red-600">PREVIEW</p>
-            <h2 className="mt-1 font-black text-[var(--text)]">Series</h2>
+            <p className="text-xs font-black tracking-[0.16em] text-red-600">TAMPILAN</p>
+            <h2 className="mt-1 font-black text-[var(--text)]">Series di CERITARIA</h2>
           </div>
-          <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black ${published ? "border border-emerald-200 bg-emerald-50 text-emerald-700" : "border border-zinc-200 bg-zinc-100 text-zinc-600"}`}>{published ? "PUBLISHED" : "DRAFT"}</span>
+          <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black ${published ? "border border-emerald-200 bg-emerald-50 text-emerald-700" : "border border-zinc-200 bg-zinc-100 text-zinc-600"}`}>{published ? "SUDAH TAYANG" : "BELUM TAYANG"}</span>
         </div>
 
         <div className="mx-auto mt-4 w-full max-w-[220px]">
@@ -39,9 +39,9 @@ export function SeriesPreviewSidebar({ title, slug, genres, coverSrc, heroSrc, p
         <div className="mt-4 min-w-0">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             <h3 className="min-w-0 flex-1 truncate font-black text-[var(--text)]">{title || "Judul series"}</h3>
-            {featured && <span className="shrink-0 rounded-full border border-rose-200 bg-rose-50 px-2 py-1 text-[9px] font-black text-rose-700">FEATURED</span>}
+            {featured && <span className="shrink-0 rounded-full border border-rose-200 bg-rose-50 px-2 py-1 text-[9px] font-black text-rose-700">UNGGULAN</span>}
           </div>
-          <p className="mt-1 truncate text-xs text-[var(--muted)]">/{slug || "slug-series"}</p>
+          <p className="mt-1 truncate text-xs text-[var(--muted)]">/{slug || "alamat-series"}</p>
           <div className="mt-3 flex min-w-0 flex-wrap gap-1.5">
             {genreItems.length ? genreItems.map((genre) => <span key={genre} className="max-w-full truncate rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-[10px] font-bold text-[var(--muted)]">{genre}</span>) : <span className="text-xs text-[var(--muted)]">Genre belum diisi</span>}
           </div>
@@ -50,11 +50,11 @@ export function SeriesPreviewSidebar({ title, slug, genres, coverSrc, heroSrc, p
 
       <section className="surface min-w-0 rounded-2xl p-4 sm:p-5">
         <div className="mb-3 min-w-0">
-          <p className="text-sm font-black text-[var(--text)]">Hero Homepage</p>
-          <p className="mt-1 break-words text-xs leading-5 text-[var(--muted)]">Jika hero kosong, preview ini adalah fallback visual otomatis yang tampil ke penonton.</p>
+          <p className="text-sm font-black text-[var(--text)]">Gambar Utama</p>
+          <p className="mt-1 break-words text-xs leading-5 text-[var(--muted)]">Gambar ini akan terlihat di bagian utama halaman. Kalau belum memilih gambar, CERITARIA akan menampilkan gambar pengganti otomatis.</p>
         </div>
         {heroSrc ? (
-          <AdminPreviewImage src={heroSrc} alt={`Hero ${title || "series"}`} aspect="hero" fallback="HERO" />
+          <AdminPreviewImage src={heroSrc} alt={`Gambar utama ${title || "series"}`} aspect="hero" fallback="HERO" />
         ) : (
           <div className="relative aspect-video overflow-hidden rounded-2xl border border-[var(--border)]">
             <SeriesFallbackVisual seed={`${seed}|hero`} genres={genreItems} className="absolute inset-0" />
