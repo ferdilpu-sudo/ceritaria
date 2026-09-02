@@ -30,12 +30,7 @@ function EmptyThumbnail() {
   );
 }
 
-export function YouTubeVideoEmbed({
-  videoUrl,
-  thumbnailUrl,
-  title,
-  episodeId,
-}: YouTubeVideoEmbedProps) {
+export function YouTubeVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId }: YouTubeVideoEmbedProps) {
   const [loaded, setLoaded] = useState(false);
   const [frameReady, setFrameReady] = useState(false);
 
@@ -45,12 +40,12 @@ export function YouTubeVideoEmbed({
   };
 
   return (
-    <div className="mx-auto w-full max-w-[380px] lg:mx-0">
-      <div className="relative aspect-[9/16] overflow-hidden rounded-[26px] border border-white/10 bg-black shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
+    <div className="mx-auto w-full max-w-none sm:max-w-[380px] lg:mx-0">
+      <div className="relative aspect-[9/16] overflow-hidden rounded-none border-y border-white/10 bg-black shadow-none sm:rounded-[26px] sm:border sm:shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
         {!loaded ? (
           <>
             {thumbnailUrl ? (
-              <MediaImage src={thumbnailUrl} alt={`Thumbnail ${title}`} className="scale-[1.01]" />
+              <MediaImage src={thumbnailUrl} alt={`Thumbnail ${title}`} sizes="(max-width: 639px) 100vw, 380px" className="scale-[1.01]" />
             ) : (
               <EmptyThumbnail />
             )}
@@ -73,7 +68,7 @@ export function YouTubeVideoEmbed({
               <div className="absolute inset-0 z-10 grid place-items-center bg-zinc-950" role="status" aria-live="polite">
                 <div className="text-center">
                   <span className="mx-auto block h-9 w-9 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-                  <p className="mt-4 text-sm font-semibold text-white/70">Memuat player…</p>
+                  <p className="mt-4 text-sm font-semibold text-white/70">Menyiapkan video…</p>
                 </div>
               </div>
             )}
@@ -91,8 +86,7 @@ export function YouTubeVideoEmbed({
         )}
       </div>
 
-      <div className="mt-2.5 flex min-h-11 items-center justify-between gap-3 px-1 text-[11px] sm:text-xs">
-        <span className="text-zinc-500">Privacy-enhanced</span>
+      <div className="flex min-h-11 items-center justify-end px-1 text-xs">
         <a
           href={videoUrl}
           target="_blank"
