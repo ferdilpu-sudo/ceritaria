@@ -11,6 +11,7 @@ Ceritaria adalah PWA mobile-first untuk katalog dan menonton mini series. Video 
 - Search series dan episode.
 - PWA mobile dengan app bar, bottom navigation, safe-area support, manifest, dan service worker minimal.
 - Admin CMS light theme untuk series/episode, live preview media, upload cover/hero/thumbnail, draft/publish, featured, dan SEO.
+- First-party analytics: visitor realtime, pageview, visitor unik, top pages, device, referrer, dan event player.
 - Supabase Auth, Postgres RLS, Storage, dan soft delete.
 - SEO: metadata, canonical, OpenGraph, JSON-LD, sitemap, robots.
 - Integrasi opsional Google AdSense dan GA4 melalui environment variables.
@@ -45,6 +46,7 @@ Jalankan migration berurutan di Supabase SQL Editor:
 1. `supabase/migrations/001_initial.sql`
 2. `supabase/migrations/002_youtube_video_provider.sql`
 3. `supabase/migrations/003_brand_ceritaria.sql`
+4. `supabase/migrations/004_first_party_analytics.sql`
 
 Buat user admin lewat Supabase Authentication, lalu tambahkan UUID-nya ke `public.admin_users` menggunakan `supabase/admin-bootstrap.sql.example` sebagai template.
 
@@ -89,6 +91,7 @@ src/
   components/          shared UI/layout
   features/
     admin/              CMS actions, forms, previews
+    analytics/          first-party analytics + realtime visitors
     episode/            episode player/data/components
     home/               homepage components
     series/             series data/components/fallback visual
@@ -116,6 +119,7 @@ Mock data tidak di-hardcode di React. Jika diperlukan untuk staging/development,
 
 - [Architecture](docs/ARCHITECTURE.md)
 - [Data model](docs/DATA_MODEL.md)
+- [Analytics](docs/ANALYTICS.md)
 - [Security](docs/SECURITY.md)
 - [Deployment](DEPLOYMENT.md)
 - [Release checklist](docs/RELEASE_CHECKLIST.md)
