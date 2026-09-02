@@ -11,7 +11,7 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
   return (
     <div className="admin-theme">
       <AdminNav />
-      <main className="shell py-8 sm:py-10">{children}</main>
+      <main className="admin-mobile-main shell py-8 sm:py-10">{children}</main>
       <AdminGuideTour />
     </div>
   );
