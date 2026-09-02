@@ -47,7 +47,7 @@ export function EpisodePreviewSidebar({
           <p className="break-words text-xs leading-5 text-[var(--muted)]">{seriesTitle || "Series belum dipilih"}</p>
           <div className="flex min-w-0 flex-wrap gap-2 pt-2 text-[10px] font-black">
             <span className={`max-w-full truncate rounded-full border px-2 py-1 ${provider === "youtube" ? "border-red-200 bg-red-50 text-red-700" : "border-sky-200 bg-sky-50 text-sky-700"}`}>{provider.toUpperCase()}</span>
-            {durationSeconds && <span className="max-w-full truncate rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-[var(--muted)]">{durationSeconds}s</span>}
+            {durationSeconds && <span className="max-w-full truncate rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-[var(--muted)]">{durationSeconds}</span>}
           </div>
         </div>
       </section>
