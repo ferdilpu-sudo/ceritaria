@@ -1,11 +1,10 @@
-const CACHE = "ceritaria-static-v4";
+const CACHE = "ceritaria-static-v5";
 const OFFLINE_URL = "/offline.html";
 const CORE_ASSETS = [
   OFFLINE_URL,
+  "/pwa/icon-192",
   "/icon.svg",
-  "/icons/icon-192.png",
   "/icons/icon-512.png",
-  "/icons/apple-touch-icon.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -48,6 +47,7 @@ self.addEventListener("fetch", (event) => {
   const cacheable =
     url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/icons/") ||
+    url.pathname === "/pwa/icon-192" ||
     url.pathname === "/icon.svg" ||
     url.pathname === OFFLINE_URL;
   if (!cacheable) return;
