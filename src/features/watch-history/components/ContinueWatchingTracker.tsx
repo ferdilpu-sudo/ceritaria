@@ -12,10 +12,17 @@ interface Props {
   thumbnailUrl: string | null;
 }
 
-export function ContinueWatchingTracker(props: Props) {
+export function ContinueWatchingTracker({
+  seriesSlug,
+  seriesTitle,
+  episodeSlug,
+  episodeTitle,
+  episodeNumber,
+  thumbnailUrl,
+}: Props) {
   useEffect(() => {
-    rememberEpisode(props);
-  }, [props]);
+    rememberEpisode({ seriesSlug, seriesTitle, episodeSlug, episodeTitle, episodeNumber, thumbnailUrl });
+  }, [seriesSlug, seriesTitle, episodeSlug, episodeTitle, episodeNumber, thumbnailUrl]);
 
   return null;
 }
