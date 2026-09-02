@@ -5,19 +5,33 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/",
     name: "Ceritaria",
     short_name: "Ceritaria",
-    description: "Platform mini series drama Ceritaria",
+    description: "Nonton mini series drama Ceritaria dari episode ke episode.",
     start_url: "/",
     scope: "/",
     display: "standalone",
     background_color: "#0b0b0f",
     theme_color: "#0b0b0f",
     lang: "id",
+    categories: ["entertainment"],
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
       { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
       { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
+      { src: "/icons/maskable.svg", sizes: "any", type: "image/svg+xml", purpose: "maskable" },
+    ],
+    shortcuts: [
+      {
+        name: "Lanjut Nonton",
+        short_name: "Lanjut",
+        url: "/lanjut",
+        icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+      },
+      {
+        name: "Cari Cerita",
+        short_name: "Cari",
+        url: "/search",
+        icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+      },
     ],
   };
 }
