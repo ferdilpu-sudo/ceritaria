@@ -79,7 +79,7 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
       const slugError = error.code === "23505";
       return {
         ok: false,
-        message: slugError ? "Alamat halaman ini sudah dipakai series lain." : error.message,
+        message: slugError ? "Alamat halaman ini sudah dipakai series lain." : "Series belum berhasil disimpan. Coba lagi.",
         fieldErrors: slugError ? { slug: "Coba gunakan alamat halaman yang berbeda." } : undefined,
       };
     }
@@ -88,9 +88,11 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
     revalidatePath("/");
     revalidatePath(`/series/${values.slug}`);
     if (existing?.slug && existing.slug !== values.slug) revalidatePath(`/series/${existing.slug}`);
-    return { ok: true, redirectTo: `/admin/series?saved=${values.id ? "updated" : "created"}` };
-  } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Series belum berhasil disimpan. Coba lagi." };
+    const state = values.id ? "updated" : "created";
+    const publicPath = encodeURIComponent(`/series/${values.slug}`);
+    return { ok: true, redirectTo: `/admin/series?saved=${state}&view=${publicPath}` };
+  } catch {
+    return { ok: false, message: "Series belum berhasil disimpan. Coba lagi beberapa saat." };
   }
 }
 
@@ -99,12 +101,12 @@ export async function deleteSeriesAction(id: string): Promise<ActionResult> {
   try {
     const { data: existing } = await supabase.from("series").select("slug").eq("id", id).maybeSingle();
     const { error } = await supabase.rpc("soft_delete_series", { target_id: id });
-    if (error) return { ok: false, message: error.message };
+    if (error) return { ok: false, message: "Series belum berhasil dihapus. Coba lagi." };
     updateTag("public-content");
     revalidatePath("/");
     if (existing) revalidatePath(`/series/${existing.slug}`);
     return { ok: true, redirectTo: "/admin/series" };
-  } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Series belum berhasil dihapus. Coba lagi." };
+  } catch {
+    return { ok: false, message: "Series belum berhasil dihapus. Coba lagi beberapa saat." };
   }
 }
