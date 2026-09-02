@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { AdminFirstRunGuide } from "@/features/admin/components/AdminFirstRunGuide";
 import { AdminMetricCard } from "@/features/admin/components/AdminMetricCard";
 import { AdminRecentList, type AdminRecentItem } from "@/features/admin/components/AdminRecentList";
 import { getAdminEpisodes, getAdminSeries } from "@/features/admin/services/admin-content";
@@ -44,7 +43,6 @@ export default async function AdminDashboard() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <AdminFirstRunGuide />
           <Link href="/admin/series/new" className="min-h-11 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm font-bold text-[var(--text)] hover:bg-[var(--surface-2)]">
             + Series
           </Link>
