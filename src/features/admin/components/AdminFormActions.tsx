@@ -6,6 +6,7 @@ interface AdminFormActionsProps {
   disabled?: boolean;
   published: boolean;
   submitLabel: string;
+  publishedMessage?: string;
 }
 
 export function AdminFormActions({
@@ -14,6 +15,7 @@ export function AdminFormActions({
   disabled = false,
   published,
   submitLabel,
+  publishedMessage = "Akan langsung tampil untuk penonton",
 }: AdminFormActionsProps) {
   return (
     <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-30 min-w-0 max-w-full rounded-2xl border border-[var(--border)] bg-white/95 p-3 shadow-[0_12px_32px_rgba(16,24,40,0.12)] backdrop-blur sm:bottom-4 sm:p-4">
@@ -21,7 +23,7 @@ export function AdminFormActions({
         <div className="flex min-w-0 items-start gap-2 text-sm sm:items-center">
           <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full sm:mt-0 ${published ? "bg-emerald-500" : "bg-zinc-400"}`} />
           <span className="min-w-0 break-words font-semibold leading-5 text-[var(--text)]">
-            {published ? "Akan langsung tampil untuk penonton" : "Akan disimpan dulu, belum tampil ke penonton"}
+            {published ? publishedMessage : "Akan disimpan dulu, belum tampil ke penonton"}
           </span>
         </div>
 
