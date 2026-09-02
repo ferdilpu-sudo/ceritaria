@@ -82,7 +82,7 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
       };
     }
 
-    const { data: series } = await supabase.from("series").select("slug").eq("id", values.seriesId).maybeSingle();
+    const { data: series } = await supabase.from("series").select("slug,is_published").eq("id", values.seriesId).maybeSingle();
     const { data: oldSeries } = existing?.series_id
       ? await supabase.from("series").select("slug").eq("id", existing.series_id).maybeSingle()
       : { data: null };
@@ -96,7 +96,8 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
       revalidatePath(`/series/${oldSeries.slug}/${existing?.slug}`);
     }
     const state = values.id ? "updated" : "created";
-    const view = series ? `&view=${encodeURIComponent(`/series/${series.slug}/${values.slug}`)}` : "";
+    const publiclyVisible = values.isPublished && series?.is_published;
+    const view = publiclyVisible ? `&view=${encodeURIComponent(`/series/${series.slug}/${values.slug}`)}` : "";
     return { ok: true, redirectTo: `/admin/episodes?saved=${state}${view}` };
   } catch {
     return { ok: false, message: "Episode belum berhasil disimpan. Coba lagi beberapa saat." };
