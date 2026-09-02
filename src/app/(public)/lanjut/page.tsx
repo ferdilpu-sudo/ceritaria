@@ -30,11 +30,7 @@ export default function ContinueWatchingPage() {
 
       {items.length ? (
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
-            <div key={`${item.seriesSlug}/${item.episodeSlug}`} className="min-w-0 [&>article]:w-full [&>article]:max-w-none">
-              <WatchHistoryCard item={item} />
-            </div>
-          ))}
+          {items.map((item) => <WatchHistoryCard key={`${item.seriesSlug}/${item.episodeSlug}`} item={item} fullWidth />)}
         </div>
       ) : (
         <div className="surface mt-7 rounded-2xl p-7 text-center">
