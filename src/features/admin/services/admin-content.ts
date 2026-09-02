@@ -29,3 +29,19 @@ export async function getAdminEpisodeById(id: string): Promise<EpisodeRow | null
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function getNextEpisodeNumbers(seriesIds: string[]) {
+  if (!seriesIds.length) return {} as Record<string, number>;
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase
+    .from("episodes")
+    .select("series_id,episode_number")
+    .in("series_id", seriesIds);
+  if (error) throw new Error(error.message);
+
+  const highest = new Map<string, number>();
+  for (const episode of data ?? []) {
+    highest.set(episode.series_id, Math.max(highest.get(episode.series_id) ?? 0, episode.episode_number));
+  }
+  return Object.fromEntries(seriesIds.map((id) => [id, (highest.get(id) ?? 0) + 1]));
+}
