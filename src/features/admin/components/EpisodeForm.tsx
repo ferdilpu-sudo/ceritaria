@@ -61,7 +61,9 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
   const published = useWatch({ control, name: "isPublished" }) ?? false;
   const thumbnailRegister = register("thumbnailFile");
   const slugRegister = register("slug", { required: "Alamat halaman wajib tersedia", pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/ });
-  const selectedSeriesTitle = series.find((item) => item.id === seriesId)?.title ?? "";
+  const selectedSeries = series.find((item) => item.id === seriesId);
+  const selectedSeriesTitle = selectedSeries?.title ?? "";
+  const seriesIsPublished = selectedSeries?.is_published ?? false;
 
   useUnsavedChangesGuard(isDirty && !saving);
   useEffect(() => {
@@ -121,6 +123,11 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
 
           <AdminFormSection guideId="episode-publish" title="Tayangkan Episode" description="Kalau episode belum selesai diperiksa, biarkan pilihan ini mati. Aktifkan saat episode sudah siap ditonton.">
             <label className="flex min-h-14 min-w-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-5 w-5 shrink-0 accent-red-600" {...register("isPublished")} /><span className="min-w-0 break-words">Tampilkan ke penonton</span></label>
+            {published && !seriesIsPublished && (
+              <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-5 text-amber-800">
+                Series <strong>{selectedSeriesTitle || "yang dipilih"}</strong> masih belum ditampilkan ke penonton. Episode ini akan tersimpan sebagai siap tayang, tetapi baru bisa ditonton setelah series-nya ikut ditampilkan.
+              </div>
+            )}
           </AdminFormSection>
 
           <AdminAdvancedSection guideId="episode-advanced" title="Pengaturan Tambahan" description="Biasanya tidak perlu diubah. Buka hanya jika kamu ingin mengatur alamat halaman, memakai video Facebook lama, atau mengubah tampilan di Google." defaultOpen={Boolean(errors.slug || errors.thumbnailUrl || initial?.video_provider === "facebook" || initial?.seo_title || initial?.seo_description)}>
@@ -135,7 +142,15 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
         </div>
         <EpisodePreviewSidebar provider={videoProvider} thumbnailSrc={thumbnailPreview.previewUrl || thumbnailUrl || null} title={title} episodeNumber={episodeNumber} seriesTitle={selectedSeriesTitle} durationSeconds={duration} published={published} />
       </div>
-      <AdminFormActions cancelHref="/admin/episodes" saving={saving} disabled={series.length === 0} published={published} submitLabel={initial ? "Simpan Perubahan" : "Simpan Episode"} />
+      <AdminFormActions
+        cancelHref="/admin/episodes"
+        saving={saving}
+        disabled={series.length === 0}
+        published={published}
+        publishedReady={seriesIsPublished}
+        publishedMessage={seriesIsPublished ? "Akan langsung tampil untuk penonton" : "Episode siap tayang, tetapi series-nya masih belum ditampilkan"}
+        submitLabel={initial ? "Simpan Perubahan" : "Simpan Episode"}
+      />
     </form>
   );
 }
