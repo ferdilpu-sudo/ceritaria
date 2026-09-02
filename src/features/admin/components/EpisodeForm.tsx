@@ -64,7 +64,7 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
 
   useUnsavedChangesGuard(isDirty && !saving);
   useEffect(() => {
-    if (!initial && seriesId) setValue("episodeNumber", nextEpisodeBySeries[seriesId] ?? 1, { shouldDirty: true });
+    if (!initial && seriesId) setValue("episodeNumber", nextEpisodeBySeries[seriesId] ?? 1, { shouldDirty: false });
   }, [initial, nextEpisodeBySeries, seriesId, setValue]);
   useEffect(() => {
     if (!initial && !slugManual) setValue("slug", buildEpisodeSlug(episodeNumber, title), { shouldDirty: Boolean(title) });
@@ -95,7 +95,7 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
         <div className="min-w-0 space-y-5">
           <AdminFormSection guideId="episode-info" title="Informasi Episode" description="Pilih series, cek nomor episode otomatis, lalu isi judul. URL dibuat otomatis.">
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
-              <label className={label}>Series <span className="text-red-600">*</span><select className={field} {...register("seriesId", { required: "Series wajib dipilih" })}>{series.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
+              <label className={label}>Series <span className="text-red-600">*</span><select className={field} {...register("seriesId", { required: "Series wajib dipilih" })}>{series.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select>{errors.seriesId && <small className="mt-1 block text-red-600">{errors.seriesId.message}</small>}</label>
               <label className={label}>Episode ke- <span className="text-red-600">*</span><input type="number" min="1" className={field} {...register("episodeNumber", { required: "Nomor episode wajib diisi", valueAsNumber: true, min: 1 })} />{errors.episodeNumber && <small className="mt-1 block text-red-600">{errors.episodeNumber.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Disarankan otomatis dari episode terakhir.</small></label>
               <label className={`${label} sm:col-span-2`}>Judul <span className="text-red-600">*</span><input className={field} placeholder="Contoh: Hari Pertama Ana Bekerja" {...register("title", { required: "Judul wajib diisi", maxLength: 200 })} />{errors.title && <small className="mt-1 block text-red-600">{errors.title.message}</small>}</label>
               <label className={`${label} sm:col-span-2`}>Ringkasan singkat{optional}<textarea rows={2} className={field} placeholder="Satu atau dua kalimat tentang episode ini." {...register("shortSynopsis", { maxLength: 320 })} /></label>
@@ -121,11 +121,11 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
             <label className="flex min-h-14 min-w-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-5 w-5 shrink-0 accent-red-600" {...register("isPublished")} /><span className="min-w-0 break-words">Published</span></label>
           </AdminFormSection>
 
-          <AdminAdvancedSection guideId="episode-advanced" title="SEO & Pengaturan Lanjutan" description="Ubah slug, sumber video legacy, URL thumbnail, atau metadata pencarian." defaultOpen={Boolean(initial?.video_provider === "facebook" || initial?.seo_title || initial?.seo_description)}>
+          <AdminAdvancedSection guideId="episode-advanced" title="SEO & Pengaturan Lanjutan" description="Ubah slug, sumber video legacy, URL thumbnail, atau metadata pencarian." defaultOpen={Boolean(errors.slug || errors.thumbnailUrl || initial?.video_provider === "facebook" || initial?.seo_title || initial?.seo_description)}>
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={`${label} sm:col-span-2`}>Slug<input className={field} {...slugRegister} onChange={(event) => { void slugRegister.onChange(event); setSlugManual(true); }} />{errors.slug && <small className="mt-1 block text-red-600">{errors.slug.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">URL episode dibuat otomatis. Edit hanya jika memang perlu.</small></label>
               <label className={label}>Sumber video<select className={field} {...register("videoProvider")}><option value="youtube">YouTube</option><option value="facebook">Facebook (legacy)</option></select></label>
-              <label className={label}>Thumbnail URL{optional}<input type="url" className={field} placeholder="https://..." {...register("thumbnailUrl")} /></label>
+              <label className={label}>Thumbnail URL{optional}<input type="url" className={field} placeholder="https://..." {...register("thumbnailUrl")} />{errors.thumbnailUrl && <small className="mt-1 block text-red-600">{errors.thumbnailUrl.message}</small>}</label>
               <label className={label}>SEO title{optional}<input className={field} {...register("seoTitle", { maxLength: 200 })} /></label>
               <label className={label}>SEO description{optional}<textarea rows={3} className={field} {...register("seoDescription", { maxLength: 320 })} /></label>
             </div>
