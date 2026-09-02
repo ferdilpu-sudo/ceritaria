@@ -1,18 +1,11 @@
 import Link from "next/link";
 import { AdminFormHeader } from "@/features/admin/components/AdminFormHeader";
 import { EpisodeForm } from "@/features/admin/components/EpisodeForm";
-import { getAdminEpisodes, getAdminSeries } from "@/features/admin/services/admin-content";
+import { getAdminSeries, getNextEpisodeNumbers } from "@/features/admin/services/admin-content";
 
 export default async function NewEpisodePage() {
-  const [series, episodes] = await Promise.all([getAdminSeries(), getAdminEpisodes()]);
-  const nextEpisodeBySeries = Object.fromEntries(
-    series.map((item) => {
-      const highest = episodes
-        .filter((episode) => episode.series_id === item.id)
-        .reduce((max, episode) => Math.max(max, episode.episode_number), 0);
-      return [item.id, highest + 1];
-    }),
-  );
+  const series = await getAdminSeries();
+  const nextEpisodeBySeries = await getNextEpisodeNumbers(series.map((item) => item.id));
 
   return (
     <div className="mx-auto w-full max-w-[1400px]">
