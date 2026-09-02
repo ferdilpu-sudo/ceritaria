@@ -4,9 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import type { WatchHistoryItem } from "@/features/watch-history/services/watch-history";
 
-export function WatchHistoryCard({ item }: { item: WatchHistoryItem }) {
+interface Props {
+  item: WatchHistoryItem;
+  fullWidth?: boolean;
+}
+
+export function WatchHistoryCard({ item, fullWidth = false }: Props) {
+  const widthClass = fullWidth ? "w-full max-w-none" : "w-[72vw] max-w-[310px] shrink-0 snap-start sm:w-[320px]";
+
   return (
-    <article className="w-[72vw] max-w-[310px] shrink-0 snap-start sm:w-[320px]">
+    <article className={widthClass}>
       <Link
         href={`/series/${item.seriesSlug}/${item.episodeSlug}`}
         className="group block overflow-hidden rounded-2xl border border-white/10 bg-[var(--surface)] active:scale-[0.985]"
