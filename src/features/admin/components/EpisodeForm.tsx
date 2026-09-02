@@ -107,7 +107,7 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={`${label} sm:col-span-2`}>{videoProvider === "youtube" ? "Link Video YouTube" : "Link Video Facebook"} <span className="text-red-600">*</span><input type="url" className={field} placeholder={videoProvider === "youtube" ? "https://youtu.be/..." : "https://www.facebook.com/.../videos/..."} {...register("videoUrl", { required: "Link video wajib diisi" })} />{errors.videoUrl && <small className="mt-1 block text-red-600">{errors.videoUrl.message}</small>}</label>
               <div className="sm:col-span-2"><VideoPreview provider={videoProvider} videoUrl={videoUrl} /></div>
-              <AdminFilePicker label="Thumbnail Episode" hint="Pilih gambar dari perangkat · JPG/PNG/WebP · maks. 5 MB" registerProps={thumbnailRegister} onFile={thumbnailPreview.readFile} />
+              <AdminFilePicker label="Thumbnail Episode" hint="Pilih gambar dari perangkat · JPG/PNG/WebP · maks. 5 MB" registerProps={thumbnailRegister} onFile={thumbnailPreview.readFile} previewSrc={thumbnailPreview.previewUrl || thumbnailUrl || null} />
               <label className={label}>Durasi Video{optional}<input inputMode="numeric" className={field} placeholder="10:30" {...register("durationSeconds", { pattern: { value: /^\d{1,3}:[0-5]\d$/, message: "Tulis seperti 10:30 untuk 10 menit 30 detik" } })} />{errors.durationSeconds && <small className="mt-1 block text-red-600">{errors.durationSeconds.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Contoh: 05:20 atau 12:45.</small></label>
             </div>
           </AdminFormSection>
