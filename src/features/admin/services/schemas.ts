@@ -5,15 +5,18 @@ import { youtubeVideoUrlSchema } from "@/features/episode/services/youtube-url";
 const slug = z.string().trim().min(2).max(160).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug harus lowercase-kebab-case");
 const optionalUrl = z.union([z.literal(""), z.url()]).transform((value) => value || null);
 const optionalText = (max: number) => z.string().trim().max(max).transform((value) => value || null);
-const durationClock = z.string().trim().refine(
-  (value) => value === "" || /^\d{1,3}:[0-5]\d$/.test(value),
-  "Durasi gunakan format menit:detik, contoh 10:30",
-).transform((value) => {
-  if (!value) return null;
+
+function parseDuration(value: string) {
+  if (/^\d+$/.test(value)) return Number(value);
+  if (!/^\d{1,3}:[0-5]\d$/.test(value)) return Number.NaN;
   const [minutes, seconds] = value.split(":").map(Number);
-  const total = minutes * 60 + seconds;
-  return total > 0 && total <= 86400 ? total : null;
-});
+  return minutes * 60 + seconds;
+}
+
+const durationClock = z.string().trim().refine(
+  (value) => value === "" || (Number.isFinite(parseDuration(value)) && parseDuration(value) > 0 && parseDuration(value) <= 86400),
+  "Durasi gunakan format menit:detik, contoh 10:30",
+).transform((value) => value ? parseDuration(value) : null);
 
 export const seriesFormSchema = z.object({
   id: z.string().uuid().optional(),
