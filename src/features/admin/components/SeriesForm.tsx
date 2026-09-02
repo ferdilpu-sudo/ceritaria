@@ -16,8 +16,8 @@ type Values = {
   isFeatured: boolean; isPublished: boolean; coverFile: FileList; heroFile: FileList;
 };
 
-const field = "mt-2 w-full rounded-xl border border-[var(--border)] bg-white px-3.5 py-3 text-[var(--text)] shadow-sm placeholder:text-zinc-400 focus:border-red-300";
-const label = "text-sm font-bold text-[var(--text)]";
+const field = "mt-2 w-full min-w-0 max-w-full rounded-xl border border-[var(--border)] bg-white px-3.5 py-3 text-[var(--text)] shadow-sm placeholder:text-zinc-400 focus:border-red-300";
+const label = "min-w-0 text-sm font-bold text-[var(--text)]";
 
 export function SeriesForm({ initial }: { initial?: SeriesRow }) {
   const router = useRouter();
@@ -61,13 +61,13 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
   });
 
   return (
-    <form onSubmit={submit} className="space-y-6 pb-4">
-      {message && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{message}</p>}
+    <form onSubmit={submit} className="min-w-0 space-y-6 pb-4">
+      {message && <p role="alert" className="max-w-full break-words rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{message}</p>}
 
-      <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
-        <div className="space-y-6">
+      <div className="grid min-w-0 gap-7 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
+        <div className="min-w-0 space-y-6">
           <AdminFormSection guideId="series-info" title="Informasi Series" description="Identitas utama series yang akan dilihat penonton di katalog CERITARIA.">
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={label}>Judul<input className={field} {...register("title", { required: "Judul wajib diisi", maxLength: 200 })} />{errors.title && <small className="mt-1 block text-red-600">{errors.title.message}</small>}</label>
               <label className={label}>Slug<input className={field} placeholder="ana-dan-max" {...register("slug", { required: true, pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/ })} /><small className="mt-1 block font-normal text-[var(--muted)]">Huruf kecil, angka, dan tanda minus.</small></label>
               <label className={`${label} sm:col-span-2`}>Sinopsis singkat<textarea rows={2} className={field} placeholder="Ringkasan singkat untuk card dan hero." {...register("shortSynopsis", { maxLength: 320 })} /></label>
@@ -77,7 +77,7 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
           </AdminFormSection>
 
           <AdminFormSection guideId="series-media" title="Media" description="Cover untuk katalog dan hero image untuk area unggulan di homepage.">
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={label}>Upload cover<input type="file" accept="image/jpeg,image/png,image/webp" className={field} {...coverRegister} onChange={(event) => { void coverRegister.onChange(event); coverPreview.readFile(event.target.files?.[0]); }} /><small className="mt-1 block font-normal text-[var(--muted)]">JPG, PNG, atau WebP. Maksimal 5 MB.</small></label>
               <label className={label}>Cover URL opsional<input type="url" className={field} placeholder="https://..." {...register("coverUrl")} /></label>
               <label className={label}>Upload hero<input type="file" accept="image/jpeg,image/png,image/webp" className={field} {...heroRegister} onChange={(event) => { void heroRegister.onChange(event); heroPreview.readFile(event.target.files?.[0]); }} /><small className="mt-1 block font-normal text-[var(--muted)]">Landscape direkomendasikan. Maksimal 5 MB.</small></label>
@@ -86,9 +86,9 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
           </AdminFormSection>
 
           <AdminFormSection guideId="series-publish" title="Publikasi & SEO" description="Atur visibilitas series dan metadata mesin pencari.">
-            <div className="grid gap-5 sm:grid-cols-2">
-              <label className="flex min-h-14 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-4 w-4 accent-red-600" {...register("isFeatured")} /> Series unggulan</label>
-              <label className="flex min-h-14 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-4 w-4 accent-red-600" {...register("isPublished")} /> Published</label>
+            <div className="grid min-w-0 gap-5 sm:grid-cols-2">
+              <label className="flex min-h-14 min-w-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-4 w-4 shrink-0 accent-red-600" {...register("isFeatured")} /><span className="min-w-0 break-words">Series unggulan</span></label>
+              <label className="flex min-h-14 min-w-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-4 w-4 shrink-0 accent-red-600" {...register("isPublished")} /><span className="min-w-0 break-words">Published</span></label>
               <label className={label}>SEO title<input className={field} {...register("seoTitle", { maxLength: 200 })} /></label>
               <label className={label}>SEO description<textarea rows={3} className={field} {...register("seoDescription", { maxLength: 320 })} /></label>
             </div>
