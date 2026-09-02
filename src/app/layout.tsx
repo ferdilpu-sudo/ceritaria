@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   metadataBase,
   title: { default: "Ceritaria", template: "%s | Ceritaria" },
   description: "Platform mini series drama Ceritaria.",
-  icons: { icon: "/icon.svg", apple: "/icons/apple-touch-icon.png" },
+  icons: { icon: "/pwa/icon-192", apple: "/pwa/icon-192" },
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Ceritaria" },
 };
 
