@@ -3,11 +3,11 @@ import { SeriesForm } from "@/features/admin/components/SeriesForm";
 
 export default function NewSeriesPage() {
   return (
-    <div className="relative left-1/2 w-[min(calc(100vw-40px),1400px)] -translate-x-1/2">
+    <div className="mx-auto w-full max-w-[1400px]">
       <AdminFormHeader
         eyebrow="SERIES"
         title="Series Baru"
-        description="Buat series baru, siapkan cover dan hero, lalu simpan sebagai draft atau langsung publikasikan."
+        description="Isi informasi utama, upload cover/hero, lalu simpan sebagai draft atau publish."
         backHref="/admin/series"
         backLabel="Daftar Series"
       />
