@@ -20,7 +20,7 @@ export function AdminFormActions({
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-2 text-sm sm:items-center">
           <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full sm:mt-0 ${published ? "bg-emerald-500" : "bg-zinc-400"}`} />
-          <span className="min-w-0 break-words font-semibold leading-5 text-[var(--text)]">{published ? "Akan tampil sebagai Published" : "Akan tersimpan sebagai Draft"}</span>
+          <span className="min-w-0 break-words font-semibold leading-5 text-[var(--text)]">{published ? "Akan langsung tampil untuk penonton" : "Akan disimpan dulu, belum tampil ke penonton"}</span>
         </div>
 
         <div className="grid min-w-0 grid-cols-2 gap-2 sm:flex sm:shrink-0">
