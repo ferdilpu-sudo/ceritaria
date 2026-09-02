@@ -7,6 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Ceritaria",
     description: "Platform mini series drama Ceritaria",
     start_url: "/",
+    scope: "/",
     display: "standalone",
     background_color: "#0b0b0f",
     theme_color: "#0b0b0f",
