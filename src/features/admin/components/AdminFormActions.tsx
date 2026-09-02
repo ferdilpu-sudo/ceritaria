@@ -20,15 +20,17 @@ export function AdminFormActions({
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-2 text-sm sm:items-center">
           <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full sm:mt-0 ${published ? "bg-emerald-500" : "bg-zinc-400"}`} />
-          <span className="min-w-0 break-words font-semibold leading-5 text-[var(--text)]">{published ? "Akan langsung tampil untuk penonton" : "Akan disimpan dulu, belum tampil ke penonton"}</span>
+          <span className="min-w-0 break-words font-semibold leading-5 text-[var(--text)]">
+            {published ? "Akan langsung tampil untuk penonton" : "Akan disimpan dulu, belum tampil ke penonton"}
+          </span>
         </div>
 
         <div className="grid min-w-0 grid-cols-2 gap-2 sm:flex sm:shrink-0">
           <Link href={cancelHref} className="min-h-11 min-w-0 rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-center text-sm font-bold text-[var(--text)] hover:bg-[var(--surface-2)] sm:px-4">
             Batal
           </Link>
-          <button type="submit" disabled={saving || disabled} className="min-h-11 min-w-0 rounded-xl bg-[var(--primary)] px-3 py-3 text-sm font-black text-white hover:bg-[var(--primary-hover)] disabled:cursor-not-allowed disabled:opacity-50 sm:px-5">
-            {saving ? "Menyimpan…" : submitLabel}
+          <button type="submit" disabled={saving || disabled} aria-busy={saving} className="min-h-11 min-w-0 rounded-xl bg-[var(--primary)] px-3 py-3 text-sm font-black text-white hover:bg-[var(--primary-hover)] disabled:cursor-not-allowed disabled:opacity-50 sm:px-5">
+            {saving ? "Sedang menyimpan…" : submitLabel}
           </button>
         </div>
       </div>
