@@ -35,7 +35,7 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
     if (!parsed.success) {
       return {
         ok: false,
-        message: "Periksa kembali field yang ditandai.",
+        message: "Ada bagian yang perlu diperbaiki sebelum disimpan.",
         fieldErrors: zodFieldErrors(parsed.error),
       };
     }
@@ -77,8 +77,8 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
       const duplicate = error.code === "23505";
       return {
         ok: false,
-        message: duplicate ? "Nomor episode atau slug sudah dipakai pada series ini." : error.message,
-        fieldErrors: duplicate ? { episodeNumber: "Nomor episode sudah ada, atau slug bentrok.", slug: "Periksa slug episode." } : undefined,
+        message: duplicate ? "Nomor episode ini sudah dipakai, atau alamat halamannya bentrok." : error.message,
+        fieldErrors: duplicate ? { episodeNumber: "Coba cek nomor episode. Nomor ini mungkin sudah ada.", slug: "Coba gunakan alamat halaman yang berbeda." } : undefined,
       };
     }
 
@@ -97,7 +97,7 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
     }
     return { ok: true, redirectTo: `/admin/episodes?saved=${values.id ? "updated" : "created"}` };
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Gagal menyimpan episode." };
+    return { ok: false, message: error instanceof Error ? error.message : "Episode belum berhasil disimpan. Coba lagi." };
   }
 }
 
@@ -118,6 +118,6 @@ export async function deleteEpisodeAction(id: string): Promise<ActionResult> {
     }
     return { ok: true, redirectTo: "/admin/episodes" };
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Gagal menghapus episode." };
+    return { ok: false, message: error instanceof Error ? error.message : "Episode belum berhasil dihapus. Coba lagi." };
   }
 }
