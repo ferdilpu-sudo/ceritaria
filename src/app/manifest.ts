@@ -14,23 +14,22 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "id",
     categories: ["entertainment"],
     icons: [
-      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/pwa/icon-192", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any maskable" },
       { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-      { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
-      { src: "/icons/maskable.svg", sizes: "any", type: "image/svg+xml", purpose: "maskable" },
     ],
     shortcuts: [
       {
         name: "Lanjut Nonton",
         short_name: "Lanjut",
         url: "/lanjut",
-        icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+        icons: [{ src: "/pwa/icon-192", sizes: "192x192", type: "image/png" }],
       },
       {
         name: "Cari Cerita",
         short_name: "Cari",
         url: "/search",
-        icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+        icons: [{ src: "/pwa/icon-192", sizes: "192x192", type: "image/png" }],
       },
     ],
   };
