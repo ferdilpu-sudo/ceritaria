@@ -32,40 +32,40 @@ function badgeClassName(badge?: string) {
 
 export function AdminRecentList({ title, eyebrow, items, manageHref, emptyText }: AdminRecentListProps) {
   return (
-    <section className="surface rounded-2xl p-5 sm:p-6">
-      <div className="flex items-end justify-between gap-4">
+    <section className="surface rounded-xl p-4 sm:p-5">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-[11px] font-black tracking-[0.18em] text-red-600">{eyebrow}</p>
-          <h2 className="mt-1 text-xl font-black text-[var(--text)]">{title}</h2>
+          <p className="text-[10px] font-black tracking-[0.18em] text-red-600">{eyebrow}</p>
+          <h2 className="mt-0.5 text-lg font-black text-[var(--text)]">{title}</h2>
         </div>
-        <Link href={manageHref} className="min-h-11 shrink-0 rounded-xl px-2 py-3 text-sm font-bold text-[var(--muted)] hover:text-[var(--text)]">
+        <Link href={manageHref} className="min-h-10 shrink-0 rounded-lg px-2 py-2.5 text-sm font-bold text-[var(--muted)] hover:text-[var(--text)]">
           Kelola →
         </Link>
       </div>
 
-      <div className="mt-4 divide-y divide-[var(--border)]">
+      <div className="mt-3 divide-y divide-[var(--border)]">
         {items.length ? (
           items.map((item) => (
-            <Link key={item.id} href={item.href} className="group flex min-h-16 items-center gap-3 py-3">
-              <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${item.published ? "bg-emerald-500" : "bg-zinc-400"}`} aria-hidden="true" />
+            <Link key={item.id} href={item.href} className="group flex min-h-14 items-center gap-2.5 py-2.5">
+              <span className={`h-2 w-2 shrink-0 rounded-full ${item.published ? "bg-emerald-500" : "bg-zinc-400"}`} aria-hidden="true" />
               <div className="min-w-0 flex-1">
                 <div className="flex min-w-0 items-center gap-2">
                   <p className="truncate text-sm font-bold text-[var(--text)] group-hover:text-red-700">{item.title}</p>
                   {item.badge && (
-                    <span className={`shrink-0 rounded-full px-2 py-1 text-[9px] font-black tracking-wide ${badgeClassName(item.badge)}`}>
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-black tracking-wide ${badgeClassName(item.badge)}`}>
                       {item.badge}
                     </span>
                   )}
                 </div>
-                <p className="mt-1 truncate text-xs text-[var(--muted)]">{item.meta}</p>
+                <p className="mt-0.5 truncate text-[11px] text-[var(--muted)]">{item.meta}</p>
               </div>
-              <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black ${item.published ? "border border-emerald-200 bg-emerald-50 text-emerald-700" : "border border-zinc-200 bg-zinc-100 text-zinc-600"}`}>
+              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-black ${item.published ? "border border-emerald-200 bg-emerald-50 text-emerald-700" : "border border-zinc-200 bg-zinc-100 text-zinc-600"}`}>
                 {item.published ? "PUBLISHED" : "DRAFT"}
               </span>
             </Link>
           ))
         ) : (
-          <p className="py-6 text-sm text-[var(--muted)]">{emptyText}</p>
+          <p className="py-5 text-sm text-[var(--muted)]">{emptyText}</p>
         )}
       </div>
     </section>
