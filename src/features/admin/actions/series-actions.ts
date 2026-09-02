@@ -33,7 +33,7 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
     if (!parsed.success) {
       return {
         ok: false,
-        message: "Periksa kembali field yang ditandai.",
+        message: "Ada bagian yang perlu diperbaiki sebelum disimpan.",
         fieldErrors: zodFieldErrors(parsed.error),
       };
     }
@@ -79,8 +79,8 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
       const slugError = error.code === "23505";
       return {
         ok: false,
-        message: slugError ? "Slug series sudah dipakai." : error.message,
-        fieldErrors: slugError ? { slug: "Slug ini sudah dipakai. Coba slug lain." } : undefined,
+        message: slugError ? "Alamat halaman ini sudah dipakai series lain." : error.message,
+        fieldErrors: slugError ? { slug: "Coba gunakan alamat halaman yang berbeda." } : undefined,
       };
     }
 
@@ -90,7 +90,7 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
     if (existing?.slug && existing.slug !== values.slug) revalidatePath(`/series/${existing.slug}`);
     return { ok: true, redirectTo: `/admin/series?saved=${values.id ? "updated" : "created"}` };
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Gagal menyimpan series." };
+    return { ok: false, message: error instanceof Error ? error.message : "Series belum berhasil disimpan. Coba lagi." };
   }
 }
 
@@ -105,6 +105,6 @@ export async function deleteSeriesAction(id: string): Promise<ActionResult> {
     if (existing) revalidatePath(`/series/${existing.slug}`);
     return { ok: true, redirectTo: "/admin/series" };
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Gagal menghapus series." };
+    return { ok: false, message: error instanceof Error ? error.message : "Series belum berhasil dihapus. Coba lagi." };
   }
 }
