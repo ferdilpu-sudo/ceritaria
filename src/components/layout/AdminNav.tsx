@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logoutAction } from "@/features/admin/actions/auth-actions";
+import { startAdminGuide } from "@/features/admin/components/AdminGuideTour";
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", exact: true },
-  { href: "/admin/series", label: "Series" },
-  { href: "/admin/episodes", label: "Episode" },
-  { href: "/admin/analytics", label: "Analytics" },
+  { href: "/admin", label: "Dashboard", exact: true, guide: "nav-dashboard" },
+  { href: "/admin/series", label: "Series", guide: "nav-series" },
+  { href: "/admin/episodes", label: "Episode", guide: "nav-episodes" },
+  { href: "/admin/analytics", label: "Analytics", guide: "nav-analytics" },
 ];
 
 function isActive(pathname: string, href: string, exact?: boolean) {
@@ -32,6 +33,7 @@ export function AdminNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                data-guide={item.guide}
                 aria-current={active ? "page" : undefined}
                 className={`min-h-11 shrink-0 rounded-xl border px-3 py-3 font-bold transition ${
                   active
@@ -53,6 +55,14 @@ export function AdminNav() {
             Lihat Situs ↗
           </Link>
         </nav>
+
+        <button
+          type="button"
+          onClick={startAdminGuide}
+          className="min-h-11 rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-sm font-bold text-[var(--text)] transition hover:bg-[var(--surface-2)]"
+        >
+          Panduan
+        </button>
 
         <form action={logoutAction}>
           <button className="min-h-11 rounded-xl px-3 py-3 text-sm font-bold text-[var(--muted)] transition hover:bg-red-50 hover:text-red-700">
