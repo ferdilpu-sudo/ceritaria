@@ -1,22 +1,30 @@
 import Link from "next/link";
 import { AdminFormHeader } from "@/features/admin/components/AdminFormHeader";
 import { EpisodeForm } from "@/features/admin/components/EpisodeForm";
-import { getAdminSeries } from "@/features/admin/services/admin-content";
+import { getAdminEpisodes, getAdminSeries } from "@/features/admin/services/admin-content";
 
 export default async function NewEpisodePage() {
-  const series = await getAdminSeries();
+  const [series, episodes] = await Promise.all([getAdminSeries(), getAdminEpisodes()]);
+  const nextEpisodeBySeries = Object.fromEntries(
+    series.map((item) => {
+      const highest = episodes
+        .filter((episode) => episode.series_id === item.id)
+        .reduce((max, episode) => Math.max(max, episode.episode_number), 0);
+      return [item.id, highest + 1];
+    }),
+  );
 
   return (
-    <div className="relative left-1/2 w-[min(calc(100vw-40px),1400px)] -translate-x-1/2">
+    <div className="mx-auto w-full max-w-[1400px]">
       <AdminFormHeader
         eyebrow="EPISODE"
         title="Episode Baru"
-        description="Tambahkan video, thumbnail, recap, momen penting, dan metadata episode."
+        description="Tempel video, pilih thumbnail, cek preview, lalu simpan sebagai draft atau publish."
         backHref="/admin/episodes"
         backLabel="Daftar Episode"
       />
       {series.length ? (
-        <EpisodeForm series={series} />
+        <EpisodeForm series={series} nextEpisodeBySeries={nextEpisodeBySeries} />
       ) : (
         <div className="surface rounded-2xl p-8 text-center">
           <p className="font-bold text-[var(--text)]">Belum ada series</p>
