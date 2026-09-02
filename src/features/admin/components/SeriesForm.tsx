@@ -49,7 +49,7 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
   const published = useWatch({ control, name: "isPublished" }) ?? false;
   const coverRegister = register("coverFile");
   const heroRegister = register("heroFile");
-  const slugRegister = register("slug", { required: "Slug wajib tersedia", pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/ });
+  const slugRegister = register("slug", { required: "Alamat halaman wajib tersedia", pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/ });
 
   useUnsavedChangesGuard(isDirty && !saving);
   useEffect(() => {
@@ -80,36 +80,36 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
       {message && <p role="alert" className="max-w-full break-words rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{message}</p>}
       <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
         <div className="min-w-0 space-y-5">
-          <AdminFormSection guideId="series-info" title="Informasi Series" description="Mulai dari isi yang benar-benar dilihat penonton. URL dibuat otomatis dari judul.">
+          <AdminFormSection guideId="series-info" title="Informasi Series" description="Tulis nama series dan informasi singkat yang akan dibaca penonton. Alamat halamannya akan dibuat otomatis.">
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
-              <label className={`${label} sm:col-span-2`}>Judul <span className="text-red-600">*</span><input className={field} placeholder="Contoh: Ana & Max" {...register("title", { required: "Judul wajib diisi", maxLength: 200 })} />{errors.title && <small className="mt-1 block text-red-600">{errors.title.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">URL: /series/{slug || "judul-series"}</small></label>
-              <label className={`${label} sm:col-span-2`}>Sinopsis singkat{optional}<textarea rows={2} className={field} placeholder="Ringkasan untuk card dan hero." {...register("shortSynopsis", { maxLength: 320 })} /></label>
-              <label className={`${label} sm:col-span-2`}>Sinopsis lengkap{optional}<textarea rows={5} className={field} {...register("synopsis", { maxLength: 8000 })} /></label>
-              <label className={`${label} sm:col-span-2`}>Genre{optional}<input className={field} placeholder="Drama, Survival, Romance" {...register("genres")} /><small className="mt-1 block font-normal text-[var(--muted)]">Pisahkan dengan koma.</small></label>
+              <label className={`${label} sm:col-span-2`}>Judul Series <span className="text-red-600">*</span><input className={field} placeholder="Contoh: Ana & Max" {...register("title", { required: "Judul wajib diisi", maxLength: 200 })} />{errors.title && <small className="mt-1 block text-red-600">{errors.title.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Alamat halaman akan dibuat otomatis dari judul.</small></label>
+              <label className={`${label} sm:col-span-2`}>Ringkasan singkat{optional}<textarea rows={2} className={field} placeholder="Ceritakan inti series ini dalam satu atau dua kalimat." {...register("shortSynopsis", { maxLength: 320 })} /></label>
+              <label className={`${label} sm:col-span-2`}>Sinopsis lengkap{optional}<textarea rows={5} className={field} placeholder="Tuliskan cerita atau premis series dengan lebih lengkap." {...register("synopsis", { maxLength: 8000 })} /></label>
+              <label className={`${label} sm:col-span-2`}>Genre{optional}<input className={field} placeholder="Drama, Survival, Romance" {...register("genres")} /><small className="mt-1 block font-normal text-[var(--muted)]">Kalau lebih dari satu, pisahkan dengan koma.</small></label>
             </div>
           </AdminFormSection>
 
-          <AdminFormSection guideId="series-media" title="Media" description="Upload gambar langsung. URL manual tersedia di Pengaturan Lanjutan.">
+          <AdminFormSection guideId="series-media" title="Cover & Gambar Utama" description="Pilih cover untuk daftar series dan gambar melebar untuk bagian utama halaman series.">
             <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-              <AdminFilePicker label="Cover" hint="Poster 2:3 · JPG/PNG/WebP · maks. 5 MB" registerProps={coverRegister} onFile={coverPreview.readFile} />
-              <AdminFilePicker label="Hero homepage" hint="Landscape 16:9 · JPG/PNG/WebP · maks. 5 MB" registerProps={heroRegister} onFile={heroPreview.readFile} />
+              <AdminFilePicker label="Cover Series" hint="Disarankan poster 2:3 · JPG/PNG/WebP · maks. 5 MB" registerProps={coverRegister} onFile={coverPreview.readFile} />
+              <AdminFilePicker label="Gambar Utama" hint="Disarankan landscape 16:9 · JPG/PNG/WebP · maks. 5 MB" registerProps={heroRegister} onFile={heroPreview.readFile} />
             </div>
           </AdminFormSection>
 
-          <AdminFormSection guideId="series-publish" title="Publikasi" description="Simpan draft selama pengecekan. Featured hanya untuk series yang ingin ditonjolkan.">
+          <AdminFormSection guideId="series-publish" title="Tayangkan Series" description="Kalau series masih ingin diperiksa, jangan tampilkan dulu. Kamu juga bisa memilih series yang ingin lebih ditonjolkan di beranda.">
             <div className="grid min-w-0 gap-3 sm:grid-cols-2">
-              <label className="flex min-h-14 min-w-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-5 w-5 shrink-0 accent-red-600" {...register("isFeatured")} /><span className="min-w-0 break-words">Series unggulan</span></label>
-              <label className="flex min-h-14 min-w-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-5 w-5 shrink-0 accent-red-600" {...register("isPublished")} /><span className="min-w-0 break-words">Published</span></label>
+              <label className="flex min-h-14 min-w-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-5 w-5 shrink-0 accent-red-600" {...register("isFeatured")} /><span className="min-w-0 break-words">Tampilkan sebagai series unggulan</span></label>
+              <label className="flex min-h-14 min-w-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-5 w-5 shrink-0 accent-red-600" {...register("isPublished")} /><span className="min-w-0 break-words">Tampilkan ke penonton</span></label>
             </div>
           </AdminFormSection>
 
-          <AdminAdvancedSection guideId="series-advanced" title="SEO & Pengaturan Lanjutan" description="Edit slug, URL gambar manual, dan metadata pencarian jika diperlukan." defaultOpen={Boolean(errors.slug || initial?.seo_title || initial?.seo_description)}>
+          <AdminAdvancedSection guideId="series-advanced" title="Pengaturan Tambahan" description="Biasanya tidak perlu diubah. Buka hanya jika ingin mengganti alamat halaman, memakai gambar dari link internet, atau mengatur tampilan di Google." defaultOpen={Boolean(errors.slug || initial?.seo_title || initial?.seo_description)}>
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
-              <label className={`${label} sm:col-span-2`}>Slug<input className={field} {...slugRegister} onChange={(event) => { void slugRegister.onChange(event); setSlugManual(true); }} />{errors.slug && <small className="mt-1 block text-red-600">{errors.slug.message}</small>}</label>
-              <label className={label}>Cover URL{optional}<input type="url" className={field} placeholder="https://..." {...register("coverUrl")} /></label>
-              <label className={label}>Hero URL{optional}<input type="url" className={field} placeholder="https://..." {...register("heroUrl")} /></label>
-              <label className={label}>SEO title{optional}<input className={field} {...register("seoTitle", { maxLength: 200 })} /></label>
-              <label className={label}>SEO description{optional}<textarea rows={3} className={field} {...register("seoDescription", { maxLength: 320 })} /></label>
+              <label className={`${label} sm:col-span-2`}>Alamat halaman<input className={field} {...slugRegister} onChange={(event) => { void slugRegister.onChange(event); setSlugManual(true); }} />{errors.slug && <small className="mt-1 block text-red-600">{errors.slug.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Sudah dibuat otomatis. Sebaiknya jangan diubah jika tidak perlu.</small></label>
+              <label className={label}>Link cover{optional}<input type="url" className={field} placeholder="https://..." {...register("coverUrl")} /><small className="mt-1 block font-normal text-[var(--muted)]">Kosongkan jika cover sudah diunggah dari perangkat.</small></label>
+              <label className={label}>Link gambar utama{optional}<input type="url" className={field} placeholder="https://..." {...register("heroUrl")} /><small className="mt-1 block font-normal text-[var(--muted)]">Kosongkan jika gambar sudah diunggah dari perangkat.</small></label>
+              <label className={label}>Judul untuk Google{optional}<input className={field} placeholder="Jika kosong, judul series akan digunakan." {...register("seoTitle", { maxLength: 200 })} /></label>
+              <label className={label}>Deskripsi untuk Google{optional}<textarea rows={3} className={field} placeholder="Ringkasan yang ingin ditampilkan di hasil pencarian." {...register("seoDescription", { maxLength: 320 })} /></label>
             </div>
           </AdminAdvancedSection>
         </div>
