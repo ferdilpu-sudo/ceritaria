@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { AdminMetricCard } from "@/features/admin/components/AdminMetricCard";
+import { AnalyticsDashboardSummary } from "@/features/analytics/components/AnalyticsDashboardSummary";
 import { AdminRecentList, type AdminRecentItem } from "@/features/admin/components/AdminRecentList";
 import { getAdminEpisodes, getAdminSeries } from "@/features/admin/services/admin-content";
+import { getAnalyticsReport } from "@/features/analytics/services/admin-analytics";
 
 export default async function AdminDashboard() {
-  const [series, episodes] = await Promise.all([getAdminSeries(), getAdminEpisodes()]);
+  const [series, episodes, analytics] = await Promise.all([getAdminSeries(), getAdminEpisodes(), getAnalyticsReport(7)]);
   const publishedSeries = series.filter((item) => item.is_published).length;
   const publishedEpisodes = episodes.filter((item) => item.is_published).length;
   const draftSeries = series.length - publishedSeries;
@@ -56,6 +58,8 @@ export default async function AdminDashboard() {
         <AdminMetricCard label="Total Episode" value={episodes.length} hint={`${draftEpisodes} draft`} />
         <AdminMetricCard label="Episode Published" value={publishedEpisodes} hint={`${episodes.length ? Math.round((publishedEpisodes / episodes.length) * 100) : 0}% tayang`} accent />
       </section>
+
+      <AnalyticsDashboardSummary report={analytics} />
 
       <div className="grid gap-5 lg:grid-cols-2">
         <AdminRecentList
