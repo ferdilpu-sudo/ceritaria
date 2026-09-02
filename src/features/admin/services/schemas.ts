@@ -5,6 +5,15 @@ import { youtubeVideoUrlSchema } from "@/features/episode/services/youtube-url";
 const slug = z.string().trim().min(2).max(160).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug harus lowercase-kebab-case");
 const optionalUrl = z.union([z.literal(""), z.url()]).transform((value) => value || null);
 const optionalText = (max: number) => z.string().trim().max(max).transform((value) => value || null);
+const durationClock = z.string().trim().refine(
+  (value) => value === "" || /^\d{1,3}:[0-5]\d$/.test(value),
+  "Durasi gunakan format menit:detik, contoh 10:30",
+).transform((value) => {
+  if (!value) return null;
+  const [minutes, seconds] = value.split(":").map(Number);
+  const total = minutes * 60 + seconds;
+  return total > 0 && total <= 86400 ? total : null;
+});
 
 export const seriesFormSchema = z.object({
   id: z.string().uuid().optional(),
@@ -33,7 +42,7 @@ export const episodeFormSchema = z.object({
   videoProvider: z.enum(["youtube", "facebook"]),
   videoUrl: z.string().trim().min(1).max(2048),
   thumbnailUrl: optionalUrl,
-  durationSeconds: z.union([z.literal(""), z.coerce.number().int().positive().max(86400)]).transform((v) => v === "" ? null : v),
+  durationSeconds: durationClock,
   isPublished: z.boolean(),
   seoTitle: optionalText(200),
   seoDescription: optionalText(320),
