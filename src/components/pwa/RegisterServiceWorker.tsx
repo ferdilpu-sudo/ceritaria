@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { InstallAppCta } from "@/components/pwa/InstallAppCta";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -9,10 +10,29 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const VISIT_KEY = "ceritaria-pwa-visits";
+const INSTALL_SNOOZE_KEY = "ceritaria-pwa-install-snoozed-at";
+const INSTALL_SNOOZE_MS = 7 * 24 * 60 * 60 * 1000;
 
 function isEpisodePlayback(pathname: string) {
   const parts = pathname.split("/").filter(Boolean);
   return parts[0] === "series" && parts.length >= 3;
+}
+
+function canOfferInstall() {
+  try {
+    const snoozedAt = Number(window.localStorage.getItem(INSTALL_SNOOZE_KEY) ?? "0");
+    return !snoozedAt || Date.now() - snoozedAt >= INSTALL_SNOOZE_MS;
+  } catch {
+    return true;
+  }
+}
+
+function snoozeInstall() {
+  try {
+    window.localStorage.setItem(INSTALL_SNOOZE_KEY, String(Date.now()));
+  } catch {
+    // Storage may be unavailable in private browsing.
+  }
 }
 
 export function RegisterServiceWorker() {
@@ -41,7 +61,9 @@ export function RegisterServiceWorker() {
     const standalone = window.matchMedia("(display-mode: standalone)").matches;
     const onBeforeInstall = (event: Event) => {
       event.preventDefault();
-      if (visits >= 2 && !standalone) setInstallPrompt(event as BeforeInstallPromptEvent);
+      if (visits >= 2 && !standalone && canOfferInstall()) {
+        setInstallPrompt(event as BeforeInstallPromptEvent);
+      }
     };
     const onInstalled = () => setInstallPrompt(null);
     window.addEventListener("beforeinstallprompt", onBeforeInstall);
@@ -104,11 +126,18 @@ export function RegisterServiceWorker() {
 
   if (installPrompt) {
     return (
-      <div className={`fixed inset-x-3 z-[70] mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-white/10 bg-zinc-950/95 p-3 text-sm shadow-2xl backdrop-blur ${position}`}>
-        <span className="min-w-0 flex-1 font-bold">Pasang Ceritaria di layar utama.</span>
-        <button type="button" onClick={async () => { await installPrompt.prompt(); await installPrompt.userChoice; setInstallPrompt(null); }} className="min-h-11 rounded-xl bg-white px-4 font-black text-black">Pasang</button>
-        <button type="button" aria-label="Tutup" onClick={() => setInstallPrompt(null)} className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-xl text-zinc-400">×</button>
-      </div>
+      <InstallAppCta
+        onDismiss={() => {
+          snoozeInstall();
+          setInstallPrompt(null);
+        }}
+        onInstall={async () => {
+          await installPrompt.prompt();
+          const choice = await installPrompt.userChoice;
+          if (choice.outcome === "dismissed") snoozeInstall();
+          setInstallPrompt(null);
+        }}
+      />
     );
   }
 
