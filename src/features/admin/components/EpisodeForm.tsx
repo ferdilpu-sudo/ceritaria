@@ -16,8 +16,8 @@ type Values = {
   isPublished: boolean; seoTitle: string; seoDescription: string; thumbnailFile: FileList;
 };
 
-const field = "mt-2 w-full rounded-xl border border-[var(--border)] bg-white px-3.5 py-3 text-[var(--text)] shadow-sm placeholder:text-zinc-400 focus:border-red-300";
-const label = "text-sm font-bold text-[var(--text)]";
+const field = "mt-2 w-full min-w-0 max-w-full rounded-xl border border-[var(--border)] bg-white px-3.5 py-3 text-[var(--text)] shadow-sm placeholder:text-zinc-400 focus:border-red-300";
+const label = "min-w-0 text-sm font-bold text-[var(--text)]";
 
 export function EpisodeForm({ series, initial }: { series: SeriesRow[]; initial?: EpisodeRow }) {
   const router = useRouter();
@@ -61,13 +61,13 @@ export function EpisodeForm({ series, initial }: { series: SeriesRow[]; initial?
   });
 
   return (
-    <form onSubmit={submit} className="space-y-6 pb-4">
-      {message && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{message}</p>}
+    <form onSubmit={submit} className="min-w-0 space-y-6 pb-4">
+      {message && <p role="alert" className="max-w-full break-words rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{message}</p>}
 
-      <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
-        <div className="space-y-6">
+      <div className="grid min-w-0 gap-7 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
+        <div className="min-w-0 space-y-6">
           <AdminFormSection guideId="episode-info" title="Informasi Episode" description="Tentukan series, urutan episode, judul, dan ringkasan yang tampil ke penonton.">
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={label}>Series<select className={field} {...register("seriesId", { required: true })}>{series.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
               <label className={label}>Nomor episode<input type="number" min="1" className={field} {...register("episodeNumber", { required: true, valueAsNumber: true, min: 1 })} /></label>
               <label className={label}>Judul<input className={field} {...register("title", { required: "Judul wajib diisi", maxLength: 200 })} />{errors.title && <small className="mt-1 block text-red-600">{errors.title.message}</small>}</label>
@@ -77,7 +77,7 @@ export function EpisodeForm({ series, initial }: { series: SeriesRow[]; initial?
           </AdminFormSection>
 
           <AdminFormSection guideId="episode-media" title="Video & Media" description="YouTube menjadi sumber utama. Sidebar kanan menampilkan preview sebelum data disimpan.">
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={label}>Video source<select className={field} {...register("videoProvider")}><option value="youtube">YouTube</option><option value="facebook">Facebook (legacy)</option></select></label>
               <label className={label}>Durasi (detik)<input type="number" min="1" className={field} placeholder="600" {...register("durationSeconds")} /></label>
               <label className={`${label} sm:col-span-2`}>{videoProvider === "youtube" ? "URL YouTube" : "Permalink Facebook Public"}<input type="url" className={field} placeholder={videoProvider === "youtube" ? "https://youtu.be/..." : "https://www.facebook.com/.../videos/..."} {...register("videoUrl", { required: true })} />{errors.videoUrl && <small className="mt-1 block text-red-600">{errors.videoUrl.message}</small>}</label>
@@ -87,15 +87,15 @@ export function EpisodeForm({ series, initial }: { series: SeriesRow[]; initial?
           </AdminFormSection>
 
           <AdminFormSection guideId="episode-editorial" title="Editorial" description="Recap dan momen penting membantu penonton mengikuti cerita dari episode ke episode.">
-            <div className="grid gap-5">
+            <div className="grid min-w-0 gap-5">
               <label className={label}>Recap<textarea rows={8} className={field} {...register("recap", { maxLength: 20000 })} /></label>
               <label className={label}>Momen penting<textarea rows={5} className={field} placeholder={"Jejak kaki baru\nPencarian di garis pantai\nSiluet terlihat dari kejauhan"} {...register("highlights", { maxLength: 4000 })} /><small className="mt-1 block font-normal text-[var(--muted)]">Satu momen per baris.</small></label>
             </div>
           </AdminFormSection>
 
           <AdminFormSection guideId="episode-publish" title="Publikasi & SEO" description="Simpan sebagai draft selama pengecekan, lalu aktifkan Published saat siap tayang.">
-            <div className="grid gap-5 sm:grid-cols-2">
-              <label className="flex min-h-14 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)] sm:col-span-2"><input type="checkbox" className="h-4 w-4 accent-red-600" {...register("isPublished")} /> Published</label>
+            <div className="grid min-w-0 gap-5 sm:grid-cols-2">
+              <label className="flex min-h-14 min-w-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)] sm:col-span-2"><input type="checkbox" className="h-4 w-4 shrink-0 accent-red-600" {...register("isPublished")} /><span className="min-w-0 break-words">Published</span></label>
               <label className={label}>SEO title<input className={field} {...register("seoTitle", { maxLength: 200 })} /></label>
               <label className={label}>SEO description<textarea rows={3} className={field} {...register("seoDescription", { maxLength: 320 })} /></label>
             </div>
