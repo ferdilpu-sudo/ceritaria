@@ -1,0 +1,14 @@
+﻿{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ceritaria",
+  "compatibility_date": "2026-09-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "vinext/server/app-router-entry",
+  "preview_urls": true,
+  "assets": {
+    "not_found_handling": "none"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
