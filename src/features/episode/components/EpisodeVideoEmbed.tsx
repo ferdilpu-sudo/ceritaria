@@ -19,37 +19,22 @@ export function EpisodeVideoEmbed({
   title,
   episodeId,
 }: EpisodeVideoEmbedProps) {
-  const isYouTube = getYouTubeVideoId(videoUrl) !== null;
-  const isFacebook = facebookPermalinkSchema.safeParse(videoUrl).success;
+  const isYouTube = provider === "youtube" && getYouTubeVideoId(videoUrl) !== null;
+  const isFacebook = provider === "facebook" && facebookPermalinkSchema.safeParse(videoUrl).success;
 
   if (isYouTube) {
-    return (
-      <YouTubeVideoEmbed
-        videoUrl={videoUrl}
-        thumbnailUrl={thumbnailUrl}
-        title={title}
-        episodeId={episodeId}
-      />
-    );
+    return <YouTubeVideoEmbed videoUrl={videoUrl} thumbnailUrl={thumbnailUrl} title={title} episodeId={episodeId} />;
   }
 
   if (isFacebook) {
-    return (
-      <FacebookVideoEmbed
-        permalink={videoUrl}
-        thumbnailUrl={thumbnailUrl}
-        title={title}
-        episodeId={episodeId}
-      />
-    );
+    return <FacebookVideoEmbed permalink={videoUrl} thumbnailUrl={thumbnailUrl} title={title} episodeId={episodeId} />;
   }
 
   return (
-    <div className="mx-auto grid aspect-[9/16] w-full max-w-[480px] place-items-center rounded-2xl border border-red-900 bg-red-950/20 p-6 text-center">
+    <div className="mx-auto grid aspect-[9/16] w-full max-w-none place-items-center border-y border-red-900 bg-red-950/20 p-6 text-center sm:max-w-[480px] sm:rounded-2xl sm:border">
       <div>
-        <p className="font-bold text-red-300">Video tidak dapat diputar</p>
-        <p className="mt-2 text-sm text-zinc-400">URL video episode ini tidak valid.</p>
-        <p className="mt-1 text-xs text-zinc-500">Provider tersimpan: {provider}</p>
+        <p className="font-bold text-red-300">Video belum bisa diputar</p>
+        <p className="mt-2 text-sm leading-6 text-zinc-400">Ada masalah pada sumber video episode ini. Coba lagi nanti.</p>
       </div>
     </div>
   );
