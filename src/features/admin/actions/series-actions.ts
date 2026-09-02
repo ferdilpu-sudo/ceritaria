@@ -3,6 +3,7 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { requireAdmin } from "@/lib/security/require-admin";
 import { seriesFormSchema, splitCommaList } from "@/features/admin/services/schemas";
+import { zodFieldErrors } from "@/features/admin/services/form-errors";
 import { uploadAdminImage } from "@/features/admin/services/media-upload";
 import type { ActionResult } from "@/features/admin/types/action-result";
 
@@ -30,7 +31,11 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
     };
     const parsed = seriesFormSchema.safeParse(raw);
     if (!parsed.success) {
-      return { ok: false, message: parsed.error.issues[0]?.message ?? "Data series tidak valid." };
+      return {
+        ok: false,
+        message: "Periksa kembali field yang ditandai.",
+        fieldErrors: zodFieldErrors(parsed.error),
+      };
     }
 
     const values = parsed.data;
@@ -71,14 +76,19 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
       : supabase.from("series").insert(payload);
     const { error } = await query;
     if (error) {
-      return { ok: false, message: error.code === "23505" ? "Slug series sudah dipakai." : error.message };
+      const slugError = error.code === "23505";
+      return {
+        ok: false,
+        message: slugError ? "Slug series sudah dipakai." : error.message,
+        fieldErrors: slugError ? { slug: "Slug ini sudah dipakai. Coba slug lain." } : undefined,
+      };
     }
 
     updateTag("public-content");
     revalidatePath("/");
     revalidatePath(`/series/${values.slug}`);
     if (existing?.slug && existing.slug !== values.slug) revalidatePath(`/series/${existing.slug}`);
-    return { ok: true, redirectTo: "/admin/series" };
+    return { ok: true, redirectTo: `/admin/series?saved=${values.id ? "updated" : "created"}` };
   } catch (error) {
     return { ok: false, message: error instanceof Error ? error.message : "Gagal menyimpan series." };
   }
