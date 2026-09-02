@@ -10,6 +10,32 @@ export interface Database {
         Update: { user_id?: string; created_at?: string };
         Relationships: [];
       };
+      analytics_events: {
+        Row: {
+          id: string;
+          visitor_id: string;
+          session_id: string;
+          event_name: string;
+          path: string;
+          referrer_host: string | null;
+          device_type: string;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          visitor_id: string;
+          session_id: string;
+          event_name: string;
+          path: string;
+          referrer_host?: string | null;
+          device_type: string;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["analytics_events"]["Insert"]>;
+        Relationships: [];
+      };
       series: {
         Row: {
           id: string;
@@ -99,8 +125,24 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
+      get_analytics_dashboard: {
+        Args: { p_days?: number; p_timezone?: string };
+        Returns: Json;
+      };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       soft_delete_series: { Args: { target_id: string }; Returns: undefined };
+      track_analytics_event: {
+        Args: {
+          p_visitor_id: string;
+          p_session_id: string;
+          p_event_name: string;
+          p_path: string;
+          p_referrer: string;
+          p_device_type: string;
+          p_metadata: Json;
+        };
+        Returns: undefined;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
