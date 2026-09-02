@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "ceritaria-admin-guide-seen-v1";
 
@@ -37,6 +37,11 @@ export function AdminFirstRunGuide() {
   const [open, setOpen] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
+  const dismiss = useCallback(() => {
+    window.localStorage.setItem(STORAGE_KEY, "seen");
+    setOpen(false);
+  }, []);
+
   useEffect(() => {
     setOpen(window.localStorage.getItem(STORAGE_KEY) !== "seen");
   }, []);
@@ -57,12 +62,7 @@ export function AdminFirstRunGuide() {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [open]);
-
-  function dismiss() {
-    window.localStorage.setItem(STORAGE_KEY, "seen");
-    setOpen(false);
-  }
+  }, [dismiss, open]);
 
   return (
     <>
