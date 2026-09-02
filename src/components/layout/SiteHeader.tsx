@@ -9,9 +9,9 @@ function SearchIcon() {
   );
 }
 
-export function SiteHeader() {
+export function SiteHeader({ hideOnMobile = false }: { hideOnMobile?: boolean }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[rgba(11,11,15,.92)] pt-[env(safe-area-inset-top)] backdrop-blur-xl">
+    <header className={`sticky top-0 z-40 border-b border-[var(--border)] bg-[rgba(11,11,15,.92)] pt-[env(safe-area-inset-top)] backdrop-blur-xl ${hideOnMobile ? "hidden sm:block" : ""}`}>
       <div className="shell flex min-h-14 items-center justify-between gap-4 sm:min-h-16">
         <Link href="/" className="text-base font-black tracking-[0.2em] sm:text-xl" aria-label="CERITARIA beranda">
           CERITARIA
