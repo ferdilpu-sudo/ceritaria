@@ -42,6 +42,10 @@ Field penting:
 
 Nomor episode dan slug unik dalam satu series.
 
+## analytics_events
+
+Event analytics anonim untuk dashboard admin. Menyimpan `visitor_id`, `session_id`, `event_name`, `path`, hostname referrer, kategori device, metadata kecil, dan `created_at`. Public tidak dapat membaca tabel ini dan tidak memiliki direct insert; event masuk melalui RPC tervalidasi.
+
 ## Storage
 
 Bucket public:
@@ -59,5 +63,6 @@ Anon/authenticated hanya dapat membaca series dan episode published yang tidak s
 - `001_initial.sql`: schema, indexes, RLS, storage bucket/policies.
 - `002_youtube_video_provider.sql`: YouTube-first + Facebook legacy.
 - `003_brand_ceritaria.sql`: migrasi SEO data dari brand lama ke Ceritaria.
+- `004_first_party_analytics.sql`: event analytics, RLS, tracking RPC, dan reporting RPC admin.
 
 Jangan mengubah migration yang sudah diterapkan pada environment production. Tambahkan migration baru untuk perubahan schema berikutnya.
