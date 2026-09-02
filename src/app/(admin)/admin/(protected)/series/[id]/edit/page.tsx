@@ -9,11 +9,11 @@ export default async function EditSeriesPage({ params }: { params: Promise<{ id:
   if (!series) notFound();
 
   return (
-    <div className="relative left-1/2 w-[min(calc(100vw-40px),1400px)] -translate-x-1/2">
+    <div className="mx-auto w-full max-w-[1400px]">
       <AdminFormHeader
         eyebrow="SERIES"
         title="Edit Series"
-        description={`Perbarui informasi, media, SEO, dan status publikasi ${series.title}.`}
+        description={`Perbarui konten utama, media, atau status publikasi ${series.title}.`}
         backHref="/admin/series"
         backLabel="Daftar Series"
       />
