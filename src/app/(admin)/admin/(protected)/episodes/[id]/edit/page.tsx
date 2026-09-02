@@ -9,11 +9,11 @@ export default async function EditEpisodePage({ params }: { params: Promise<{ id
   if (!episode) notFound();
 
   return (
-    <div className="relative left-1/2 w-[min(calc(100vw-40px),1400px)] -translate-x-1/2">
+    <div className="mx-auto w-full max-w-[1400px]">
       <AdminFormHeader
         eyebrow="EPISODE"
         title="Edit Episode"
-        description={`Perbarui video, thumbnail, editorial, SEO, dan status publikasi ${episode.title}.`}
+        description={`Perbarui video, thumbnail, isi cerita, atau status publikasi ${episode.title}.`}
         backHref="/admin/episodes"
         backLabel="Daftar Episode"
       />
