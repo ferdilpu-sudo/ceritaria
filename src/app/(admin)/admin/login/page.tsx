@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { loginAction } from "@/features/admin/actions/auth-actions";
+import { AdminPasswordField } from "@/features/admin/components/AdminPasswordField";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 interface Props {
@@ -44,10 +45,7 @@ export default async function LoginPage({ searchParams }: Props) {
             Email
             <input type="email" name="email" autoComplete="email" required className="mt-2 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" />
           </label>
-          <label className="block">
-            Password
-            <input type="password" name="password" autoComplete="current-password" required className="mt-2 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" />
-          </label>
+          <AdminPasswordField />
           <button className="min-h-12 w-full rounded-xl bg-[var(--primary)] font-black">Masuk</button>
         </form>
       </div>
