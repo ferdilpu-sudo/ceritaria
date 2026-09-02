@@ -4,9 +4,11 @@ const links = [
   ["Tentang", "/about"], ["Kontak", "/contact"], ["Privasi", "/privacy"], ["Ketentuan", "/terms"],
 ] as const;
 
-export function SiteFooter() {
+export function SiteFooter({ mobileNavInset = true }: { mobileNavInset?: boolean }) {
+  const mobilePadding = mobileNavInset ? "pb-[calc(6rem+env(safe-area-inset-bottom))]" : "pb-6";
+
   return (
-    <footer className="mt-12 border-t border-[var(--border)] pb-[calc(6rem+env(safe-area-inset-bottom))] pt-7 sm:mt-20 sm:py-10">
+    <footer className={`mt-12 border-t border-[var(--border)] pt-7 sm:mt-20 sm:py-10 ${mobilePadding}`}>
       <div className="shell flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="hidden sm:block">
           <p className="font-black tracking-[0.15em]">CERITARIA</p>
