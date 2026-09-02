@@ -1,10 +1,9 @@
-const CACHE = "ceritaria-static-v5";
+const CACHE = "ceritaria-static-v6";
 const OFFLINE_URL = "/offline.html";
 const CORE_ASSETS = [
   OFFLINE_URL,
   "/pwa/icon-192",
   "/icon.svg",
-  "/icons/icon-512.png",
 ];
 
 self.addEventListener("install", (event) => {
