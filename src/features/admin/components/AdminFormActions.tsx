@@ -7,6 +7,7 @@ interface AdminFormActionsProps {
   published: boolean;
   submitLabel: string;
   publishedMessage?: string;
+  publishedReady?: boolean;
 }
 
 export function AdminFormActions({
@@ -16,12 +17,15 @@ export function AdminFormActions({
   published,
   submitLabel,
   publishedMessage = "Akan langsung tampil untuk penonton",
+  publishedReady = true,
 }: AdminFormActionsProps) {
+  const statusDot = !published ? "bg-zinc-400" : publishedReady ? "bg-emerald-500" : "bg-amber-500";
+
   return (
     <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-30 min-w-0 max-w-full rounded-2xl border border-[var(--border)] bg-white/95 p-3 shadow-[0_12px_32px_rgba(16,24,40,0.12)] backdrop-blur sm:bottom-4 sm:p-4">
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-2 text-sm sm:items-center">
-          <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full sm:mt-0 ${published ? "bg-emerald-500" : "bg-zinc-400"}`} />
+          <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full sm:mt-0 ${statusDot}`} />
           <span className="min-w-0 break-words font-semibold leading-5 text-[var(--text)]">
             {published ? publishedMessage : "Akan disimpan dulu, belum tampil ke penonton"}
           </span>
