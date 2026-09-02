@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   metadataBase,
   title: { default: "Ceritaria", template: "%s | Ceritaria" },
   description: "Platform mini series drama Ceritaria.",
-  icons: { icon: "/icon.svg", apple: "/icons/icon-192.png" },
+  icons: { icon: "/icon.svg", apple: "/icons/apple-touch-icon.png" },
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Ceritaria" },
 };
 
@@ -16,6 +16,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: "#0b0b0f",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
