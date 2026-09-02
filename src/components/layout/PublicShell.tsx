@@ -16,7 +16,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {!playback && <SiteHeader />}
+      <div className={playback ? "hidden sm:block" : undefined}><SiteHeader /></div>
       <main className={playback ? "min-h-dvh" : "public-mobile-main"}>{children}</main>
       <SiteFooter />
       {!playback && <MobileBottomNav />}
