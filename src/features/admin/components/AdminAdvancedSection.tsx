@@ -16,7 +16,7 @@ export function AdminAdvancedSection({
   defaultOpen = false,
 }: AdminAdvancedSectionProps) {
   return (
-    <details className="surface group min-w-0 rounded-2xl" open={defaultOpen}>
+    <details className="surface group min-w-0 rounded-2xl" {...(defaultOpen ? { open: true } : {})}>
       <summary
         data-guide={guideId}
         className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 marker:hidden sm:px-6"
