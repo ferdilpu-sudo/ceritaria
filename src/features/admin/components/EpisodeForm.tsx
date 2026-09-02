@@ -9,6 +9,7 @@ import { AdminFilePicker } from "@/features/admin/components/AdminFilePicker";
 import { AdminFormActions } from "@/features/admin/components/AdminFormActions";
 import { AdminFormSection } from "@/features/admin/components/AdminFormSection";
 import { EpisodePreviewSidebar } from "@/features/admin/components/EpisodePreviewSidebar";
+import { VideoPreview } from "@/features/admin/components/VideoPreview";
 import { useImageFilePreview } from "@/features/admin/hooks/useImageFilePreview";
 import { useUnsavedChangesGuard } from "@/features/admin/hooks/useUnsavedChangesGuard";
 import { applyServerFieldErrors } from "@/features/admin/utils/apply-server-field-errors";
@@ -102,9 +103,10 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
             </div>
           </AdminFormSection>
 
-          <AdminFormSection guideId="episode-media" title="Video & Thumbnail" description="Cukup tempel link YouTube dan pilih thumbnail. Preview akan muncul di samping atau di bawah form.">
+          <AdminFormSection guideId="episode-media" title="Video & Thumbnail" description="Tempel link YouTube, cek player, lalu pilih thumbnail. Semua ada di satu area supaya cepat diverifikasi.">
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={`${label} sm:col-span-2`}>{videoProvider === "youtube" ? "URL YouTube" : "Permalink Facebook Public"} <span className="text-red-600">*</span><input type="url" className={field} placeholder={videoProvider === "youtube" ? "https://youtu.be/..." : "https://www.facebook.com/.../videos/..."} {...register("videoUrl", { required: "URL video wajib diisi" })} />{errors.videoUrl && <small className="mt-1 block text-red-600">{errors.videoUrl.message}</small>}</label>
+              <div className="sm:col-span-2"><VideoPreview provider={videoProvider} videoUrl={videoUrl} /></div>
               <AdminFilePicker label="Thumbnail" hint="Poster/vertical · JPG/PNG/WebP · maks. 5 MB" registerProps={thumbnailRegister} onFile={thumbnailPreview.readFile} />
               <label className={label}>Durasi{optional}<input inputMode="numeric" className={field} placeholder="10:30" {...register("durationSeconds", { pattern: { value: /^\d{1,3}:[0-5]\d$/, message: "Gunakan format menit:detik, contoh 10:30" } })} />{errors.durationSeconds && <small className="mt-1 block text-red-600">{errors.durationSeconds.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Format menit:detik.</small></label>
             </div>
@@ -131,7 +133,7 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
             </div>
           </AdminAdvancedSection>
         </div>
-        <EpisodePreviewSidebar provider={videoProvider} videoUrl={videoUrl} thumbnailSrc={thumbnailPreview.previewUrl || thumbnailUrl || null} title={title} episodeNumber={episodeNumber} seriesTitle={selectedSeriesTitle} durationSeconds={duration} published={published} />
+        <EpisodePreviewSidebar provider={videoProvider} thumbnailSrc={thumbnailPreview.previewUrl || thumbnailUrl || null} title={title} episodeNumber={episodeNumber} seriesTitle={selectedSeriesTitle} durationSeconds={duration} published={published} />
       </div>
       <AdminFormActions cancelHref="/admin/episodes" saving={saving} disabled={series.length === 0} published={published} submitLabel={initial ? "Simpan Perubahan" : "Simpan Episode"} />
     </form>
