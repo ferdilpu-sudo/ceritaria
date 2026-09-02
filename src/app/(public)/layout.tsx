@@ -1,5 +1,6 @@
 import Script from "next/script";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { PublicAnalyticsTracker } from "@/features/analytics/components/PublicAnalyticsTracker";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { getOptionalPublicEnv } from "@/lib/env";
@@ -9,6 +10,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
   return (
     <>
+      <PublicAnalyticsTracker />
       <SiteHeader />
       <main className="public-mobile-main">{children}</main>
       <SiteFooter />
