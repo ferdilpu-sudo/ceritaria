@@ -91,8 +91,8 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
 
           <AdminFormSection guideId="series-media" title="Cover & Gambar Utama" description="Pilih cover untuk daftar series dan gambar melebar untuk bagian utama halaman series.">
             <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-              <AdminFilePicker label="Cover Series" hint="Disarankan poster 2:3 · JPG/PNG/WebP · maks. 5 MB" registerProps={coverRegister} onFile={coverPreview.readFile} />
-              <AdminFilePicker label="Gambar Utama" hint="Disarankan landscape 16:9 · JPG/PNG/WebP · maks. 5 MB" registerProps={heroRegister} onFile={heroPreview.readFile} />
+              <AdminFilePicker label="Cover Series" hint="Disarankan poster 2:3 · JPG/PNG/WebP · maks. 5 MB" registerProps={coverRegister} onFile={coverPreview.readFile} previewSrc={coverPreview.previewUrl || coverUrl || null} />
+              <AdminFilePicker label="Gambar Utama" hint="Disarankan landscape 16:9 · JPG/PNG/WebP · maks. 5 MB" registerProps={heroRegister} onFile={heroPreview.readFile} previewSrc={heroPreview.previewUrl || heroUrl || null} />
             </div>
           </AdminFormSection>
 
