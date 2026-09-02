@@ -1,5 +1,7 @@
 "use client";
 
+import { recordAnalyticsEvent } from "@/features/analytics/services/analytics-client";
+
 type EventName =
   | "episode_view"
   | "play_intent"
@@ -14,4 +16,5 @@ declare global {
 
 export function trackEvent(name: EventName, params: Record<string, string | number> = {}) {
   window.gtag?.("event", name, params);
+  void recordAnalyticsEvent(name, window.location.pathname, params);
 }
