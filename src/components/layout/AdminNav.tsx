@@ -8,6 +8,7 @@ const navItems = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/series", label: "Series" },
   { href: "/admin/episodes", label: "Episode" },
+  { href: "/admin/analytics", label: "Analytics" },
 ];
 
 function isActive(pathname: string, href: string, exact?: boolean) {
