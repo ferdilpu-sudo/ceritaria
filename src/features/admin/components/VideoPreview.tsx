@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { buildFacebookEmbedUrl } from "@/features/episode/services/facebook-url";
-import { buildYouTubeEmbedUrl, getYouTubeVideoId } from "@/features/episode/services/youtube-url";
+import { buildYouTubeEmbedUrl } from "@/features/episode/services/youtube-url";
 import type { VideoProvider } from "@/types/database.types";
 
 interface VideoPreviewProps {
@@ -58,7 +58,6 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
   const embedUrl = resolveEmbedUrl(provider, videoUrl);
   const isYouTube = provider === "youtube";
   const providerName = isYouTube ? "YouTube" : "Facebook";
-  const videoId = isYouTube ? getYouTubeVideoId(videoUrl) : null;
 
   if (!videoUrl.trim()) {
     return (
@@ -108,10 +107,7 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] pt-4 text-xs">
-        <div>
-          <span className="font-bold text-emerald-700">Video siap digunakan</span>
-          {videoId && <span className="ml-2 text-[var(--muted)]">YouTube #{videoId}</span>}
-        </div>
+        <span className="font-bold text-emerald-700">✓ Video siap digunakan</span>
         <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-lg px-2 py-3 font-bold text-[var(--muted)] hover:text-[var(--text)]">
           Buka videonya ↗
         </a>
