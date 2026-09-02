@@ -89,8 +89,8 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
     revalidatePath(`/series/${values.slug}`);
     if (existing?.slug && existing.slug !== values.slug) revalidatePath(`/series/${existing.slug}`);
     const state = values.id ? "updated" : "created";
-    const publicPath = encodeURIComponent(`/series/${values.slug}`);
-    return { ok: true, redirectTo: `/admin/series?saved=${state}&view=${publicPath}` };
+    const view = values.isPublished ? `&view=${encodeURIComponent(`/series/${values.slug}`)}` : "";
+    return { ok: true, redirectTo: `/admin/series?saved=${state}${view}` };
   } catch {
     return { ok: false, message: "Series belum berhasil disimpan. Coba lagi beberapa saat." };
   }
