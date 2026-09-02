@@ -8,6 +8,7 @@ import { EpisodeVideoEmbed } from "@/features/episode/components/EpisodeVideoEmb
 import { EpisodeViewTracker } from "@/features/episode/components/EpisodeViewTracker";
 import { getPublishedEpisode, getPublishedEpisodesForSeries } from "@/features/episode/services/public-episodes";
 import { getPublishedSeriesBySlug } from "@/features/series/services/public-series";
+import { ContinueWatchingTracker } from "@/features/watch-history/components/ContinueWatchingTracker";
 import { getPublicEnv } from "@/lib/env";
 
 export const revalidate = 300;
@@ -81,12 +82,20 @@ export default async function EpisodePage({ params }: PageProps) {
   };
 
   return (
-    <div className="shell pb-0 pt-3 sm:pt-9">
+    <div className="shell pb-0 pt-2 sm:pt-9">
       <EpisodeViewTracker episodeId={episode.id} />
+      <ContinueWatchingTracker
+        seriesSlug={series.slug}
+        seriesTitle={series.title}
+        episodeSlug={episode.slug}
+        episodeTitle={episode.title}
+        episodeNumber={episode.episode_number}
+        thumbnailUrl={episode.thumbnail_url}
+      />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
 
-      <nav aria-label="Kembali ke series" className="mb-3 sm:hidden">
-        <Link href={`/series/${series.slug}`} className="inline-flex min-h-11 items-center rounded-2xl pr-4 text-sm font-bold text-zinc-300 active:scale-[0.98]">
+      <nav aria-label="Kembali ke series" className="mb-2 sm:hidden">
+        <Link href={`/series/${series.slug}`} className="inline-flex min-h-11 max-w-full items-center truncate rounded-2xl pr-4 text-sm font-bold text-zinc-300 active:scale-[0.98]">
           ← {series.title}
         </Link>
       </nav>
@@ -100,7 +109,7 @@ export default async function EpisodePage({ params }: PageProps) {
       </nav>
 
       <div className="grid gap-5 sm:gap-8 lg:grid-cols-[minmax(300px,380px)_minmax(0,1fr)] lg:gap-12 xl:gap-16">
-        <div className="lg:sticky lg:top-24 lg:self-start">
+        <div className="-mx-4 sm:mx-0 lg:sticky lg:top-24 lg:self-start">
           <EpisodeVideoEmbed
             provider={episode.video_provider}
             videoUrl={episode.video_url}
