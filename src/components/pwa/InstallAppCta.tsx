@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import type { ReactNode } from "react";
 
 interface InstallAppCtaProps {
   onInstall: () => Promise<void>;
   onDismiss: () => void;
 }
 
-function Benefit({ children }: { children: React.ReactNode }) {
+function Benefit({ children }: { children: ReactNode }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-1 text-[11px] font-bold text-zinc-300">
       <span className="text-emerald-400" aria-hidden="true">✓</span>
@@ -19,7 +20,10 @@ function Benefit({ children }: { children: React.ReactNode }) {
 export function InstallAppCta({ onInstall, onDismiss }: InstallAppCtaProps) {
   return (
     <aside
+      role="dialog"
+      aria-modal="false"
       aria-labelledby="install-ceritaria-title"
+      aria-describedby="install-ceritaria-description"
       className="fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-[70] mx-auto max-w-md overflow-hidden rounded-[24px] border border-white/10 bg-[#15151b]/97 shadow-[0_18px_55px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-[380px]"
     >
       <div className="h-1 bg-gradient-to-r from-red-700 via-red-500 to-rose-400" />
@@ -32,7 +36,7 @@ export function InstallAppCta({ onInstall, onDismiss }: InstallAppCtaProps) {
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-black tracking-[0.16em] text-red-400">CERITARIA APP</p>
             <h2 id="install-ceritaria-title" className="mt-0.5 text-[17px] font-black leading-6 text-white">Nonton lebih nyaman dari layar utama</h2>
-            <p className="mt-1 text-[12px] leading-5 text-zinc-400">Pasang Ceritaria seperti aplikasi. Lebih cepat dibuka dan tampil tanpa address bar browser.</p>
+            <p id="install-ceritaria-description" className="mt-1 text-[12px] leading-5 text-zinc-400">Pasang Ceritaria agar lebih cepat dibuka dan tampil seperti aplikasi, tanpa tampilan browser.</p>
           </div>
 
           <button
@@ -68,7 +72,7 @@ export function InstallAppCta({ onInstall, onDismiss }: InstallAppCtaProps) {
           </button>
         </div>
 
-        <p className="mt-3 text-center text-[10px] leading-4 text-zinc-500">Gratis. Bisa dihapus kapan saja dari perangkat.</p>
+        <p className="mt-3 text-center text-[10px] leading-4 text-zinc-500">Gratis dan bisa dihapus kapan saja.</p>
       </div>
     </aside>
   );
