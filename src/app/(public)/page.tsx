@@ -8,7 +8,7 @@ import { ContinueWatchingSection } from "@/features/watch-history/components/Con
 import { getLatestEpisodes } from "@/features/episode/services/public-episodes";
 import { getFeaturedSeries, getPublishedSeries } from "@/features/series/services/public-series";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Ceritaria", alternates: { canonical: "/" } };
 
 export default async function HomePage() {
