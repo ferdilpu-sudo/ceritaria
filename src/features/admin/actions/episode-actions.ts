@@ -1,10 +1,9 @@
 "use server";
 
-import { revalidatePath, updateTag } from "next/cache";
 import { requireAdmin } from "@/lib/security/require-admin";
 import { episodeFormSchema, splitLineList } from "@/features/admin/services/schemas";
 import { zodFieldErrors } from "@/features/admin/services/form-errors";
-import { uploadAdminImage } from "@/features/admin/services/media-upload";
+import { refreshPublicPaths } from "@/features/admin/services/public-cache";
 import type { ActionResult } from "@/features/admin/types/action-result";
 
 function readBoolean(formData: FormData, key: string) {
@@ -45,11 +44,6 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
     const { data: existing } = values.id
       ? await supabase.from("episodes").select("published_at,series_id,slug").eq("id", id).maybeSingle()
       : { data: null };
-    let thumbnailUrl = values.thumbnailUrl;
-    const file = formData.get("thumbnailFile");
-    if (file instanceof File && file.size > 0) {
-      thumbnailUrl = await uploadAdminImage(supabase, "episode-media", file, id);
-    }
 
     const payload = {
       id,
@@ -62,7 +56,7 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
       highlights: splitLineList(values.highlights),
       video_provider: values.videoProvider,
       video_url: values.videoUrl,
-      thumbnail_url: thumbnailUrl,
+      thumbnail_url: values.thumbnailUrl,
       duration_seconds: values.durationSeconds,
       is_published: values.isPublished,
       published_at: values.isPublished ? (existing?.published_at ?? new Date().toISOString()) : existing?.published_at ?? null,
@@ -86,15 +80,14 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
     const { data: oldSeries } = existing?.series_id
       ? await supabase.from("series").select("slug").eq("id", existing.series_id).maybeSingle()
       : { data: null };
-    updateTag("public-content");
-    revalidatePath("/");
-    if (series) {
-      revalidatePath(`/series/${series.slug}`);
-      revalidatePath(`/series/${series.slug}/${values.slug}`);
-    }
-    if (oldSeries && (oldSeries.slug !== series?.slug || existing?.slug !== values.slug)) {
-      revalidatePath(`/series/${oldSeries.slug}/${existing?.slug}`);
-    }
+    refreshPublicPaths([
+      "/",
+      series ? `/series/${series.slug}` : null,
+      series ? `/series/${series.slug}/${values.slug}` : null,
+      oldSeries && (oldSeries.slug !== series?.slug || existing?.slug !== values.slug)
+        ? `/series/${oldSeries.slug}/${existing?.slug}`
+        : null,
+    ]);
     const state = values.id ? "updated" : "created";
     const publiclyVisible = values.isPublished && series?.is_published;
     const view = publiclyVisible ? `&view=${encodeURIComponent(`/series/${series.slug}/${values.slug}`)}` : "";
@@ -113,12 +106,11 @@ export async function deleteEpisodeAction(id: string): Promise<ActionResult> {
       : { data: null };
     const { error } = await supabase.from("episodes").update({ deleted_at: new Date().toISOString(), is_published: false }).eq("id", id);
     if (error) return { ok: false, message: "Episode belum berhasil dihapus. Coba lagi." };
-    updateTag("public-content");
-    revalidatePath("/");
-    if (series && existing) {
-      revalidatePath(`/series/${series.slug}`);
-      revalidatePath(`/series/${series.slug}/${existing.slug}`);
-    }
+    refreshPublicPaths([
+      "/",
+      series ? `/series/${series.slug}` : null,
+      series && existing ? `/series/${series.slug}/${existing.slug}` : null,
+    ]);
     return { ok: true, redirectTo: "/admin/episodes" };
   } catch {
     return { ok: false, message: "Episode belum berhasil dihapus. Coba lagi beberapa saat." };
