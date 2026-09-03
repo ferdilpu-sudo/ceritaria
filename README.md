@@ -47,6 +47,7 @@ Jalankan migration berurutan di Supabase SQL Editor:
 2. `supabase/migrations/002_youtube_video_provider.sql`
 3. `supabase/migrations/003_brand_ceritaria.sql`
 4. `supabase/migrations/004_first_party_analytics.sql`
+5. `supabase/migrations/005_soft_delete_uniqueness.sql`
 
 Buat user admin lewat Supabase Authentication, lalu tambahkan UUID-nya ke `public.admin_users` menggunakan `supabase/admin-bootstrap.sql.example` sebagai template.
 
