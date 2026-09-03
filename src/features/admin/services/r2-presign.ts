@@ -61,7 +61,7 @@ export async function createR2UploadUrl(kind: MediaKind, contentType: AllowedIma
   ] as const;
   const canonicalQuery = queryEntries
     .map(([name, value]) => [encodeRfc3986(name), encodeRfc3986(value)] as const)
-    .sort(([left], [right]) => left.localeCompare(right))
+    .sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)
     .map(([name, value]) => `${name}=${value}`)
     .join("&");
 
