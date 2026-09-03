@@ -15,7 +15,7 @@ Ceritaria adalah PWA mobile-first untuk katalog dan menonton mini series. Video 
 - Supabase Auth, Postgres RLS, Storage, dan soft delete.
 - SEO: metadata, canonical, OpenGraph, JSON-LD, sitemap, robots.
 - Integrasi opsional Google AdSense dan GA4 melalui environment variables.
-- Deployment target Oracle Cloud VM + Cloudflare Tunnel.
+- Production deployment di Cloudflare Workers; media gambar menggunakan Cloudflare R2.
 
 ## Stack
 
