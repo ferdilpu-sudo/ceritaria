@@ -3,7 +3,6 @@
 import { requireAdmin } from "@/lib/security/require-admin";
 import { episodeFormSchema, splitLineList } from "@/features/admin/services/schemas";
 import { zodFieldErrors } from "@/features/admin/services/form-errors";
-import { refreshPublicPaths } from "@/features/admin/services/public-cache";
 import type { ActionResult } from "@/features/admin/types/action-result";
 
 function readBoolean(formData: FormData, key: string) {
@@ -42,7 +41,7 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
     const values = parsed.data;
     const id = values.id ?? crypto.randomUUID();
     const { data: existing } = values.id
-      ? await supabase.from("episodes").select("published_at,series_id,slug").eq("id", id).maybeSingle()
+      ? await supabase.from("episodes").select("published_at").eq("id", id).maybeSingle()
       : { data: null };
 
     const payload = {
@@ -77,17 +76,6 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
     }
 
     const { data: series } = await supabase.from("series").select("slug,is_published").eq("id", values.seriesId).maybeSingle();
-    const { data: oldSeries } = existing?.series_id
-      ? await supabase.from("series").select("slug").eq("id", existing.series_id).maybeSingle()
-      : { data: null };
-    refreshPublicPaths([
-      "/",
-      series ? `/series/${series.slug}` : null,
-      series ? `/series/${series.slug}/${values.slug}` : null,
-      oldSeries && (oldSeries.slug !== series?.slug || existing?.slug !== values.slug)
-        ? `/series/${oldSeries.slug}/${existing?.slug}`
-        : null,
-    ]);
     const state = values.id ? "updated" : "created";
     const publiclyVisible = values.isPublished && series?.is_published;
     const view = publiclyVisible ? `&view=${encodeURIComponent(`/series/${series.slug}/${values.slug}`)}` : "";
@@ -100,17 +88,8 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
 export async function deleteEpisodeAction(id: string): Promise<ActionResult> {
   const { supabase } = await requireAdmin();
   try {
-    const { data: existing } = await supabase.from("episodes").select("series_id,slug").eq("id", id).maybeSingle();
-    const { data: series } = existing
-      ? await supabase.from("series").select("slug").eq("id", existing.series_id).maybeSingle()
-      : { data: null };
     const { error } = await supabase.from("episodes").update({ deleted_at: new Date().toISOString(), is_published: false }).eq("id", id);
     if (error) return { ok: false, message: "Episode belum berhasil dihapus. Coba lagi." };
-    refreshPublicPaths([
-      "/",
-      series ? `/series/${series.slug}` : null,
-      series && existing ? `/series/${series.slug}/${existing.slug}` : null,
-    ]);
     return { ok: true, redirectTo: "/admin/episodes" };
   } catch {
     return { ok: false, message: "Episode belum berhasil dihapus. Coba lagi beberapa saat." };
