@@ -1,6 +1,6 @@
 "use client";
 
-import { MEDIA_KIND_CONFIG, validateImageMetadata, type MediaKind } from "@/features/admin/services/media-upload-config";
+import { MAX_IMAGE_BYTES, MEDIA_KIND_CONFIG, validateImageMetadata, type MediaKind } from "@/features/admin/services/media-upload-config";
 
 const WEBP_QUALITY = 0.82;
 
@@ -37,8 +37,8 @@ export async function prepareAdminImage(file: File, kind: MediaKind) {
     context.drawImage(bitmap, 0, 0, width, height);
     bitmap.close();
     const blob = await canvasToBlob(canvas);
-    if (!blob || blob.size > file.size && !resized) return file;
-    if (blob.size > 5 * 1024 * 1024) throw new Error("Gambar masih terlalu besar setelah dioptimalkan.");
+    if (!blob || (blob.size > file.size && !resized)) return file;
+    if (blob.size > MAX_IMAGE_BYTES) throw new Error("Gambar masih terlalu besar setelah dioptimalkan.");
 
     return new File([blob], webpName(file.name), { type: "image/webp", lastModified: Date.now() });
   } catch (error) {
