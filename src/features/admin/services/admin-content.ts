@@ -36,7 +36,8 @@ export async function getNextEpisodeNumbers(seriesIds: string[]) {
   const { data, error } = await supabase
     .from("episodes")
     .select("series_id,episode_number")
-    .in("series_id", seriesIds);
+    .in("series_id", seriesIds)
+    .is("deleted_at", null);
   if (error) throw new Error(error.message);
 
   const highest = new Map<string, number>();
