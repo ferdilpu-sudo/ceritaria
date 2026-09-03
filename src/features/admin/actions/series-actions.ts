@@ -1,10 +1,9 @@
 "use server";
 
-import { revalidatePath, updateTag } from "next/cache";
 import { requireAdmin } from "@/lib/security/require-admin";
 import { seriesFormSchema, splitCommaList } from "@/features/admin/services/schemas";
 import { zodFieldErrors } from "@/features/admin/services/form-errors";
-import { uploadAdminImage } from "@/features/admin/services/media-upload";
+import { refreshPublicPaths } from "@/features/admin/services/public-cache";
 import type { ActionResult } from "@/features/admin/types/action-result";
 
 function readBoolean(formData: FormData, key: string) {
@@ -44,18 +43,6 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
       ? await supabase.from("series").select("published_at,slug").eq("id", id).maybeSingle()
       : { data: null };
 
-    let coverUrl = values.coverUrl;
-    let heroUrl = values.heroUrl;
-    const coverFile = formData.get("coverFile");
-    const heroFile = formData.get("heroFile");
-
-    if (coverFile instanceof File && coverFile.size > 0) {
-      coverUrl = await uploadAdminImage(supabase, "series-media", coverFile, id);
-    }
-    if (heroFile instanceof File && heroFile.size > 0) {
-      heroUrl = await uploadAdminImage(supabase, "series-media", heroFile, id);
-    }
-
     const payload = {
       id,
       slug: values.slug,
@@ -63,8 +50,8 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
       short_synopsis: values.shortSynopsis,
       synopsis: values.synopsis,
       genres: splitCommaList(values.genres),
-      cover_url: coverUrl,
-      hero_url: heroUrl,
+      cover_url: values.coverUrl,
+      hero_url: values.heroUrl,
       is_featured: values.isFeatured,
       is_published: values.isPublished,
       published_at: values.isPublished ? (existing?.published_at ?? new Date().toISOString()) : (existing?.published_at ?? null),
@@ -84,10 +71,11 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
       };
     }
 
-    updateTag("public-content");
-    revalidatePath("/");
-    revalidatePath(`/series/${values.slug}`);
-    if (existing?.slug && existing.slug !== values.slug) revalidatePath(`/series/${existing.slug}`);
+    refreshPublicPaths([
+      "/",
+      `/series/${values.slug}`,
+      existing?.slug && existing.slug !== values.slug ? `/series/${existing.slug}` : null,
+    ]);
     const state = values.id ? "updated" : "created";
     const view = values.isPublished ? `&view=${encodeURIComponent(`/series/${values.slug}`)}` : "";
     return { ok: true, redirectTo: `/admin/series?saved=${state}${view}` };
@@ -102,9 +90,7 @@ export async function deleteSeriesAction(id: string): Promise<ActionResult> {
     const { data: existing } = await supabase.from("series").select("slug").eq("id", id).maybeSingle();
     const { error } = await supabase.rpc("soft_delete_series", { target_id: id });
     if (error) return { ok: false, message: "Series belum berhasil dihapus. Coba lagi." };
-    updateTag("public-content");
-    revalidatePath("/");
-    if (existing) revalidatePath(`/series/${existing.slug}`);
+    refreshPublicPaths(["/", existing ? `/series/${existing.slug}` : null]);
     return { ok: true, redirectTo: "/admin/series" };
   } catch {
     return { ok: false, message: "Series belum berhasil dihapus. Coba lagi beberapa saat." };
