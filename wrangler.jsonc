@@ -13,12 +13,5 @@
 	},
 	"observability": {
 		"enabled": true
-	},
-	"kv_namespaces": [
-		{
-			"binding": "VINEXT_KV_CACHE",
-			"id": "982d80a6dcd04986a203411a596b9a85",
-			"remote": true
-		}
-	]
+	}
 }
