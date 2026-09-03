@@ -11,6 +11,7 @@ import { AdminFormSection } from "@/features/admin/components/AdminFormSection";
 import { SeriesPreviewSidebar } from "@/features/admin/components/SeriesPreviewSidebar";
 import { useImageFilePreview } from "@/features/admin/hooks/useImageFilePreview";
 import { useUnsavedChangesGuard } from "@/features/admin/hooks/useUnsavedChangesGuard";
+import { uploadAdminImageDirect } from "@/features/admin/services/upload-admin-image";
 import { applyServerFieldErrors } from "@/features/admin/utils/apply-server-field-errors";
 import { slugifyAdminTitle } from "@/features/admin/utils/slug";
 import type { SeriesRow } from "@/types/database.types";
@@ -58,21 +59,28 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
 
   const submit = handleSubmit(async (values) => {
     setSaving(true); setMessage(null); clearErrors();
-    const form = new FormData();
-    if (initial?.id) form.set("id", initial.id);
-    Object.entries(values).forEach(([key, value]) => {
-      if (key !== "coverFile" && key !== "heroFile") form.set(key, typeof value === "boolean" ? String(value) : String(value ?? ""));
-    });
-    if (values.coverFile?.[0]) form.set("coverFile", values.coverFile[0]);
-    if (values.heroFile?.[0]) form.set("heroFile", values.heroFile[0]);
-    const result = await saveSeriesAction(form);
-    setSaving(false);
-    if (!result.ok) {
-      applyServerFieldErrors(setError, result.fieldErrors);
-      setMessage(result.message);
-      return;
+    try {
+      const [nextCoverUrl, nextHeroUrl] = await Promise.all([
+        values.coverFile?.[0] ? uploadAdminImageDirect(values.coverFile[0], "series-cover") : Promise.resolve(values.coverUrl),
+        values.heroFile?.[0] ? uploadAdminImageDirect(values.heroFile[0], "series-hero") : Promise.resolve(values.heroUrl),
+      ]);
+      const form = new FormData();
+      if (initial?.id) form.set("id", initial.id);
+      Object.entries({ ...values, coverUrl: nextCoverUrl, heroUrl: nextHeroUrl }).forEach(([key, value]) => {
+        if (key !== "coverFile" && key !== "heroFile") form.set(key, typeof value === "boolean" ? String(value) : String(value ?? ""));
+      });
+      const result = await saveSeriesAction(form);
+      if (!result.ok) {
+        applyServerFieldErrors(setError, result.fieldErrors);
+        setMessage(result.message);
+        return;
+      }
+      router.push(result.redirectTo); router.refresh();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Gambar belum berhasil diunggah. Coba lagi.");
+    } finally {
+      setSaving(false);
     }
-    router.push(result.redirectTo); router.refresh();
   });
 
   return (
@@ -89,10 +97,10 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
             </div>
           </AdminFormSection>
 
-          <AdminFormSection guideId="series-media" title="Cover & Gambar Utama" description="Pilih cover untuk daftar series dan gambar melebar untuk bagian utama halaman series.">
+          <AdminFormSection guideId="series-media" title="Cover & Gambar Utama" description="Pilih cover untuk daftar series dan gambar melebar untuk bagian utama halaman series. Gambar akan diringankan otomatis saat diunggah.">
             <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-              <AdminFilePicker label="Cover Series" hint="Disarankan poster 2:3 · JPG/PNG/WebP · maks. 5 MB" registerProps={coverRegister} onFile={coverPreview.readFile} previewSrc={coverPreview.previewUrl || coverUrl || null} />
-              <AdminFilePicker label="Gambar Utama" hint="Disarankan landscape 16:9 · JPG/PNG/WebP · maks. 5 MB" registerProps={heroRegister} onFile={heroPreview.readFile} previewSrc={heroPreview.previewUrl || heroUrl || null} />
+              <AdminFilePicker label="Cover Series" hint="Poster 2:3 · JPG/PNG/WebP · maks. 5 MB" registerProps={coverRegister} onFile={coverPreview.readFile} previewSrc={coverPreview.previewUrl || coverUrl || null} />
+              <AdminFilePicker label="Gambar Utama" hint="Landscape 16:9 · JPG/PNG/WebP · maks. 5 MB" registerProps={heroRegister} onFile={heroPreview.readFile} previewSrc={heroPreview.previewUrl || heroUrl || null} />
             </div>
           </AdminFormSection>
 
