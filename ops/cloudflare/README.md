@@ -1,13 +1,15 @@
 # Cloudflare untuk Ceritaria
 
-## Tunnel
+Ceritaria saat ini berjalan di Cloudflare Workers melalui Vinext. Konfigurasi media gambar baru menggunakan Cloudflare R2 dan dijelaskan di [`R2_MEDIA.md`](./R2_MEDIA.md).
 
-1. Tambahkan domain ke Cloudflare.
-2. Buat named tunnel, misalnya `ceritaria-production`.
-3. Install `cloudflared` pada Oracle VM.
-4. Arahkan published hostname ke `http://127.0.0.1:3000`.
-5. Redirect `www` ke hostname canonical bila diperlukan.
-6. Jangan membuka port 80/443 pada VM hanya untuk aplikasi bila seluruh traffic web masuk lewat Tunnel.
+## Media R2
+
+- Bucket yang disarankan: `ceritaria-media`.
+- Domain publik yang disarankan: `img.ceritaria.site`.
+- Browser mengunggah langsung ke R2 dengan presigned PUT URL.
+- Worker hanya memverifikasi admin dan membuat URL upload singkat, sehingga body gambar tidak melewati Worker.
+- Supabase tetap menjadi database dan autentikasi; URL gambar disimpan di Postgres.
+- Workers KV hanya dipakai Vinext untuk cache aplikasi, bukan penyimpanan gambar.
 
 ## Cache rules
 
@@ -21,7 +23,7 @@
 
 ## Security
 
-- Cloudflare Tunnel menjadi ingress; aplikasi tetap bind ke loopback.
-- DDoS protection bawaan Cloudflare tetap aktif.
-- Tambahkan rate rule pada login admin hanya jika ada abuse nyata.
+- Jangan commit credential R2 atau secret Supabase.
+- Token R2 untuk media sebaiknya dibatasi hanya ke bucket media.
+- `/api/admin/media/presign` memverifikasi user dan keanggotaan `admin_users` sebelum membuat presigned URL.
 - Jangan memakai Cloudflare untuk proxy/download file video YouTube/Facebook.
