@@ -9,7 +9,7 @@ import { SeriesFallbackVisual } from "@/features/series/components/SeriesFallbac
 import { getPublishedSeriesBySlug } from "@/features/series/services/public-series";
 import { getPublicEnv } from "@/lib/env";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 interface PageProps { params: Promise<{ slug: string }>; }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
