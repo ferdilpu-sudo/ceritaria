@@ -12,6 +12,7 @@ import { EpisodePreviewSidebar } from "@/features/admin/components/EpisodePrevie
 import { VideoPreview } from "@/features/admin/components/VideoPreview";
 import { useImageFilePreview } from "@/features/admin/hooks/useImageFilePreview";
 import { useUnsavedChangesGuard } from "@/features/admin/hooks/useUnsavedChangesGuard";
+import { uploadAdminImageDirect } from "@/features/admin/services/upload-admin-image";
 import { applyServerFieldErrors } from "@/features/admin/utils/apply-server-field-errors";
 import { secondsToClock } from "@/features/admin/utils/duration";
 import { buildEpisodeSlug } from "@/features/admin/utils/slug";
@@ -75,20 +76,27 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
 
   const submit = handleSubmit(async (values) => {
     setSaving(true); setMessage(null); clearErrors();
-    const form = new FormData();
-    if (initial?.id) form.set("id", initial.id);
-    Object.entries(values).forEach(([key, value]) => {
-      if (key !== "thumbnailFile") form.set(key, typeof value === "boolean" ? String(value) : String(value ?? ""));
-    });
-    if (values.thumbnailFile?.[0]) form.set("thumbnailFile", values.thumbnailFile[0]);
-    const result = await saveEpisodeAction(form);
-    setSaving(false);
-    if (!result.ok) {
-      applyServerFieldErrors(setError, result.fieldErrors);
-      setMessage(result.message);
-      return;
+    try {
+      const nextThumbnailUrl = values.thumbnailFile?.[0]
+        ? await uploadAdminImageDirect(values.thumbnailFile[0], "episode-thumbnail")
+        : values.thumbnailUrl;
+      const form = new FormData();
+      if (initial?.id) form.set("id", initial.id);
+      Object.entries({ ...values, thumbnailUrl: nextThumbnailUrl }).forEach(([key, value]) => {
+        if (key !== "thumbnailFile") form.set(key, typeof value === "boolean" ? String(value) : String(value ?? ""));
+      });
+      const result = await saveEpisodeAction(form);
+      if (!result.ok) {
+        applyServerFieldErrors(setError, result.fieldErrors);
+        setMessage(result.message);
+        return;
+      }
+      router.push(result.redirectTo); router.refresh();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Thumbnail belum berhasil diunggah. Coba lagi.");
+    } finally {
+      setSaving(false);
     }
-    router.push(result.redirectTo); router.refresh();
   });
 
   return (
@@ -105,11 +113,11 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
             </div>
           </AdminFormSection>
 
-          <AdminFormSection guideId="episode-media" title="Video & Thumbnail" description="Tempel link video yang sudah kamu upload, cek preview-nya, lalu pilih gambar thumbnail untuk episode ini.">
+          <AdminFormSection guideId="episode-media" title="Video & Thumbnail" description="Tempel link video yang sudah kamu upload, cek preview-nya, lalu pilih thumbnail. Gambar akan diringankan otomatis saat diunggah.">
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={`${label} sm:col-span-2`}>{videoProvider === "youtube" ? "Link Video YouTube" : "Link Video Facebook"} <span className="text-red-600">*</span><input type="url" className={field} placeholder={videoProvider === "youtube" ? "https://youtu.be/..." : "https://www.facebook.com/.../videos/..."} {...register("videoUrl", { required: "Link video wajib diisi" })} />{errors.videoUrl && <small className="mt-1 block text-red-600">{errors.videoUrl.message}</small>}</label>
               <div className="sm:col-span-2"><VideoPreview provider={videoProvider} videoUrl={videoUrl} /></div>
-              <AdminFilePicker label="Thumbnail Episode" hint="Pilih gambar dari perangkat · JPG/PNG/WebP · maks. 5 MB" registerProps={thumbnailRegister} onFile={thumbnailPreview.readFile} previewSrc={thumbnailPreview.previewUrl || thumbnailUrl || null} />
+              <AdminFilePicker label="Thumbnail Episode" hint="Poster 9:16 · JPG/PNG/WebP · maks. 5 MB" registerProps={thumbnailRegister} onFile={thumbnailPreview.readFile} previewSrc={thumbnailPreview.previewUrl || thumbnailUrl || null} />
               <label className={label}>Durasi Video{optional}<input inputMode="numeric" className={field} placeholder="10:30" {...register("durationSeconds", { pattern: { value: /^\d{1,3}:[0-5]\d$/, message: "Tulis seperti 10:30 untuk 10 menit 30 detik" } })} />{errors.durationSeconds && <small className="mt-1 block text-red-600">{errors.durationSeconds.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Contoh: 05:20 atau 12:45.</small></label>
             </div>
           </AdminFormSection>
