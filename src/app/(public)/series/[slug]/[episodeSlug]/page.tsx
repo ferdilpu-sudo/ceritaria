@@ -11,7 +11,7 @@ import { getPublishedSeriesBySlug } from "@/features/series/services/public-seri
 import { ContinueWatchingTracker } from "@/features/watch-history/components/ContinueWatchingTracker";
 import { getPublicEnv } from "@/lib/env";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ slug: string; episodeSlug: string }>;
