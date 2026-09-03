@@ -3,7 +3,6 @@
 import { requireAdmin } from "@/lib/security/require-admin";
 import { seriesFormSchema, splitCommaList } from "@/features/admin/services/schemas";
 import { zodFieldErrors } from "@/features/admin/services/form-errors";
-import { refreshPublicPaths } from "@/features/admin/services/public-cache";
 import type { ActionResult } from "@/features/admin/types/action-result";
 
 function readBoolean(formData: FormData, key: string) {
@@ -40,7 +39,7 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
     const values = parsed.data;
     const id = values.id ?? crypto.randomUUID();
     const { data: existing } = values.id
-      ? await supabase.from("series").select("published_at,slug").eq("id", id).maybeSingle()
+      ? await supabase.from("series").select("published_at").eq("id", id).maybeSingle()
       : { data: null };
 
     const payload = {
@@ -71,11 +70,6 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
       };
     }
 
-    refreshPublicPaths([
-      "/",
-      `/series/${values.slug}`,
-      existing?.slug && existing.slug !== values.slug ? `/series/${existing.slug}` : null,
-    ]);
     const state = values.id ? "updated" : "created";
     const view = values.isPublished ? `&view=${encodeURIComponent(`/series/${values.slug}`)}` : "";
     return { ok: true, redirectTo: `/admin/series?saved=${state}${view}` };
@@ -87,10 +81,8 @@ export async function saveSeriesAction(formData: FormData): Promise<ActionResult
 export async function deleteSeriesAction(id: string): Promise<ActionResult> {
   const { supabase } = await requireAdmin();
   try {
-    const { data: existing } = await supabase.from("series").select("slug").eq("id", id).maybeSingle();
     const { error } = await supabase.rpc("soft_delete_series", { target_id: id });
     if (error) return { ok: false, message: "Series belum berhasil dihapus. Coba lagi." };
-    refreshPublicPaths(["/", existing ? `/series/${existing.slug}` : null]);
     return { ok: true, redirectTo: "/admin/series" };
   } catch {
     return { ok: false, message: "Series belum berhasil dihapus. Coba lagi beberapa saat." };
