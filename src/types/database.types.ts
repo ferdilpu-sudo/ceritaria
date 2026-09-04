@@ -23,9 +23,21 @@ export interface Database {
         Relationships: [];
       };
       community_profiles: {
-        Row: { user_id: string; display_name: string; avatar_url: string | null; is_blocked: boolean; created_at: string; updated_at: string };
-        Insert: { user_id: string; display_name: string; avatar_url?: string | null; is_blocked?: boolean; created_at?: string; updated_at?: string };
+        Row: { user_id: string; display_name: string; avatar_url: string | null; bio: string; is_blocked: boolean; created_at: string; updated_at: string };
+        Insert: { user_id: string; display_name: string; avatar_url?: string | null; bio?: string; is_blocked?: boolean; created_at?: string; updated_at?: string };
         Update: Partial<Database["public"]["Tables"]["community_profiles"]["Insert"]>;
+        Relationships: [];
+      };
+      community_notifications: {
+        Row: {
+          id: string; user_id: string; actor_user_id: string; comment_id: string; episode_id: string;
+          notification_type: string; is_read: boolean; created_at: string;
+        };
+        Insert: {
+          id?: string; user_id: string; actor_user_id: string; comment_id: string; episode_id: string;
+          notification_type?: string; is_read?: boolean; created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["community_notifications"]["Insert"]>;
         Relationships: [];
       };
       episode_comments: {
