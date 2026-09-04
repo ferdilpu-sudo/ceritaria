@@ -20,11 +20,11 @@ export function EpisodeVideoEmbed({ provider, videoUrl, thumbnailUrl, title, epi
   const isFacebook = provider === "facebook" && facebookPermalinkSchema.safeParse(videoUrl).success;
 
   if (isYouTube) {
-    return <YouTubeVideoEmbed videoUrl={videoUrl} thumbnailUrl={thumbnailUrl} title={title} episodeId={episodeId} autoStart={autoStart} nextHref={nextHref} nextTitle={nextTitle} />;
+    return <YouTubeVideoEmbed key={episodeId} videoUrl={videoUrl} thumbnailUrl={thumbnailUrl} title={title} episodeId={episodeId} autoStart={autoStart} nextHref={nextHref} nextTitle={nextTitle} />;
   }
 
   if (isFacebook) {
-    return <FacebookVideoEmbed permalink={videoUrl} thumbnailUrl={thumbnailUrl} title={title} episodeId={episodeId} />;
+    return <FacebookVideoEmbed key={episodeId} permalink={videoUrl} thumbnailUrl={thumbnailUrl} title={title} episodeId={episodeId} />;
   }
 
   return (
