@@ -7,10 +7,11 @@ Ceritaria adalah PWA mobile-first untuk katalog dan menonton mini series. Video 
 - Homepage dengan hero series, episode terbaru, dan katalog series.
 - Detail series dengan fallback hero visual data-driven ketika artwork belum tersedia.
 - Detail episode 9:16, click-to-load player, prev/next, recap, momen penting, dan episode terkait.
+- Komunitas per episode: akun penonton, komentar, balasan satu tingkat, like, report, dan moderasi admin.
 - YouTube-first via `youtube-nocookie.com`; Facebook tetap didukung untuk row legacy.
 - Search series dan episode.
 - PWA mobile dengan app bar, bottom navigation, safe-area support, manifest, dan service worker minimal.
-- Admin CMS light theme untuk series/episode, live preview media, upload cover/hero/thumbnail, draft/publish, featured, dan SEO.
+- Admin CMS light theme untuk series/episode, live preview media, upload cover/hero/thumbnail, draft/publish, featured, SEO, dan moderasi komunitas.
 - First-party analytics: visitor realtime, pageview, visitor unik, top pages, device, referrer, dan event player.
 - Supabase Auth, Postgres RLS, Storage, dan soft delete.
 - SEO: metadata, canonical, OpenGraph, JSON-LD, sitemap, robots.
@@ -48,6 +49,7 @@ Jalankan migration berurutan di Supabase SQL Editor:
 3. `supabase/migrations/003_brand_ceritaria.sql`
 4. `supabase/migrations/004_first_party_analytics.sql`
 5. `supabase/migrations/005_soft_delete_uniqueness.sql`
+6. `supabase/migrations/006_community_comments.sql`
 
 Buat user admin lewat Supabase Authentication, lalu tambahkan UUID-nya ke `public.admin_users` menggunakan `supabase/admin-bootstrap.sql.example` sebagai template.
 
@@ -93,6 +95,7 @@ src/
   features/
     admin/              CMS actions, forms, previews
     analytics/          first-party analytics + realtime visitors
+    community/          komentar, auth penonton, like, report
     episode/            episode player/data/components
     home/               homepage components
     series/             series data/components/fallback visual
