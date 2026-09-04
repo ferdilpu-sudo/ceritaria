@@ -5,12 +5,13 @@ import { usePathname } from "next/navigation";
 import { logoutAction } from "@/features/admin/actions/auth-actions";
 import { startAdminGuide } from "@/features/admin/components/AdminGuideTour";
 
-type IconName = "home" | "series" | "episode" | "analytics";
+type IconName = "home" | "series" | "episode" | "community" | "analytics";
 
 const navItems = [
   { href: "/admin", label: "Beranda", desktopLabel: "Dashboard", exact: true, guide: "nav-dashboard", icon: "home" as IconName },
   { href: "/admin/series", label: "Series", desktopLabel: "Series", guide: "nav-series", icon: "series" as IconName },
   { href: "/admin/episodes", label: "Episode", desktopLabel: "Episode", guide: "nav-episodes", icon: "episode" as IconName },
+  { href: "/admin/community", label: "Komentar", desktopLabel: "Komunitas", guide: "nav-community", icon: "community" as IconName },
   { href: "/admin/analytics", label: "Analytics", desktopLabel: "Analytics", guide: "nav-analytics", icon: "analytics" as IconName },
 ];
 
@@ -22,6 +23,7 @@ function NavIcon({ name }: { name: IconName }) {
   if (name === "home") return <path d="M3 10.7 12 3l9 7.7V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10.7Z" />;
   if (name === "series") return <><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M8 8h8M8 12h8M8 16h5" /></>;
   if (name === "episode") return <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m10 9 5 3-5 3V9Z" /></>;
+  if (name === "community") return <><path d="M4 5h16v11H9l-5 4V5Z" /><path d="M8 9h8M8 12h5" /></>;
   return <><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /><path d="M3 7.5 9 3l6 6 6-5" /></>;
 }
 
@@ -78,12 +80,12 @@ export function AdminNav() {
       </header>
 
       <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-[var(--border)] bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:hidden" aria-label="Navigasi admin mobile">
-        <div className="grid grid-cols-4">
+        <div className="grid grid-cols-5">
           {navItems.map((item) => {
             const active = isActive(pathname, item.href, item.exact);
             return (
               <Link key={item.href} href={item.href} data-guide={item.guide} aria-current={active ? "page" : undefined}
-                className={`relative flex min-h-16 min-w-0 flex-col items-center justify-center gap-1 px-1 text-[10px] font-bold transition ${active ? "text-red-600" : "text-[var(--muted)] active:bg-[var(--surface-2)]"}`}>
+                className={`relative flex min-h-16 min-w-0 flex-col items-center justify-center gap-1 px-1 text-[9px] font-bold transition ${active ? "text-red-600" : "text-[var(--muted)] active:bg-[var(--surface-2)]"}`}>
                 {active && <span className="absolute top-0 h-0.5 w-8 rounded-full bg-red-600" />}
                 <svg aria-hidden="true" viewBox="0 0 24 24" className="h-[22px] w-[22px] fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <NavIcon name={item.icon} />
