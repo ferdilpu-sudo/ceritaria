@@ -3,6 +3,7 @@
 export interface YouTubePlayer {
   getCurrentTime(): number;
   getDuration(): number;
+  seekTo(seconds: number, allowSeekAhead: boolean): void;
   destroy(): void;
 }
 
