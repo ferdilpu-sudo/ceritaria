@@ -115,6 +115,7 @@ export interface Database {
     Functions: {
       create_episode_poll: { Args: { p_episode_id: string; p_question: string; p_options: string[] }; Returns: string };
       delete_own_comment: { Args: { p_comment_id: string }; Returns: undefined };
+      get_episode_reaction_counts: { Args: { p_episode_id: string }; Returns: { reaction: string; count: number }[] };
       get_analytics_dashboard: { Args: { p_days?: number; p_timezone?: string }; Returns: Json };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       soft_delete_series: { Args: { target_id: string }; Returns: undefined };
