@@ -37,6 +37,21 @@ create index idx_episode_reactions_episode on public.episode_reactions (episode_
 create index idx_poll_options_poll on public.episode_poll_options (poll_id, sort_order);
 create index idx_poll_votes_option on public.episode_poll_votes (option_id);
 
+create or replace function public.get_episode_reaction_counts(p_episode_id uuid)
+returns table (reaction text, count bigint)
+language sql stable security definer set search_path = '' as $$
+  select er.reaction::text, count(*)
+  from public.episode_reactions er
+  join public.episodes e on e.id = er.episode_id
+  where er.episode_id = p_episode_id
+    and e.is_published = true
+    and e.deleted_at is null
+    and e.published_at <= now()
+  group by er.reaction;
+$$;
+revoke all on function public.get_episode_reaction_counts(uuid) from public;
+grant execute on function public.get_episode_reaction_counts(uuid) to anon, authenticated;
+
 create or replace function public.validate_poll_vote()
 returns trigger language plpgsql set search_path = '' as $$
 declare option_poll uuid; active_poll boolean;
@@ -71,6 +86,7 @@ returns uuid language plpgsql security definer set search_path = '' as $$
 declare new_poll_id uuid; option_text text; option_index integer := 0;
 begin
   if not public.is_admin() then raise exception 'not authorized'; end if;
+  if char_length(trim(p_question)) < 4 or char_length(trim(p_question)) > 160 then raise exception 'invalid poll question'; end if;
   if array_length(p_options, 1) is null or array_length(p_options, 1) < 2 or array_length(p_options, 1) > 6 then
     raise exception 'poll requires 2 to 6 options';
   end if;
@@ -93,19 +109,22 @@ alter table public.episode_polls enable row level security;
 alter table public.episode_poll_options enable row level security;
 alter table public.episode_poll_votes enable row level security;
 
-create policy "public read episode reactions" on public.episode_reactions for select to anon, authenticated using (true);
+create policy "user read own reaction" on public.episode_reactions for select to authenticated using (user_id = auth.uid());
 create policy "user add reaction" on public.episode_reactions for insert to authenticated
   with check (user_id = auth.uid() and exists (select 1 from public.community_profiles p where p.user_id = auth.uid() and p.is_blocked = false));
 create policy "user update reaction" on public.episode_reactions for update to authenticated
-  using (user_id = auth.uid()) with check (user_id = auth.uid());
+  using (user_id = auth.uid()) with check (user_id = auth.uid() and exists (select 1 from public.community_profiles p where p.user_id = auth.uid() and p.is_blocked = false));
 create policy "user remove reaction" on public.episode_reactions for delete to authenticated using (user_id = auth.uid());
 
-create policy "public read active polls" on public.episode_polls for select to anon, authenticated
+create policy "public read polls" on public.episode_polls for select to anon, authenticated
   using (exists (select 1 from public.episodes e where e.id = episode_id and e.is_published = true and e.deleted_at is null and e.published_at <= now()));
 create policy "admin manage polls" on public.episode_polls for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 create policy "public read poll options" on public.episode_poll_options for select to anon, authenticated
-  using (exists (select 1 from public.episode_polls p where p.id = poll_id));
+  using (exists (
+    select 1 from public.episode_polls p join public.episodes e on e.id = p.episode_id
+    where p.id = poll_id and e.is_published = true and e.deleted_at is null and e.published_at <= now()
+  ));
 create policy "admin manage poll options" on public.episode_poll_options for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 create policy "user read own poll votes" on public.episode_poll_votes for select to authenticated using (user_id = auth.uid());
