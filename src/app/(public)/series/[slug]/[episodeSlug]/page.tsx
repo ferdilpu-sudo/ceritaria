@@ -74,7 +74,7 @@ export default async function EpisodePage({ params, searchParams }: PageProps) {
 
       <div className="grid gap-5 sm:gap-8 lg:grid-cols-[minmax(300px,380px)_minmax(0,1fr)] lg:gap-12 xl:gap-16">
         <div className="-mx-4 sm:mx-0 lg:sticky lg:top-24 lg:self-start">
-          <EpisodeVideoEmbed provider={episode.video_provider} videoUrl={episode.video_url} thumbnailUrl={episode.thumbnail_url} title={episode.title} episodeId={episode.id} autoStart={query.play === "1"} nextHref={nextHref} nextTitle={next?.title} />
+          <EpisodeVideoEmbed provider={episode.video_provider} videoUrl={episode.video_url} thumbnailUrl={episode.thumbnail_url} title={episode.title} episodeId={episode.id} seriesSlug={series.slug} episodeSlug={episode.slug} autoStart={query.play === "1"} nextHref={nextHref} nextTitle={next?.title} />
         </div>
 
         <main className="min-w-0 max-w-3xl">
