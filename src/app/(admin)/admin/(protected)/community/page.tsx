@@ -1,16 +1,24 @@
 import Link from "next/link";
 import { deleteCommentAdminAction, setCommentHiddenAction, setCommunityUserBlockedAction } from "@/features/admin/actions/community-actions";
+import { CommunityStatsCards } from "@/features/admin/components/CommunityStatsCards";
 import { requireAdmin } from "@/lib/security/require-admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function CommunityAdminPage() {
   const { supabase } = await requireAdmin();
-  const { data: comments } = await supabase
-    .from("episode_comments")
+  const [commentsResult, membersResult, likesResult, reactionsResult, votesResult, reportsResult] = await Promise.all([
+    supabase.from("episode_comments").select("id", { count: "exact", head: true }).is("deleted_at", null),
+    supabase.from("community_profiles").select("user_id", { count: "exact", head: true }),
+    supabase.from("comment_likes").select("comment_id", { count: "exact", head: true }),
+    supabase.from("episode_reactions").select("episode_id", { count: "exact", head: true }),
+    supabase.from("episode_poll_votes").select("poll_id", { count: "exact", head: true }),
+    supabase.from("comment_reports").select("id", { count: "exact", head: true }),
+  ]);
+
+  const { data: comments } = await supabase.from("episode_comments")
     .select("id,episode_id,user_id,parent_id,body,like_count,is_hidden,deleted_at,created_at")
-    .order("created_at", { ascending: false })
-    .limit(100);
+    .order("created_at", { ascending: false }).limit(100);
 
   const rows = comments ?? [];
   const userIds = [...new Set(rows.map((row) => row.user_id))];
@@ -32,10 +40,19 @@ export default async function CommunityAdminPage() {
         <div>
           <p className="text-xs font-black tracking-[0.16em] text-red-600">KOMUNITAS</p>
           <h1 className="mt-1 text-3xl font-black text-[var(--text)]">Moderasi Komentar</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">100 komentar terbaru. Sembunyikan konten bermasalah atau blokir akun yang berulang kali melanggar.</p>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">Pantau engagement, moderasi komentar, dan kelola akun yang melanggar aturan komunitas.</p>
         </div>
         <Link href="/admin/community/polls" className="min-h-11 rounded-xl bg-red-600 px-4 py-3 text-sm font-black text-white hover:bg-red-700">Kelola Prediksi →</Link>
       </header>
+
+      <CommunityStatsCards
+        comments={commentsResult.count ?? 0}
+        members={membersResult.count ?? 0}
+        likes={likesResult.count ?? 0}
+        reactions={reactionsResult.count ?? 0}
+        votes={votesResult.count ?? 0}
+        reports={reportsResult.count ?? 0}
+      />
 
       {rows.length === 0 ? (
         <div className="rounded-2xl border border-[var(--border)] bg-white p-8 text-center text-[var(--muted)]">Belum ada komentar.</div>
@@ -69,9 +86,7 @@ export default async function CommunityAdminPage() {
                     <form action={setCommentHiddenAction}>
                       <input type="hidden" name="id" value={comment.id} />
                       <input type="hidden" name="hidden" value={comment.is_hidden ? "false" : "true"} />
-                      <button className="min-h-10 rounded-xl border border-[var(--border)] px-3 text-sm font-bold text-[var(--text)] hover:bg-[var(--surface)]">
-                        {comment.is_hidden ? "Tampilkan" : "Sembunyikan"}
-                      </button>
+                      <button className="min-h-10 rounded-xl border border-[var(--border)] px-3 text-sm font-bold text-[var(--text)] hover:bg-[var(--surface)]">{comment.is_hidden ? "Tampilkan" : "Sembunyikan"}</button>
                     </form>
                     <form action={deleteCommentAdminAction}>
                       <input type="hidden" name="id" value={comment.id} />
@@ -80,9 +95,7 @@ export default async function CommunityAdminPage() {
                     <form action={setCommunityUserBlockedAction}>
                       <input type="hidden" name="userId" value={comment.user_id} />
                       <input type="hidden" name="blocked" value={profile?.is_blocked ? "false" : "true"} />
-                      <button className="min-h-10 rounded-xl border border-[var(--border)] px-3 text-sm font-bold text-[var(--muted)] hover:bg-[var(--surface)]">
-                        {profile?.is_blocked ? "Buka blokir" : "Blokir user"}
-                      </button>
+                      <button className="min-h-10 rounded-xl border border-[var(--border)] px-3 text-sm font-bold text-[var(--muted)] hover:bg-[var(--surface)]">{profile?.is_blocked ? "Buka blokir" : "Blokir user"}</button>
                     </form>
                   </div>
                 )}
