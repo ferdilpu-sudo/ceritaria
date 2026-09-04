@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdSlot } from "@/components/ads/AdSlot";
+import { EpisodeComments } from "@/features/community/components/EpisodeComments";
 import { EpisodeCard } from "@/features/episode/components/EpisodeCard";
 import { EpisodeNavigation } from "@/features/episode/components/EpisodeNavigation";
 import { EpisodeVideoEmbed } from "@/features/episode/components/EpisodeVideoEmbed";
@@ -150,6 +151,7 @@ export default async function EpisodePage({ params }: PageProps) {
         </main>
       </div>
 
+      <EpisodeComments episodeId={episode.id} />
       <div className="mx-auto mt-8 max-w-3xl sm:mt-10"><AdSlot /></div>
 
       {related.length > 0 && (
