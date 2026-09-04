@@ -7,11 +7,11 @@ Ceritaria adalah PWA mobile-first untuk katalog dan menonton mini series. Video 
 - Homepage dengan hero series, episode terbaru, dan katalog series.
 - Detail series dengan fallback hero visual data-driven ketika artwork belum tersedia.
 - Detail episode 9:16, click-to-load player, prev/next, recap, momen penting, dan episode terkait.
-- Komunitas episode: akun penonton, komentar, reply satu tingkat, like, report, moderasi, reaksi cepat, serta polling/prediksi.
+- Komunitas episode: akun penonton, profil singkat, komentar, reply satu tingkat, like, report, notifikasi balasan, sorting terbaru/populer, reaksi cepat, serta polling/prediksi.
 - YouTube-first via `youtube-nocookie.com`; Facebook tetap didukung untuk row legacy.
 - Search series dan episode.
 - PWA mobile dengan app bar, bottom navigation, safe-area support, manifest, dan service worker minimal.
-- Admin CMS light theme untuk series/episode, live preview media, upload cover/hero/thumbnail, draft/publish, featured, SEO, moderasi komunitas, dan pengelolaan polling.
+- Admin CMS light theme untuk series/episode, live preview media, upload cover/hero/thumbnail, draft/publish, featured, SEO, moderasi komunitas, statistik engagement, dan pengelolaan polling.
 - First-party analytics: visitor realtime, pageview, visitor unik, top pages, device, referrer, dan event player.
 - Supabase Auth, Postgres RLS, Storage, dan soft delete.
 - SEO: metadata, canonical, OpenGraph, JSON-LD, sitemap, robots.
@@ -51,6 +51,7 @@ Jalankan migration berurutan di Supabase SQL Editor:
 5. `supabase/migrations/005_soft_delete_uniqueness.sql`
 6. `supabase/migrations/006_community_comments.sql`
 7. `supabase/migrations/007_episode_engagement.sql`
+8. `supabase/migrations/008_community_polish.sql`
 
 Buat user admin lewat Supabase Authentication, lalu tambahkan UUID-nya ke `public.admin_users` menggunakan `supabase/admin-bootstrap.sql.example` sebagai template.
 
