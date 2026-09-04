@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdSlot } from "@/components/ads/AdSlot";
+import { EpisodeComments } from "@/features/community/components/EpisodeComments";
 import { EpisodeEngagement } from "@/features/community/components/EpisodeEngagement";
 import { EpisodeCard } from "@/features/episode/components/EpisodeCard";
 import { EpisodeNavigation } from "@/features/episode/components/EpisodeNavigation";
@@ -127,6 +128,7 @@ export default async function EpisodePage({ params }: PageProps) {
           <div className="mt-5 sm:mt-6"><EpisodeNavigation seriesSlug={series.slug} previous={previous} next={next} /></div>
 
           <EpisodeEngagement episodeId={episode.id} />
+          <EpisodeComments episodeId={episode.id} />
 
           {episode.recap && (
             <section className="mt-8 border-t border-[var(--border)] pt-7 sm:mt-10 sm:pt-8">
