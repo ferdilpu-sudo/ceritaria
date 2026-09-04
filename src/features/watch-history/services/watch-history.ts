@@ -47,6 +47,12 @@ export function readWatchHistory(): WatchHistoryItem[] {
   }
 }
 
+export function getResumeProgress(seriesSlug: string, episodeSlug: string) {
+  const item = readWatchHistory().find((entry) => entry.seriesSlug === seriesSlug && entry.episodeSlug === episodeSlug);
+  if (!item || item.completed || item.progressPercent < 1 || item.progressPercent >= 90) return 0;
+  return item.progressPercent;
+}
+
 export function rememberEpisode(item: Omit<WatchHistoryItem, "watchedAt" | "progressPercent" | "completed">) {
   if (typeof window === "undefined") return;
   const history = readWatchHistory();
