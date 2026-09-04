@@ -26,28 +26,31 @@ export function EpisodeEngagement({ episodeId }: { episodeId: string }) {
 
   const load = useCallback(async () => {
     const [{ data: reactionRows }, { data: claims }] = await Promise.all([
-      supabase.from("episode_reactions").select("reaction").eq("episode_id", episodeId),
+      supabase.rpc("get_episode_reaction_counts", { p_episode_id: episodeId }),
       supabase.auth.getClaims(),
     ]);
     const next = { love: 0, shock: 0, sad: 0, angry: 0 } as Record<ReactionKey, number>;
-    (reactionRows ?? []).forEach((row) => { const key = row.reaction as ReactionKey; if (key in next) next[key] += 1; });
+    (reactionRows ?? []).forEach((row) => {
+      const key = row.reaction as ReactionKey;
+      if (key in next) next[key] = Number(row.count);
+    });
     setCounts(next);
 
     const userId = claims.data?.claims?.sub;
     if (userId) {
       const { data } = await supabase.from("episode_reactions").select("reaction").eq("episode_id", episodeId).eq("user_id", userId).maybeSingle();
       setMine((data?.reaction as ReactionKey | undefined) ?? null);
-    }
+    } else setMine(null);
 
     const { data: pollRow } = await supabase.from("episode_polls").select("id,question,is_active").eq("episode_id", episodeId).maybeSingle();
-    if (!pollRow) { setPoll(null); setOptions([]); return; }
+    if (!pollRow) { setPoll(null); setOptions([]); setMyVote(null); return; }
     setPoll(pollRow);
     const { data: optionRows } = await supabase.from("episode_poll_options").select("id,label,vote_count,sort_order").eq("poll_id", pollRow.id).order("sort_order");
     setOptions(optionRows ?? []);
     if (userId) {
       const { data: vote } = await supabase.from("episode_poll_votes").select("option_id").eq("poll_id", pollRow.id).eq("user_id", userId).maybeSingle();
       setMyVote(vote?.option_id ?? null);
-    }
+    } else setMyVote(null);
   }, [episodeId, supabase]);
 
   useEffect(() => { void load(); }, [load]);
@@ -57,8 +60,10 @@ export function EpisodeEngagement({ episodeId }: { episodeId: string }) {
     const userId = data?.claims?.sub;
     if (!userId) { setMessage("Masuk ke akun untuk memberi reaksi."); return; }
     setBusy(true); setMessage("");
-    if (mine === key) await supabase.from("episode_reactions").delete().eq("episode_id", episodeId).eq("user_id", userId);
-    else await supabase.from("episode_reactions").upsert({ episode_id: episodeId, user_id: userId, reaction: key }, { onConflict: "episode_id,user_id" });
+    const result = mine === key
+      ? await supabase.from("episode_reactions").delete().eq("episode_id", episodeId).eq("user_id", userId)
+      : await supabase.from("episode_reactions").upsert({ episode_id: episodeId, user_id: userId, reaction: key }, { onConflict: "episode_id,user_id" });
+    if (result.error) setMessage("Reaksi belum tersimpan. Coba lagi.");
     await load(); setBusy(false);
   }
 
