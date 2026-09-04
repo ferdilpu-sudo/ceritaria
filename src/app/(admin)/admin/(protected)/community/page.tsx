@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { deleteCommentAdminAction, setCommentHiddenAction, setCommunityUserBlockedAction } from "@/features/admin/actions/community-actions";
 import { requireAdmin } from "@/lib/security/require-admin";
 
@@ -27,10 +28,13 @@ export default async function CommunityAdminPage() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <p className="text-xs font-black tracking-[0.16em] text-red-600">KOMUNITAS</p>
-        <h1 className="mt-1 text-3xl font-black text-[var(--text)]">Moderasi Komentar</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">100 komentar terbaru. Sembunyikan konten bermasalah atau blokir akun yang berulang kali melanggar.</p>
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-black tracking-[0.16em] text-red-600">KOMUNITAS</p>
+          <h1 className="mt-1 text-3xl font-black text-[var(--text)]">Moderasi Komentar</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">100 komentar terbaru. Sembunyikan konten bermasalah atau blokir akun yang berulang kali melanggar.</p>
+        </div>
+        <Link href="/admin/community/polls" className="min-h-11 rounded-xl bg-red-600 px-4 py-3 text-sm font-black text-white hover:bg-red-700">Kelola Prediksi →</Link>
       </header>
 
       {rows.length === 0 ? (
