@@ -52,6 +52,30 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["comment_reports"]["Insert"]>;
         Relationships: [];
       };
+      episode_reactions: {
+        Row: { episode_id: string; user_id: string; reaction: string; created_at: string; updated_at: string };
+        Insert: { episode_id: string; user_id: string; reaction: string; created_at?: string; updated_at?: string };
+        Update: Partial<Database["public"]["Tables"]["episode_reactions"]["Insert"]>;
+        Relationships: [];
+      };
+      episode_polls: {
+        Row: { id: string; episode_id: string; question: string; is_active: boolean; created_at: string; updated_at: string };
+        Insert: { id?: string; episode_id: string; question: string; is_active?: boolean; created_at?: string; updated_at?: string };
+        Update: Partial<Database["public"]["Tables"]["episode_polls"]["Insert"]>;
+        Relationships: [];
+      };
+      episode_poll_options: {
+        Row: { id: string; poll_id: string; label: string; sort_order: number; vote_count: number };
+        Insert: { id?: string; poll_id: string; label: string; sort_order: number; vote_count?: number };
+        Update: Partial<Database["public"]["Tables"]["episode_poll_options"]["Insert"]>;
+        Relationships: [];
+      };
+      episode_poll_votes: {
+        Row: { poll_id: string; option_id: string; user_id: string; created_at: string };
+        Insert: { poll_id: string; option_id: string; user_id: string; created_at?: string };
+        Update: Partial<Database["public"]["Tables"]["episode_poll_votes"]["Insert"]>;
+        Relationships: [];
+      };
       series: {
         Row: {
           id: string; slug: string; title: string; short_synopsis: string | null; synopsis: string | null;
@@ -89,6 +113,7 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
+      create_episode_poll: { Args: { p_episode_id: string; p_question: string; p_options: string[] }; Returns: string };
       delete_own_comment: { Args: { p_comment_id: string }; Returns: undefined };
       get_analytics_dashboard: { Args: { p_days?: number; p_timezone?: string }; Returns: Json };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
