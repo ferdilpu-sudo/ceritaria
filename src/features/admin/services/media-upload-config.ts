@@ -2,12 +2,13 @@ export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 
 export type AllowedImageType = (typeof ALLOWED_IMAGE_TYPES)[number];
-export type MediaKind = "series-cover" | "series-hero" | "episode-thumbnail";
+export type MediaKind = "series-cover" | "series-hero" | "episode-thumbnail" | "community-avatar";
 
 export const MEDIA_KIND_CONFIG: Record<MediaKind, { maxWidth: number; maxHeight: number; prefix: string }> = {
   "series-cover": { maxWidth: 1200, maxHeight: 1800, prefix: "series/cover" },
   "series-hero": { maxWidth: 1920, maxHeight: 1080, prefix: "series/hero" },
   "episode-thumbnail": { maxWidth: 1080, maxHeight: 1920, prefix: "episodes/thumbnail" },
+  "community-avatar": { maxWidth: 640, maxHeight: 640, prefix: "community/avatar" },
 };
 
 const extensions: Record<AllowedImageType, string> = {
