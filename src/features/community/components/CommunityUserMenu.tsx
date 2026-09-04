@@ -80,9 +80,7 @@ export function CommunityUserMenu({ userId }: { userId: string }) {
         <div><p className="text-xs text-zinc-500">Masuk sebagai</p><p className="font-black">{displayName || "Penonton"}</p></div>
         <div className="flex gap-2">
           <button type="button" onClick={() => setPanel(panel === "profile" ? null : "profile")} className="min-h-11 rounded-xl border border-[var(--border)] px-3 text-sm font-bold">Profil</button>
-          <button type="button" onClick={() => setPanel(panel === "notifications" ? null : "notifications")} className="min-h-11 rounded-xl border border-[var(--border)] px-3 text-sm font-bold">
-            Notifikasi{unread ? ` ${unread}` : ""}
-          </button>
+          <button type="button" onClick={() => setPanel(panel === "notifications" ? null : "notifications")} className="min-h-11 rounded-xl border border-[var(--border)] px-3 text-sm font-bold">Notifikasi{unread ? ` ${unread}` : ""}</button>
         </div>
       </div>
 
@@ -90,7 +88,13 @@ export function CommunityUserMenu({ userId }: { userId: string }) {
         <div className="mt-4 space-y-3 border-t border-[var(--border)] pt-4">
           <input value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={32} className="w-full rounded-xl border border-[var(--border)] bg-zinc-950 px-4 py-3 text-sm outline-none focus:border-red-500" placeholder="Nama tampil" />
           <textarea value={bio} onChange={(event) => setBio(event.target.value)} maxLength={120} rows={3} className="w-full resize-none rounded-xl border border-[var(--border)] bg-zinc-950 px-4 py-3 text-sm outline-none focus:border-red-500" placeholder="Bio singkat, misalnya: Tim Ana sejak episode 1" />
-          <div className="flex items-center justify-between gap-3"><span className="text-xs text-zinc-500">{bio.length}/120</span><button type="button" disabled={busy} onClick={() => void saveProfile()} className="min-h-11 rounded-xl bg-red-600 px-4 text-sm font-black text-white disabled:opacity-60">Simpan profil</button></div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="text-xs text-zinc-500">{bio.length}/120</span>
+            <div className="flex gap-2">
+              <Link href="/profile" className="inline-flex min-h-11 items-center rounded-xl border border-[var(--border)] px-4 text-sm font-bold text-zinc-200">Profil lengkap</Link>
+              <button type="button" disabled={busy} onClick={() => void saveProfile()} className="min-h-11 rounded-xl bg-red-600 px-4 text-sm font-black text-white disabled:opacity-60">Simpan</button>
+            </div>
+          </div>
           {message && <p className="text-sm text-zinc-300">{message}</p>}
         </div>
       )}
