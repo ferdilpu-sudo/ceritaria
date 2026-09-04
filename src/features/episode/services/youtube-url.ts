@@ -43,7 +43,7 @@ export const youtubeVideoUrlSchema = z.string().trim().refine(
 export function buildYouTubeEmbedUrl(videoUrl: string, autoplay = false) {
   const id = getYouTubeVideoId(videoUrl);
   if (!id) throw new Error("URL YouTube tidak valid");
-  const params = new URLSearchParams({ playsinline: "1", rel: "0" });
+  const params = new URLSearchParams({ playsinline: "1", rel: "0", enablejsapi: "1" });
   if (autoplay) params.set("autoplay", "1");
   return `https://www.youtube-nocookie.com/embed/${id}?${params.toString()}`;
 }
