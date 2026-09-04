@@ -27,6 +27,16 @@ function progressOf(player: YouTubePlayer) {
   return duration > 0 ? Math.min(100, Math.max(0, (player.getCurrentTime() / duration) * 100)) : 0;
 }
 
+function restorePosition(player: YouTubePlayer, progressPercent: number, attempt = 0) {
+  if (progressPercent <= 0) return;
+  const duration = player.getDuration();
+  if (duration > 0) {
+    player.seekTo((duration * progressPercent) / 100, true);
+    return;
+  }
+  if (attempt < 8) window.setTimeout(() => restorePosition(player, progressPercent, attempt + 1), 250);
+}
+
 export function YouTubeVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, seriesSlug, episodeSlug, autoStart = false, nextHref, nextTitle }: Props) {
   const router = useRouter();
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -52,11 +62,7 @@ export function YouTubeVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, se
       playerRef.current = new api.Player(iframeRef.current, {
         events: {
           onReady: (event) => {
-            const resumeProgress = getResumeProgress(seriesSlug, episodeSlug);
-            const duration = event.target.getDuration();
-            if (resumeProgress > 0 && duration > 0) {
-              event.target.seekTo((duration * resumeProgress) / 100, true);
-            }
+            restorePosition(event.target, getResumeProgress(seriesSlug, episodeSlug));
             setFrameReady(true);
           },
           onStateChange: (event) => {
