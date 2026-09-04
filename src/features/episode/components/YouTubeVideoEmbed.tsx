@@ -7,6 +7,7 @@ import { MediaImage } from "@/components/ui/MediaImage";
 import { loadYouTubeIframeApi, type YouTubePlayer } from "@/features/episode/services/youtube-iframe-api";
 import { buildYouTubeEmbedUrl } from "@/features/episode/services/youtube-url";
 import { emitWatchProgress } from "@/features/watch-history/services/watch-progress-events";
+import { getResumeProgress } from "@/features/watch-history/services/watch-history";
 import { trackEvent } from "@/lib/analytics/events";
 
 interface Props {
@@ -14,6 +15,8 @@ interface Props {
   thumbnailUrl: string | null;
   title: string;
   episodeId: string;
+  seriesSlug: string;
+  episodeSlug: string;
   autoStart?: boolean;
   nextHref?: string;
   nextTitle?: string;
@@ -24,7 +27,7 @@ function progressOf(player: YouTubePlayer) {
   return duration > 0 ? Math.min(100, Math.max(0, (player.getCurrentTime() / duration) * 100)) : 0;
 }
 
-export function YouTubeVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, autoStart = false, nextHref, nextTitle }: Props) {
+export function YouTubeVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, seriesSlug, episodeSlug, autoStart = false, nextHref, nextTitle }: Props) {
   const router = useRouter();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const playerRef = useRef<YouTubePlayer | null>(null);
@@ -38,23 +41,39 @@ export function YouTubeVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, au
   useEffect(() => {
     if (!loaded || !iframeRef.current) return;
     let cancelled = false;
-    const stopProgress = () => { if (progressTimer.current) clearInterval(progressTimer.current); progressTimer.current = null; };
+    const stopProgress = () => {
+      if (progressTimer.current) clearInterval(progressTimer.current);
+      progressTimer.current = null;
+    };
     const saveProgress = (player: YouTubePlayer) => emitWatchProgress({ episodeId, progressPercent: progressOf(player) });
 
     void loadYouTubeIframeApi().then((api) => {
       if (cancelled || !iframeRef.current) return;
       playerRef.current = new api.Player(iframeRef.current, {
         events: {
-          onReady: () => setFrameReady(true),
+          onReady: (event) => {
+            const resumeProgress = getResumeProgress(seriesSlug, episodeSlug);
+            const duration = event.target.getDuration();
+            if (resumeProgress > 0 && duration > 0) {
+              event.target.seekTo((duration * resumeProgress) / 100, true);
+            }
+            setFrameReady(true);
+          },
           onStateChange: (event) => {
             if (event.data === api.PlayerState.PLAYING) {
-              setEnded(false); stopProgress(); saveProgress(event.target);
+              setEnded(false);
+              stopProgress();
+              saveProgress(event.target);
               progressTimer.current = setInterval(() => saveProgress(event.target), 5000);
             } else if (event.data === api.PlayerState.PAUSED) {
-              stopProgress(); saveProgress(event.target);
+              stopProgress();
+              saveProgress(event.target);
             } else if (event.data === api.PlayerState.ENDED) {
-              stopProgress(); emitWatchProgress({ episodeId, progressPercent: 100 });
-              setEnded(true); setCountdown(6); setAutoNext(true);
+              stopProgress();
+              emitWatchProgress({ episodeId, progressPercent: 100 });
+              setEnded(true);
+              setCountdown(6);
+              setAutoNext(true);
             }
           },
         },
@@ -62,27 +81,37 @@ export function YouTubeVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, au
     }).catch(() => setFrameReady(true));
 
     return () => {
-      cancelled = true; stopProgress();
+      cancelled = true;
+      stopProgress();
       try { playerRef.current?.destroy(); } catch { /* iframe may already be gone */ }
       playerRef.current = null;
     };
-  }, [loaded, episodeId]);
+  }, [loaded, episodeId, seriesSlug, episodeSlug]);
 
   useEffect(() => {
     if (!ended || !nextHref || !autoNext) return;
-    if (countdown <= 0) { router.push(`${nextHref}?play=1`); return; }
+    if (countdown <= 0) {
+      router.push(`${nextHref}?play=1`);
+      return;
+    }
     const timer = window.setTimeout(() => setCountdown((value) => value - 1), 1000);
     return () => window.clearTimeout(timer);
   }, [ended, nextHref, autoNext, countdown, router]);
 
-  const startPlayback = () => { trackEvent("play_intent", { episode_id: episodeId }); setLoaded(true); };
+  const startPlayback = () => {
+    trackEvent("play_intent", { episode_id: episodeId });
+    setLoaded(true);
+  };
 
   return (
     <div className="mx-auto w-full max-w-none sm:max-w-[380px] lg:mx-0">
       <div className="relative aspect-[9/16] overflow-hidden rounded-none border-y border-white/10 bg-black sm:rounded-[26px] sm:border sm:shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
         {!loaded ? (
-          <><MediaImage src={thumbnailUrl} alt={`Thumbnail ${title}`} sizes="(max-width: 639px) 100vw, 380px" /><div className="absolute inset-0 bg-black/30" />
-            <button type="button" onClick={startPlayback} className="absolute left-1/2 top-1/2 min-h-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white px-6 font-black text-black shadow-2xl">▶ Putar episode</button></>
+          <>
+            <MediaImage src={thumbnailUrl} alt={`Thumbnail ${title}`} sizes="(max-width: 639px) 100vw, 380px" />
+            <div className="absolute inset-0 bg-black/30" />
+            <button type="button" onClick={startPlayback} className="absolute left-1/2 top-1/2 min-h-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white px-6 font-black text-black shadow-2xl">▶ Putar episode</button>
+          </>
         ) : (
           <>
             {!frameReady && <div className="absolute inset-0 z-10 grid place-items-center bg-zinc-950"><div className="text-center"><span className="mx-auto block h-9 w-9 animate-spin rounded-full border-2 border-white/20 border-t-white" /><p className="mt-4 text-sm font-semibold text-white/70">Menyiapkan video…</p></div></div>}
