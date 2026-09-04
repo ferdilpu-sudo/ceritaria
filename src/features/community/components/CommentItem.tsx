@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { CommentComposer } from "@/features/community/components/CommentComposer";
+import { CommunityAvatar } from "@/features/community/components/CommunityAvatar";
 import type { CommunityComment, CommunityProfile } from "@/features/community/types/community";
 
 interface Props {
@@ -29,16 +31,17 @@ function relativeTime(value: string) {
 export function CommentItem({ comment, profile, replies, profiles, currentUserId, liked, onReply, onLike, onDelete, onReport }: Props) {
   const [replying, setReplying] = useState(false);
   const own = currentUserId === comment.user_id;
+  const name = profile?.display_name ?? "Penonton";
 
   return (
     <article className="border-b border-[var(--border)] py-5 last:border-b-0">
       <div className="flex gap-3">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-zinc-800 text-sm font-black">
-          {(profile?.display_name ?? "P").slice(0, 1).toUpperCase()}
-        </div>
+        <Link href={`/u/${comment.user_id}`} aria-label={`Lihat profil ${name}`} className="shrink-0 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500">
+          <CommunityAvatar name={name} avatarUrl={profile?.avatar_url} size="sm" />
+        </Link>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="font-black">{profile?.display_name ?? "Penonton"}</span>
+            <Link href={`/u/${comment.user_id}`} className="font-black hover:text-red-300">{name}</Link>
             <span className="text-xs text-zinc-500">{relativeTime(comment.created_at)}</span>
           </div>
           <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-zinc-200">{comment.body}</p>
@@ -46,9 +49,7 @@ export function CommentItem({ comment, profile, replies, profiles, currentUserId
             <button onClick={() => onLike(comment.id)} disabled={!currentUserId} className="min-h-10 rounded-xl px-2 hover:text-white disabled:opacity-40">
               {liked.has(comment.id) ? "♥" : "♡"} {comment.like_count}
             </button>
-            {currentUserId && (
-              <button onClick={() => setReplying((value) => !value)} className="min-h-10 rounded-xl px-2 hover:text-white">Balas</button>
-            )}
+            {currentUserId && <button onClick={() => setReplying((value) => !value)} className="min-h-10 rounded-xl px-2 hover:text-white">Balas</button>}
             {own ? (
               <button onClick={() => onDelete(comment.id)} className="min-h-10 rounded-xl px-2 text-red-300 hover:text-red-200">Hapus</button>
             ) : currentUserId ? (
@@ -57,12 +58,7 @@ export function CommentItem({ comment, profile, replies, profiles, currentUserId
           </div>
           {replying && (
             <div className="mt-3">
-              <CommentComposer
-                placeholder={`Balas ${profile?.display_name ?? "komentar"}...`}
-                submitLabel="Balas"
-                onCancel={() => setReplying(false)}
-                onSubmit={async (body) => { await onReply(comment.id, body); setReplying(false); }}
-              />
+              <CommentComposer placeholder={`Balas ${name}...`} submitLabel="Balas" onCancel={() => setReplying(false)} onSubmit={async (body) => { await onReply(comment.id, body); setReplying(false); }} />
             </div>
           )}
           {replies.length > 0 && (
@@ -70,16 +66,18 @@ export function CommentItem({ comment, profile, replies, profiles, currentUserId
               {replies.map((reply) => {
                 const replyProfile = profiles.get(reply.user_id);
                 const replyOwn = currentUserId === reply.user_id;
+                const replyName = replyProfile?.display_name ?? "Penonton";
                 return (
-                  <div key={reply.id}>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-black">{replyProfile?.display_name ?? "Penonton"}</span>
-                      <span className="text-xs text-zinc-500">{relativeTime(reply.created_at)}</span>
-                    </div>
-                    <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-zinc-300">{reply.body}</p>
-                    <div className="mt-1 flex gap-1 text-xs font-bold text-zinc-500">
-                      <button onClick={() => onLike(reply.id)} disabled={!currentUserId} className="min-h-9 px-2 disabled:opacity-40">{liked.has(reply.id) ? "♥" : "♡"} {reply.like_count}</button>
-                      {replyOwn && <button onClick={() => onDelete(reply.id)} className="min-h-9 px-2 text-red-300">Hapus</button>}
+                  <div key={reply.id} className="flex gap-2.5">
+                    <Link href={`/u/${reply.user_id}`} className="shrink-0 rounded-full"><CommunityAvatar name={replyName} avatarUrl={replyProfile?.avatar_url} size="sm" /></Link>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2"><Link href={`/u/${reply.user_id}`} className="text-sm font-black hover:text-red-300">{replyName}</Link><span className="text-xs text-zinc-500">{relativeTime(reply.created_at)}</span></div>
+                      <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-zinc-300">{reply.body}</p>
+                      <div className="mt-1 flex gap-1 text-xs font-bold text-zinc-500">
+                        <button onClick={() => onLike(reply.id)} disabled={!currentUserId} className="min-h-9 px-2 disabled:opacity-40">{liked.has(reply.id) ? "♥" : "♡"} {reply.like_count}</button>
+                        {replyOwn && <button onClick={() => onDelete(reply.id)} className="min-h-9 px-2 text-red-300">Hapus</button>}
+                        {!replyOwn && currentUserId && <button onClick={() => onReport(reply.id)} className="min-h-9 px-2">Laporkan</button>}
+                      </div>
                     </div>
                   </div>
                 );
