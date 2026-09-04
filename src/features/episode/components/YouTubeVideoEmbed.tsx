@@ -1,102 +1,97 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { MediaImage } from "@/components/ui/MediaImage";
+import { loadYouTubeIframeApi, type YouTubePlayer } from "@/features/episode/services/youtube-iframe-api";
 import { buildYouTubeEmbedUrl } from "@/features/episode/services/youtube-url";
+import { emitWatchProgress } from "@/features/watch-history/services/watch-progress-events";
 import { trackEvent } from "@/lib/analytics/events";
 
-interface YouTubeVideoEmbedProps {
+interface Props {
   videoUrl: string;
   thumbnailUrl: string | null;
   title: string;
   episodeId: string;
+  autoStart?: boolean;
+  nextHref?: string;
+  nextTitle?: string;
 }
 
-function PlayIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor" aria-hidden="true">
-      <path d="M8 5.6v12.8a1 1 0 0 0 1.52.85l9.1-6.4a1 1 0 0 0 0-1.7l-9.1-6.4A1 1 0 0 0 8 5.6Z" />
-    </svg>
-  );
+function progressOf(player: YouTubePlayer) {
+  const duration = player.getDuration();
+  return duration > 0 ? Math.min(100, Math.max(0, (player.getCurrentTime() / duration) * 100)) : 0;
 }
 
-function EmptyThumbnail() {
-  return (
-    <div className="absolute inset-0 overflow-hidden bg-gradient-to-br from-zinc-800 via-zinc-950 to-black" aria-hidden="true">
-      <div className="absolute -left-16 top-1/4 h-48 w-48 rounded-full bg-red-700/15 blur-3xl" />
-      <div className="absolute -right-20 bottom-1/4 h-56 w-56 rounded-full bg-white/[0.035] blur-3xl" />
-      <div className="absolute inset-x-8 top-8 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-    </div>
-  );
-}
-
-export function YouTubeVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId }: YouTubeVideoEmbedProps) {
-  const [loaded, setLoaded] = useState(false);
+export function YouTubeVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, autoStart = false, nextHref, nextTitle }: Props) {
+  const router = useRouter();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const playerRef = useRef<YouTubePlayer | null>(null);
+  const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [loaded, setLoaded] = useState(autoStart);
   const [frameReady, setFrameReady] = useState(false);
+  const [ended, setEnded] = useState(false);
+  const [countdown, setCountdown] = useState(6);
+  const [autoNext, setAutoNext] = useState(true);
 
-  const startPlayback = () => {
-    trackEvent("play_intent", { episode_id: episodeId });
-    setLoaded(true);
-  };
+  useEffect(() => {
+    if (!loaded || !iframeRef.current) return;
+    let cancelled = false;
+    const stopProgress = () => { if (progressTimer.current) clearInterval(progressTimer.current); progressTimer.current = null; };
+    const saveProgress = (player: YouTubePlayer) => emitWatchProgress({ episodeId, progressPercent: progressOf(player) });
+
+    void loadYouTubeIframeApi().then((api) => {
+      if (cancelled || !iframeRef.current) return;
+      playerRef.current = new api.Player(iframeRef.current, {
+        events: {
+          onReady: () => setFrameReady(true),
+          onStateChange: (event) => {
+            if (event.data === api.PlayerState.PLAYING) {
+              setEnded(false); stopProgress(); saveProgress(event.target);
+              progressTimer.current = setInterval(() => saveProgress(event.target), 5000);
+            } else if (event.data === api.PlayerState.PAUSED) {
+              stopProgress(); saveProgress(event.target);
+            } else if (event.data === api.PlayerState.ENDED) {
+              stopProgress(); emitWatchProgress({ episodeId, progressPercent: 100 });
+              setEnded(true); setCountdown(6); setAutoNext(true);
+            }
+          },
+        },
+      });
+    }).catch(() => setFrameReady(true));
+
+    return () => {
+      cancelled = true; stopProgress();
+      try { playerRef.current?.destroy(); } catch { /* iframe may already be gone */ }
+      playerRef.current = null;
+    };
+  }, [loaded, episodeId]);
+
+  useEffect(() => {
+    if (!ended || !nextHref || !autoNext) return;
+    if (countdown <= 0) { router.push(`${nextHref}?play=1`); return; }
+    const timer = window.setTimeout(() => setCountdown((value) => value - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [ended, nextHref, autoNext, countdown, router]);
+
+  const startPlayback = () => { trackEvent("play_intent", { episode_id: episodeId }); setLoaded(true); };
 
   return (
     <div className="mx-auto w-full max-w-none sm:max-w-[380px] lg:mx-0">
-      <div className="relative aspect-[9/16] overflow-hidden rounded-none border-y border-white/10 bg-black shadow-none sm:rounded-[26px] sm:border sm:shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
+      <div className="relative aspect-[9/16] overflow-hidden rounded-none border-y border-white/10 bg-black sm:rounded-[26px] sm:border sm:shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
         {!loaded ? (
-          <>
-            {thumbnailUrl ? (
-              <MediaImage src={thumbnailUrl} alt={`Thumbnail ${title}`} sizes="(max-width: 639px) 100vw, 380px" className="scale-[1.01]" />
-            ) : (
-              <EmptyThumbnail />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/5 to-black/40" />
-            <button
-              type="button"
-              onClick={startPlayback}
-              aria-label={`Putar ${title}`}
-              className="group absolute left-1/2 top-1/2 flex min-h-14 -translate-x-1/2 -translate-y-1/2 items-center gap-3 whitespace-nowrap rounded-full bg-white px-5 py-3 font-black text-black shadow-2xl transition hover:scale-[1.03] hover:bg-zinc-100 active:scale-[0.98]"
-            >
-              <span className="grid h-10 w-10 place-items-center rounded-full bg-[var(--primary)] text-white transition group-hover:bg-[var(--primary-hover)]">
-                <PlayIcon />
-              </span>
-              <span className="pr-1">Putar episode</span>
-            </button>
-          </>
+          <><MediaImage src={thumbnailUrl} alt={`Thumbnail ${title}`} sizes="(max-width: 639px) 100vw, 380px" /><div className="absolute inset-0 bg-black/30" />
+            <button type="button" onClick={startPlayback} className="absolute left-1/2 top-1/2 min-h-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white px-6 font-black text-black shadow-2xl">▶ Putar episode</button></>
         ) : (
           <>
-            {!frameReady && (
-              <div className="absolute inset-0 z-10 grid place-items-center bg-zinc-950" role="status" aria-live="polite">
-                <div className="text-center">
-                  <span className="mx-auto block h-9 w-9 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-                  <p className="mt-4 text-sm font-semibold text-white/70">Menyiapkan video…</p>
-                </div>
-              </div>
-            )}
-            <iframe
-              title={`YouTube player ${title}`}
-              src={buildYouTubeEmbedUrl(videoUrl, true)}
-              className="h-full w-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              loading="eager"
-              referrerPolicy="strict-origin-when-cross-origin"
-              onLoad={() => setFrameReady(true)}
-            />
+            {!frameReady && <div className="absolute inset-0 z-10 grid place-items-center bg-zinc-950"><div className="text-center"><span className="mx-auto block h-9 w-9 animate-spin rounded-full border-2 border-white/20 border-t-white" /><p className="mt-4 text-sm font-semibold text-white/70">Menyiapkan video…</p></div></div>}
+            <iframe ref={iframeRef} title={`YouTube player ${title}`} src={buildYouTubeEmbedUrl(videoUrl, true)} className="h-full w-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="eager" referrerPolicy="strict-origin-when-cross-origin" />
+            {ended && <div className="absolute inset-0 z-20 grid place-items-center bg-black/85 p-6 text-center"><div><p className="text-sm font-bold text-red-300">EPISODE SELESAI</p><h3 className="mt-2 text-xl font-black">{nextHref ? "Lanjut ke episode berikutnya" : "Kamu sudah sampai episode terakhir"}</h3>{nextHref && <><p className="mt-2 text-sm text-zinc-300">{nextTitle ?? "Episode berikutnya"}{autoNext ? ` · otomatis dalam ${countdown} detik` : ""}</p><div className="mt-5 flex flex-col gap-2"><Link href={`${nextHref}?play=1`} className="min-h-12 rounded-xl bg-red-600 px-5 py-3 font-black text-white">▶ Lanjut sekarang</Link>{autoNext && <button type="button" onClick={() => setAutoNext(false)} className="min-h-11 rounded-xl border border-white/15 px-4 text-sm font-bold text-zinc-300">Batalkan lanjut otomatis</button>}</div></>}</div></div>}
           </>
         )}
       </div>
-
-      <div className="flex min-h-11 items-center justify-end px-1 text-xs">
-        <a
-          href={videoUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex min-h-11 items-center rounded-lg px-2 font-bold text-zinc-400 transition hover:text-white"
-          onClick={() => trackEvent("youtube_fallback_click", { episode_id: episodeId })}
-        >
-          Buka di YouTube ↗
-        </a>
-      </div>
+      <div className="flex min-h-11 items-center justify-end px-1 text-xs"><a href={videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-lg px-2 font-bold text-zinc-400 hover:text-white" onClick={() => trackEvent("youtube_fallback_click", { episode_id: episodeId })}>Buka di YouTube ↗</a></div>
     </div>
   );
 }
