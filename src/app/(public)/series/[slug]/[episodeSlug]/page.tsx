@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdSlot } from "@/components/ads/AdSlot";
-import { EpisodeComments } from "@/features/community/components/EpisodeComments";
+import { EpisodeEngagement } from "@/features/community/components/EpisodeEngagement";
 import { EpisodeCard } from "@/features/episode/components/EpisodeCard";
 import { EpisodeNavigation } from "@/features/episode/components/EpisodeNavigation";
 import { EpisodeVideoEmbed } from "@/features/episode/components/EpisodeVideoEmbed";
@@ -126,6 +126,8 @@ export default async function EpisodePage({ params }: PageProps) {
           {episode.short_synopsis && <p className="mt-3 text-sm leading-6 text-zinc-300 sm:mt-5 sm:max-w-2xl sm:text-lg sm:leading-7">{episode.short_synopsis}</p>}
           <div className="mt-5 sm:mt-6"><EpisodeNavigation seriesSlug={series.slug} previous={previous} next={next} /></div>
 
+          <EpisodeEngagement episodeId={episode.id} />
+
           {episode.recap && (
             <section className="mt-8 border-t border-[var(--border)] pt-7 sm:mt-10 sm:pt-8">
               <h2 className="text-xl font-black sm:text-2xl">Recap Episode</h2>
@@ -151,7 +153,6 @@ export default async function EpisodePage({ params }: PageProps) {
         </main>
       </div>
 
-      <EpisodeComments episodeId={episode.id} />
       <div className="mx-auto mt-8 max-w-3xl sm:mt-10"><AdSlot /></div>
 
       {related.length > 0 && (
