@@ -12,112 +12,76 @@ export interface Database {
       };
       analytics_events: {
         Row: {
-          id: string;
-          visitor_id: string;
-          session_id: string;
-          event_name: string;
-          path: string;
-          referrer_host: string | null;
-          device_type: string;
-          metadata: Json;
-          created_at: string;
+          id: string; visitor_id: string; session_id: string; event_name: string; path: string;
+          referrer_host: string | null; device_type: string; metadata: Json; created_at: string;
         };
         Insert: {
-          id?: string;
-          visitor_id: string;
-          session_id: string;
-          event_name: string;
-          path: string;
-          referrer_host?: string | null;
-          device_type: string;
-          metadata?: Json;
-          created_at?: string;
+          id?: string; visitor_id: string; session_id: string; event_name: string; path: string;
+          referrer_host?: string | null; device_type: string; metadata?: Json; created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["analytics_events"]["Insert"]>;
         Relationships: [];
       };
-      series: {
+      community_profiles: {
+        Row: { user_id: string; display_name: string; avatar_url: string | null; is_blocked: boolean; created_at: string; updated_at: string };
+        Insert: { user_id: string; display_name: string; avatar_url?: string | null; is_blocked?: boolean; created_at?: string; updated_at?: string };
+        Update: Partial<Database["public"]["Tables"]["community_profiles"]["Insert"]>;
+        Relationships: [];
+      };
+      episode_comments: {
         Row: {
-          id: string;
-          slug: string;
-          title: string;
-          short_synopsis: string | null;
-          synopsis: string | null;
-          genres: string[];
-          cover_url: string | null;
-          hero_url: string | null;
-          is_featured: boolean;
-          is_published: boolean;
-          published_at: string | null;
-          seo_title: string | null;
-          seo_description: string | null;
-          created_at: string;
-          updated_at: string;
-          deleted_at: string | null;
+          id: string; episode_id: string; user_id: string; parent_id: string | null; body: string;
+          like_count: number; is_hidden: boolean; deleted_at: string | null; created_at: string; updated_at: string;
         };
         Insert: {
-          id?: string;
-          slug: string;
-          title: string;
-          short_synopsis?: string | null;
-          synopsis?: string | null;
-          genres?: string[];
-          cover_url?: string | null;
-          hero_url?: string | null;
-          is_featured?: boolean;
-          is_published?: boolean;
-          published_at?: string | null;
-          seo_title?: string | null;
-          seo_description?: string | null;
-          created_at?: string;
-          updated_at?: string;
-          deleted_at?: string | null;
+          id?: string; episode_id: string; user_id: string; parent_id?: string | null; body: string;
+          like_count?: number; is_hidden?: boolean; deleted_at?: string | null; created_at?: string; updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["episode_comments"]["Insert"]>;
+        Relationships: [];
+      };
+      comment_likes: {
+        Row: { comment_id: string; user_id: string; created_at: string };
+        Insert: { comment_id: string; user_id: string; created_at?: string };
+        Update: Partial<Database["public"]["Tables"]["comment_likes"]["Insert"]>;
+        Relationships: [];
+      };
+      comment_reports: {
+        Row: { id: string; comment_id: string; user_id: string; reason: string; created_at: string };
+        Insert: { id?: string; comment_id: string; user_id: string; reason?: string; created_at?: string };
+        Update: Partial<Database["public"]["Tables"]["comment_reports"]["Insert"]>;
+        Relationships: [];
+      };
+      series: {
+        Row: {
+          id: string; slug: string; title: string; short_synopsis: string | null; synopsis: string | null;
+          genres: string[]; cover_url: string | null; hero_url: string | null; is_featured: boolean;
+          is_published: boolean; published_at: string | null; seo_title: string | null; seo_description: string | null;
+          created_at: string; updated_at: string; deleted_at: string | null;
+        };
+        Insert: {
+          id?: string; slug: string; title: string; short_synopsis?: string | null; synopsis?: string | null;
+          genres?: string[]; cover_url?: string | null; hero_url?: string | null; is_featured?: boolean;
+          is_published?: boolean; published_at?: string | null; seo_title?: string | null; seo_description?: string | null;
+          created_at?: string; updated_at?: string; deleted_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["series"]["Insert"]>;
         Relationships: [];
       };
       episodes: {
         Row: {
-          id: string;
-          series_id: string;
-          episode_number: number;
-          slug: string;
-          title: string;
-          short_synopsis: string | null;
-          recap: string | null;
-          highlights: string[];
-          video_provider: VideoProvider;
-          video_url: string;
-          thumbnail_url: string | null;
-          duration_seconds: number | null;
-          is_published: boolean;
-          published_at: string | null;
-          seo_title: string | null;
-          seo_description: string | null;
-          created_at: string;
-          updated_at: string;
-          deleted_at: string | null;
+          id: string; series_id: string; episode_number: number; slug: string; title: string;
+          short_synopsis: string | null; recap: string | null; highlights: string[]; video_provider: VideoProvider;
+          video_url: string; thumbnail_url: string | null; duration_seconds: number | null; is_published: boolean;
+          published_at: string | null; seo_title: string | null; seo_description: string | null;
+          created_at: string; updated_at: string; deleted_at: string | null;
         };
         Insert: {
-          id?: string;
-          series_id: string;
-          episode_number: number;
-          slug: string;
-          title: string;
-          short_synopsis?: string | null;
-          recap?: string | null;
-          highlights?: string[];
-          video_provider?: VideoProvider;
-          video_url: string;
-          thumbnail_url?: string | null;
-          duration_seconds?: number | null;
-          is_published?: boolean;
-          published_at?: string | null;
-          seo_title?: string | null;
-          seo_description?: string | null;
-          created_at?: string;
-          updated_at?: string;
-          deleted_at?: string | null;
+          id?: string; series_id: string; episode_number: number; slug: string; title: string;
+          short_synopsis?: string | null; recap?: string | null; highlights?: string[]; video_provider?: VideoProvider;
+          video_url: string; thumbnail_url?: string | null; duration_seconds?: number | null; is_published?: boolean;
+          published_at?: string | null; seo_title?: string | null; seo_description?: string | null;
+          created_at?: string; updated_at?: string; deleted_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["episodes"]["Insert"]>;
         Relationships: [];
@@ -125,21 +89,14 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
-      get_analytics_dashboard: {
-        Args: { p_days?: number; p_timezone?: string };
-        Returns: Json;
-      };
+      delete_own_comment: { Args: { p_comment_id: string }; Returns: undefined };
+      get_analytics_dashboard: { Args: { p_days?: number; p_timezone?: string }; Returns: Json };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       soft_delete_series: { Args: { target_id: string }; Returns: undefined };
       track_analytics_event: {
         Args: {
-          p_visitor_id: string;
-          p_session_id: string;
-          p_event_name: string;
-          p_path: string;
-          p_referrer: string;
-          p_device_type: string;
-          p_metadata: Json;
+          p_visitor_id: string; p_session_id: string; p_event_name: string; p_path: string;
+          p_referrer: string; p_device_type: string; p_metadata: Json;
         };
         Returns: undefined;
       };
@@ -151,3 +108,5 @@ export interface Database {
 
 export type SeriesRow = Database["public"]["Tables"]["series"]["Row"];
 export type EpisodeRow = Database["public"]["Tables"]["episodes"]["Row"];
+export type CommunityProfileRow = Database["public"]["Tables"]["community_profiles"]["Row"];
+export type EpisodeCommentRow = Database["public"]["Tables"]["episode_comments"]["Row"];
