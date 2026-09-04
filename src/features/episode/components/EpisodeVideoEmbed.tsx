@@ -10,17 +10,19 @@ interface EpisodeVideoEmbedProps {
   thumbnailUrl: string | null;
   title: string;
   episodeId: string;
+  seriesSlug: string;
+  episodeSlug: string;
   autoStart?: boolean;
   nextHref?: string;
   nextTitle?: string;
 }
 
-export function EpisodeVideoEmbed({ provider, videoUrl, thumbnailUrl, title, episodeId, autoStart, nextHref, nextTitle }: EpisodeVideoEmbedProps) {
+export function EpisodeVideoEmbed({ provider, videoUrl, thumbnailUrl, title, episodeId, seriesSlug, episodeSlug, autoStart, nextHref, nextTitle }: EpisodeVideoEmbedProps) {
   const isYouTube = provider === "youtube" && getYouTubeVideoId(videoUrl) !== null;
   const isFacebook = provider === "facebook" && facebookPermalinkSchema.safeParse(videoUrl).success;
 
   if (isYouTube) {
-    return <YouTubeVideoEmbed key={episodeId} videoUrl={videoUrl} thumbnailUrl={thumbnailUrl} title={title} episodeId={episodeId} autoStart={autoStart} nextHref={nextHref} nextTitle={nextTitle} />;
+    return <YouTubeVideoEmbed key={episodeId} videoUrl={videoUrl} thumbnailUrl={thumbnailUrl} title={title} episodeId={episodeId} seriesSlug={seriesSlug} episodeSlug={episodeSlug} autoStart={autoStart} nextHref={nextHref} nextTitle={nextTitle} />;
   }
 
   if (isFacebook) {
