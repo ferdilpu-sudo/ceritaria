@@ -3,7 +3,7 @@ import { getPublishedSeries } from "@/features/series/services/public-series";
 import { getLatestEpisodes } from "@/features/episode/services/public-episodes";
 import { getPublicEnv } from "@/lib/env";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { NEXT_PUBLIC_SITE_URL } = getPublicEnv();
