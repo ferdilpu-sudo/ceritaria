@@ -36,7 +36,7 @@ export function EpisodeEngagement({ episodeId }: { episodeId: string }) {
     });
     setCounts(next);
 
-    const userId = claims.data?.claims?.sub;
+    const userId = claims?.claims?.sub;
     if (userId) {
       const { data } = await supabase.from("episode_reactions").select("reaction").eq("episode_id", episodeId).eq("user_id", userId).maybeSingle();
       setMine((data?.reaction as ReactionKey | undefined) ?? null);
