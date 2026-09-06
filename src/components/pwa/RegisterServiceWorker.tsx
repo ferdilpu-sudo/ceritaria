@@ -44,7 +44,7 @@ export function RegisterServiceWorker() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
-    setOnline(navigator.onLine);
+    const onlineSyncTimer = window.setTimeout(() => setOnline(navigator.onLine), 0);
     const onOnline = () => setOnline(true);
     const onOffline = () => setOnline(false);
     window.addEventListener("online", onOnline);
@@ -89,6 +89,7 @@ export function RegisterServiceWorker() {
     }
 
     return () => {
+      window.clearTimeout(onlineSyncTimer);
       window.removeEventListener("online", onOnline);
       window.removeEventListener("offline", onOffline);
       window.removeEventListener("beforeinstallprompt", onBeforeInstall);
