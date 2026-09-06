@@ -78,9 +78,14 @@ export function AdminGuideTour() {
   }, []);
 
   useEffect(() => {
-    if (pathname === "/admin" && window.localStorage.getItem(SEEN_KEY) !== "seen") start();
+    const startTimer = pathname === "/admin" && window.localStorage.getItem(SEEN_KEY) !== "seen"
+      ? window.setTimeout(start, 0)
+      : null;
     window.addEventListener(START_EVENT, start);
-    return () => window.removeEventListener(START_EVENT, start);
+    return () => {
+      if (startTimer !== null) window.clearTimeout(startTimer);
+      window.removeEventListener(START_EVENT, start);
+    };
   }, [pathname, start]);
 
   useEffect(() => {
@@ -89,12 +94,11 @@ export function AdminGuideTour() {
     if (!step) return;
 
     const updateFrame = () => setPanelFrame(getPanelFrame());
-    updateFrame();
 
     if (pathname !== step.path) {
-      setHighlight(null);
+      const clearHighlightTimer = window.setTimeout(() => setHighlight(null), 0);
       router.replace(step.path);
-      return;
+      return () => window.clearTimeout(clearHighlightTimer);
     }
 
     let frame = 0;
@@ -110,11 +114,12 @@ export function AdminGuideTour() {
       }, 240);
     };
 
-    locate();
+    const locateTimer = window.setTimeout(locate, 0);
     window.addEventListener("resize", locate);
     window.visualViewport?.addEventListener("resize", locate);
     window.visualViewport?.addEventListener("scroll", locate);
     return () => {
+      window.clearTimeout(locateTimer);
       window.clearTimeout(timeout);
       window.cancelAnimationFrame(frame);
       window.removeEventListener("resize", locate);
