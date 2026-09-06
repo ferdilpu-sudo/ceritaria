@@ -48,7 +48,10 @@ export function EpisodeComments({ episodeId }: Props) {
     setLoading(false);
   }, [episodeId, supabase]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    const loadTimer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(loadTimer);
+  }, [load]);
 
   async function createComment(body: string, parentId: string | null = null) {
     if (!user) throw new Error("Masuk terlebih dahulu.");
