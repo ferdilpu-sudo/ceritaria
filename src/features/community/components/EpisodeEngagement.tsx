@@ -53,7 +53,10 @@ export function EpisodeEngagement({ episodeId }: { episodeId: string }) {
     } else setMyVote(null);
   }, [episodeId, supabase]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    const loadTimer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(loadTimer);
+  }, [load]);
 
   async function react(key: ReactionKey) {
     const { data } = await supabase.auth.getClaims();
