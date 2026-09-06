@@ -34,7 +34,10 @@ export function CommunityProfileEditor() {
     setStats({ comments: count ?? 0, likes: (comments ?? []).reduce((sum, item) => sum + item.like_count, 0) });
   }, [supabase]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    const loadTimer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(loadTimer);
+  }, [load]);
 
   async function saveProfile() {
     if (!userId) return;
