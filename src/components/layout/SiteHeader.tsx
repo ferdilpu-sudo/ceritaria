@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 function SearchIcon() {
@@ -13,8 +14,27 @@ export function SiteHeader({ hideOnMobile = false }: { hideOnMobile?: boolean })
   return (
     <header className={`sticky top-0 z-40 border-b border-[var(--border)] bg-[rgba(11,11,15,.92)] pt-[env(safe-area-inset-top)] backdrop-blur-xl ${hideOnMobile ? "hidden sm:block" : ""}`}>
       <div className="shell flex min-h-14 items-center justify-between gap-4 sm:min-h-16">
-        <Link href="/" className="text-base font-black tracking-[0.2em] sm:text-xl" aria-label="CERITARIA beranda">
-          CERITARIA
+        <Link
+          href="/"
+          className="group flex min-h-11 items-center gap-2 rounded-xl pr-2"
+          aria-label="Ceritaria beranda"
+        >
+          <Image
+            src="/brand/ceritaria-mark.svg"
+            alt=""
+            width={40}
+            height={45}
+            priority
+            className="h-10 w-auto shrink-0 drop-shadow-[0_4px_12px_rgba(229,9,20,.2)] sm:h-11"
+          />
+          <span className="min-w-0">
+            <span className="block font-serif text-[1.35rem] font-semibold leading-none tracking-[-0.045em] text-[#fff7f4] sm:text-[1.55rem]">
+              Ceritaria
+            </span>
+            <span className="mt-1 hidden text-[8px] font-semibold uppercase tracking-[0.24em] text-zinc-500 lg:block">
+              Setiap cerita, selalu berarti
+            </span>
+          </span>
         </Link>
 
         <Link href="/search" className="grid h-11 w-11 place-items-center rounded-full bg-[var(--surface)] text-zinc-200 active:scale-95 sm:hidden" aria-label="Cari series atau episode">
