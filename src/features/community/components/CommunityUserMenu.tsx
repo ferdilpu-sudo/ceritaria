@@ -54,7 +54,10 @@ export function CommunityUserMenu({ userId }: { userId: string }) {
     setSeries(new Map(((seriesRows ?? []) as SeriesInfo[]).map((item) => [item.id, item])));
   }, [supabase, userId]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    const loadTimer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(loadTimer);
+  }, [load]);
 
   async function saveProfile() {
     const name = displayName.trim();
