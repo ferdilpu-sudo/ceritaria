@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AdSlot } from "@/components/ads/AdSlot";
+import { AdsterraNative } from "@/components/ads/AdsterraNative";
 import { HomeEpisodeCard } from "@/features/home/components/HomeEpisodeCard";
 import { HomeSectionHeader } from "@/features/home/components/HomeSectionHeader";
 import { HomeSeriesCard } from "@/features/home/components/HomeSeriesCard";
@@ -38,7 +38,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      <AdSlot />
+      <AdsterraNative />
 
       <section id="semua-series" className="scroll-mt-20 pt-1 sm:scroll-mt-24 sm:pt-2" aria-labelledby="all-series-title">
         <HomeSectionHeader eyebrow="JELAJAHI CERITA" title="Semua Series" />
