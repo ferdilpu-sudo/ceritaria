@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AdSlot } from "@/components/ads/AdSlot";
+import { AdsterraBanner } from "@/components/ads/AdsterraBanner";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { EpisodeCard } from "@/features/episode/components/EpisodeCard";
 import { getPublishedEpisodesForSeries } from "@/features/episode/services/public-episodes";
@@ -93,7 +93,7 @@ export default async function SeriesPage({ params }: PageProps) {
         </section>
       </div>
 
-      <AdSlot />
+      <AdsterraBanner />
 
       <section id="daftar-episode" className="mt-7 scroll-mt-20 sm:mt-12 sm:scroll-mt-24">
         <div className="mb-5 flex items-end justify-between gap-4">
