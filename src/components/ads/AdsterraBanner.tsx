@@ -71,7 +71,6 @@ export function AdsterraBanner({ label = "Iklan" }: { label?: string }) {
           width={config.width}
           height={config.height}
           className="max-w-full border-0 bg-transparent"
-          sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-forms allow-top-navigation-by-user-activation"
           referrerPolicy="strict-origin-when-cross-origin"
         />
       </div>
