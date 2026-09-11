@@ -47,7 +47,7 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
       episodeNumber: initial?.episode_number ?? nextEpisodeBySeries[firstSeriesId] ?? 1,
       slug: initial?.slug ?? "", title: initial?.title ?? "", shortSynopsis: initial?.short_synopsis ?? "",
       recap: initial?.recap ?? "", highlights: initial?.highlights.join("\n") ?? "",
-      videoProvider: initial?.video_provider ?? "facebook", videoUrl: initial?.video_url ?? "",
+      videoProvider: initial?.video_provider ?? "telecloud", videoUrl: initial?.video_url ?? "",
       thumbnailUrl: initial?.thumbnail_url ?? "", durationSeconds: secondsToClock(initial?.duration_seconds),
       isPublished: initial?.is_published ?? false, seoTitle: initial?.seo_title ?? "", seoDescription: initial?.seo_description ?? "",
     },
@@ -55,7 +55,7 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
   const seriesId = useWatch({ control, name: "seriesId" }) ?? "";
   const episodeNumber = useWatch({ control, name: "episodeNumber" }) ?? 1;
   const title = useWatch({ control, name: "title" }) ?? "";
-  const videoProvider = useWatch({ control, name: "videoProvider" }) ?? "facebook";
+  const videoProvider = useWatch({ control, name: "videoProvider" }) ?? "telecloud";
   const videoUrl = useWatch({ control, name: "videoUrl" }) ?? "";
   const thumbnailUrl = useWatch({ control, name: "thumbnailUrl" }) ?? "";
   const duration = useWatch({ control, name: "durationSeconds" }) ?? "";
@@ -65,6 +65,12 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
   const selectedSeries = series.find((item) => item.id === seriesId);
   const selectedSeriesTitle = selectedSeries?.title ?? "";
   const seriesIsPublished = selectedSeries?.is_published ?? false;
+  const videoProviderLabel = videoProvider === "telecloud" ? "TeleCloud" : videoProvider === "youtube" ? "YouTube" : "Facebook";
+  const videoPlaceholder = videoProvider === "telecloud"
+    ? "https://tele.flyonz.web.id/s/..."
+    : videoProvider === "youtube"
+      ? "https://youtu.be/..."
+      : "https://www.facebook.com/share/v/... atau https://www.facebook.com/reel/...";
 
   useUnsavedChangesGuard(isDirty && !saving);
   useEffect(() => {
@@ -115,7 +121,7 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
 
           <AdminFormSection guideId="episode-media" title="Video & Thumbnail" description="Tempel link video yang sudah kamu upload, cek preview-nya, lalu pilih thumbnail. Gambar akan diringankan otomatis saat diunggah.">
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
-              <label className={`${label} sm:col-span-2`}>{videoProvider === "youtube" ? "Link Video YouTube" : "Link Video Facebook"} <span className="text-red-600">*</span><input type="url" className={field} placeholder={videoProvider === "youtube" ? "https://youtu.be/..." : "https://www.facebook.com/share/v/... atau https://www.facebook.com/reel/..."} {...register("videoUrl", { required: "Link video wajib diisi" })} />{errors.videoUrl && <small className="mt-1 block text-red-600">{errors.videoUrl.message}</small>}</label>
+              <label className={`${label} sm:col-span-2`}>Link Video {videoProviderLabel} <span className="text-red-600">*</span><input type="url" className={field} placeholder={videoPlaceholder} {...register("videoUrl", { required: "Link video wajib diisi" })} />{errors.videoUrl && <small className="mt-1 block text-red-600">{errors.videoUrl.message}</small>}</label>
               <div className="sm:col-span-2"><VideoPreview provider={videoProvider} videoUrl={videoUrl} /></div>
               <AdminFilePicker label="Thumbnail Episode" hint="Poster 9:16 · JPG/PNG/WebP · maks. 5 MB" registerProps={thumbnailRegister} onFile={thumbnailPreview.readFile} previewSrc={thumbnailPreview.previewUrl || thumbnailUrl || null} />
               <label className={label}>Durasi Video{optional}<input inputMode="numeric" className={field} placeholder="10:30" {...register("durationSeconds", { pattern: { value: /^\d{1,3}:[0-5]\d$/, message: "Tulis seperti 10:30 untuk 10 menit 30 detik" } })} />{errors.durationSeconds && <small className="mt-1 block text-red-600">{errors.durationSeconds.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Contoh: 05:20 atau 12:45.</small></label>
@@ -141,7 +147,7 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
           <AdminAdvancedSection guideId="episode-advanced" title="Pengaturan Tambahan" description="Biasanya tidak perlu diubah. Buka hanya jika kamu ingin mengatur alamat halaman, mengganti sumber video, atau mengubah tampilan di Google." defaultOpen={Boolean(errors.slug || errors.thumbnailUrl || initial?.video_provider === "facebook" || initial?.seo_title || initial?.seo_description)}>
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={`${label} sm:col-span-2`}>Alamat halaman<input className={field} {...slugRegister} onChange={(event) => { void slugRegister.onChange(event); setSlugManual(true); }} />{errors.slug && <small className="mt-1 block text-red-600">{errors.slug.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Sudah dibuat otomatis dari nomor episode dan judul. Sebaiknya jangan diubah jika tidak perlu.</small></label>
-              <label className={label}>Video berasal dari<select className={field} {...register("videoProvider")}><option value="facebook">Facebook</option><option value="youtube">YouTube</option></select></label>
+              <label className={label}>Video berasal dari<select className={field} {...register("videoProvider")}><option value="telecloud">TeleCloud</option><option value="facebook">Facebook</option><option value="youtube">YouTube</option></select></label>
               <label className={label}>Link thumbnail{optional}<input type="url" className={field} placeholder="https://..." {...register("thumbnailUrl")} />{errors.thumbnailUrl && <small className="mt-1 block text-red-600">{errors.thumbnailUrl.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Kosongkan jika thumbnail sudah diunggah dari perangkat.</small></label>
               <label className={label}>Judul untuk Google{optional}<input className={field} placeholder="Jika kosong, judul episode akan digunakan." {...register("seoTitle", { maxLength: 200 })} /></label>
               <label className={label}>Deskripsi untuk Google{optional}<textarea rows={3} className={field} placeholder="Ringkasan yang ingin ditampilkan di hasil pencarian." {...register("seoDescription", { maxLength: 320 })} /></label>
