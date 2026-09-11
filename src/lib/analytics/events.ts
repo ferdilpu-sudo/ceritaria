@@ -8,7 +8,8 @@ type EventName =
   | "next_episode_click"
   | "previous_episode_click"
   | "facebook_fallback_click"
-  | "youtube_fallback_click";
+  | "youtube_fallback_click"
+  | "telecloud_fallback_click";
 
 declare global {
   interface Window { gtag?: (...args: unknown[]) => void; }
