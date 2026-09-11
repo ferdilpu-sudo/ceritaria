@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { episodeFormSchema, seriesFormSchema } from "@/features/admin/services/schemas";
 
-function episodeInput(videoProvider: "youtube" | "facebook", videoUrl: string) {
+function episodeInput(videoProvider: "telecloud" | "youtube" | "facebook", videoUrl: string) {
   return {
     seriesId: crypto.randomUUID(), episodeNumber: "1", slug: "episode-1", title: "Episode 1",
     shortSynopsis: "", recap: "", highlights: "", videoProvider, videoUrl, thumbnailUrl: "",
@@ -19,5 +19,7 @@ describe("admin form validation", () => {
     expect(episodeFormSchema.safeParse(episodeInput("youtube", "https://youtu.be/dQw4w9WgXcQ")).success).toBe(true);
     expect(episodeFormSchema.safeParse(episodeInput("youtube", "https://www.facebook.com/example/videos/123456789")).success).toBe(false);
     expect(episodeFormSchema.safeParse(episodeInput("facebook", "https://www.facebook.com/example/videos/123456789")).success).toBe(true);
+    expect(episodeFormSchema.safeParse(episodeInput("telecloud", "https://tele.flyonz.web.id/s/25c4dedf-2ad9-4a90-a423-69a8c8f62645")).success).toBe(true);
+    expect(episodeFormSchema.safeParse(episodeInput("telecloud", "https://tele.flyonz.web.id/api/files/32/stream")).success).toBe(false);
   });
 });
