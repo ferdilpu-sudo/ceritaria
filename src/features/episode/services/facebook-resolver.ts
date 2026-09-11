@@ -1,5 +1,5 @@
 import "server-only";
-import { facebookPermalinkSchema, isFacebookShareUrl } from "@/features/episode/services/facebook-url";
+import { facebookPermalinkSchema, isFacebookShareUrl, isFacebookWatchUrl, normalizeFacebookVideoUrl } from "@/features/episode/services/facebook-url";
 
 const FACEBOOK_USER_AGENT =
   "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
@@ -43,6 +43,7 @@ function canonicalFromCandidate(value: string): string | null {
 export async function resolveFacebookVideoUrl(input: string) {
   const validUrl = facebookPermalinkSchema.parse(input);
 
+  if (isFacebookWatchUrl(validUrl)) return normalizeFacebookVideoUrl(validUrl);
   if (!isFacebookShareUrl(validUrl)) return cleanFacebookUrl(validUrl);
 
   let currentUrl = validUrl;
