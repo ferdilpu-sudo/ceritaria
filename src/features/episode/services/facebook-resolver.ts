@@ -34,7 +34,7 @@ function canonicalFromCandidate(value: string): string | null {
 
     if (isFacebookShareUrl(url.toString()) || url.pathname === "/") return null;
 
-    return cleanFacebookUrl(url.toString());
+    return normalizeFacebookVideoUrl(cleanFacebookUrl(url.toString()));
   } catch {
     return null;
   }
@@ -44,7 +44,7 @@ export async function resolveFacebookVideoUrl(input: string) {
   const validUrl = facebookPermalinkSchema.parse(input);
 
   if (isFacebookWatchUrl(validUrl)) return normalizeFacebookVideoUrl(validUrl);
-  if (!isFacebookShareUrl(validUrl)) return cleanFacebookUrl(validUrl);
+  if (!isFacebookShareUrl(validUrl)) return normalizeFacebookVideoUrl(validUrl);
 
   let currentUrl = validUrl;
 
