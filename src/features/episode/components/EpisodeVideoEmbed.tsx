@@ -1,6 +1,8 @@
 import { FacebookVideoEmbed } from "@/features/episode/components/FacebookVideoEmbed";
+import { TeleCloudVideoEmbed } from "@/features/episode/components/TeleCloudVideoEmbed";
 import { YouTubeVideoEmbed } from "@/features/episode/components/YouTubeVideoEmbed";
 import { facebookPermalinkSchema, isFacebookShareUrl } from "@/features/episode/services/facebook-url";
+import { getTeleCloudStreamUrl } from "@/features/episode/services/telecloud-url";
 import { getYouTubeVideoId } from "@/features/episode/services/youtube-url";
 import type { VideoProvider } from "@/types/database.types";
 
@@ -18,8 +20,13 @@ interface EpisodeVideoEmbedProps {
 }
 
 export function EpisodeVideoEmbed({ provider, videoUrl, thumbnailUrl, title, episodeId, seriesSlug, episodeSlug, autoStart, nextHref, nextTitle }: EpisodeVideoEmbedProps) {
+  const isTeleCloud = provider === "telecloud" && getTeleCloudStreamUrl(videoUrl) !== null;
   const isYouTube = provider === "youtube" && getYouTubeVideoId(videoUrl) !== null;
   const isFacebook = provider === "facebook" && facebookPermalinkSchema.safeParse(videoUrl).success && !isFacebookShareUrl(videoUrl);
+
+  if (isTeleCloud) {
+    return <TeleCloudVideoEmbed key={episodeId} videoUrl={videoUrl} thumbnailUrl={thumbnailUrl} title={title} episodeId={episodeId} seriesSlug={seriesSlug} episodeSlug={episodeSlug} autoStart={autoStart} nextHref={nextHref} nextTitle={nextTitle} />;
+  }
 
   if (isYouTube) {
     return <YouTubeVideoEmbed key={episodeId} videoUrl={videoUrl} thumbnailUrl={thumbnailUrl} title={title} episodeId={episodeId} seriesSlug={seriesSlug} episodeSlug={episodeSlug} autoStart={autoStart} nextHref={nextHref} nextTitle={nextTitle} />;
