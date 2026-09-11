@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { facebookPermalinkSchema } from "@/features/episode/services/facebook-url";
+import { teleCloudVideoUrlSchema } from "@/features/episode/services/telecloud-url";
 import { youtubeVideoUrlSchema } from "@/features/episode/services/youtube-url";
 
 const slug = z.string().trim().min(2, "Alamat halaman terlalu pendek").max(160, "Alamat halaman terlalu panjang").regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Gunakan huruf kecil, angka, dan tanda minus saja");
@@ -42,7 +43,7 @@ export const episodeFormSchema = z.object({
   shortSynopsis: optionalText(320),
   recap: optionalText(20000),
   highlights: z.string().max(4000),
-  videoProvider: z.enum(["youtube", "facebook"]),
+  videoProvider: z.enum(["telecloud", "youtube", "facebook"]),
   videoUrl: z.string().trim().min(1, "Link video wajib diisi").max(2048),
   thumbnailUrl: optionalUrl,
   durationSeconds: durationClock,
@@ -50,15 +51,20 @@ export const episodeFormSchema = z.object({
   seoTitle: optionalText(200),
   seoDescription: optionalText(320),
 }).superRefine((value, ctx) => {
-  const schema = value.videoProvider === "youtube" ? youtubeVideoUrlSchema : facebookPermalinkSchema;
-  if (!schema.safeParse(value.videoUrl).success) {
-    ctx.addIssue({
-      code: "custom",
-      path: ["videoUrl"],
-      message: value.videoProvider === "youtube"
+  const isValid = value.videoProvider === "telecloud"
+    ? teleCloudVideoUrlSchema.safeParse(value.videoUrl).success
+    : value.videoProvider === "youtube"
+      ? youtubeVideoUrlSchema.safeParse(value.videoUrl).success
+      : facebookPermalinkSchema.safeParse(value.videoUrl).success;
+
+  if (!isValid) {
+    const message = value.videoProvider === "telecloud"
+      ? "Link TeleCloud belum dikenali. Gunakan link share publik /s/... dari tele.flyonz.web.id."
+      : value.videoProvider === "youtube"
         ? "Link YouTube belum dikenali. Coba salin ulang link videonya."
-        : "Link video Facebook belum dikenali. Pastikan videonya dapat dibuka publik.",
-    });
+        : "Link video Facebook belum dikenali. Pastikan videonya dapat dibuka publik.";
+
+    ctx.addIssue({ code: "custom", path: ["videoUrl"], message });
   }
 });
 
