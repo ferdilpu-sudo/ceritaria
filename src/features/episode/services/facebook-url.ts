@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-const allowedHosts = new Set(["facebook.com", "www.facebook.com", "m.facebook.com"]);
+const allowedHosts = new Set([
+  "facebook.com",
+  "www.facebook.com",
+  "m.facebook.com",
+  "fb.watch",
+  "www.fb.watch",
+]);
 
 export const facebookPermalinkSchema = z
   .url("URL Facebook tidak valid")
@@ -11,7 +17,25 @@ export const facebookPermalinkSchema = z
     } catch {
       return false;
     }
-  }, "Gunakan permalink video Facebook Public dengan HTTPS");
+  }, "Gunakan link video, Reel, atau link share Facebook Public dengan HTTPS");
+
+export function isFacebookShareUrl(value: string) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase();
+    const path = url.pathname.toLowerCase();
+
+    return (
+      host === "fb.watch" ||
+      host === "www.fb.watch" ||
+      path.startsWith("/share/v/") ||
+      path.startsWith("/share/r/") ||
+      path.startsWith("/share/p/")
+    );
+  } catch {
+    return false;
+  }
+}
 
 export function buildFacebookEmbedUrl(permalink: string) {
   const validUrl = facebookPermalinkSchema.parse(permalink);
