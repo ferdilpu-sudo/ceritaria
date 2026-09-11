@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { buildFacebookEmbedUrl } from "@/features/episode/services/facebook-url";
+import { buildFacebookEmbedUrl, isFacebookShareUrl } from "@/features/episode/services/facebook-url";
 import { buildYouTubeEmbedUrl } from "@/features/episode/services/youtube-url";
 import type { VideoProvider } from "@/types/database.types";
 
@@ -55,8 +55,9 @@ function PreviewFrame({ embedUrl, providerName }: PreviewFrameProps) {
 }
 
 export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
-  const embedUrl = resolveEmbedUrl(provider, videoUrl);
   const isYouTube = provider === "youtube";
+  const isFacebookShare = provider === "facebook" && isFacebookShareUrl(videoUrl);
+  const embedUrl = isFacebookShare ? null : resolveEmbedUrl(provider, videoUrl);
   const providerName = isYouTube ? "YouTube" : "Facebook";
 
   if (!videoUrl.trim()) {
@@ -64,6 +65,20 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
       <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface-2)] p-6 text-center">
         <p className="text-sm font-bold text-[var(--text)]">Video belum dimasukkan</p>
         <p className="mt-2 text-sm text-[var(--muted)]">Tempel link video di atas. Setelah itu videonya akan tampil di sini untuk kamu periksa.</p>
+      </div>
+    );
+  }
+
+  if (isFacebookShare) {
+    return (
+      <div className="rounded-2xl border border-sky-200 bg-sky-50 p-5">
+        <p className="text-sm font-black text-sky-800">Link share Facebook dikenali</p>
+        <p className="mt-2 text-sm leading-6 text-sky-700">
+          Saat episode disimpan, Ceritaria akan mengubah link share ini ke permalink Reel/video final secara otomatis. Preview akan normal setelah link final tersimpan.
+        </p>
+        <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex min-h-11 items-center rounded-lg px-2 py-3 text-sm font-bold text-sky-800">
+          Buka link Facebook ↗
+        </a>
       </div>
     );
   }
@@ -97,8 +112,8 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
       </div>
 
       {!isYouTube && (
-        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
-          Untuk episode baru, sebaiknya gunakan YouTube. Pilihan Facebook disediakan untuk video lama.
+        <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-xs text-sky-700">
+          Facebook aktif sebagai sumber video Ceritaria. Gunakan video atau Reel yang dapat ditonton publik.
         </div>
       )}
 
