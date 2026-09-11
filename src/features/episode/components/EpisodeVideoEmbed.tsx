@@ -1,6 +1,6 @@
 import { FacebookVideoEmbed } from "@/features/episode/components/FacebookVideoEmbed";
 import { YouTubeVideoEmbed } from "@/features/episode/components/YouTubeVideoEmbed";
-import { facebookPermalinkSchema } from "@/features/episode/services/facebook-url";
+import { facebookPermalinkSchema, isFacebookShareUrl } from "@/features/episode/services/facebook-url";
 import { getYouTubeVideoId } from "@/features/episode/services/youtube-url";
 import type { VideoProvider } from "@/types/database.types";
 
@@ -19,7 +19,7 @@ interface EpisodeVideoEmbedProps {
 
 export function EpisodeVideoEmbed({ provider, videoUrl, thumbnailUrl, title, episodeId, seriesSlug, episodeSlug, autoStart, nextHref, nextTitle }: EpisodeVideoEmbedProps) {
   const isYouTube = provider === "youtube" && getYouTubeVideoId(videoUrl) !== null;
-  const isFacebook = provider === "facebook" && facebookPermalinkSchema.safeParse(videoUrl).success;
+  const isFacebook = provider === "facebook" && facebookPermalinkSchema.safeParse(videoUrl).success && !isFacebookShareUrl(videoUrl);
 
   if (isYouTube) {
     return <YouTubeVideoEmbed key={episodeId} videoUrl={videoUrl} thumbnailUrl={thumbnailUrl} title={title} episodeId={episodeId} seriesSlug={seriesSlug} episodeSlug={episodeSlug} autoStart={autoStart} nextHref={nextHref} nextTitle={nextTitle} />;
