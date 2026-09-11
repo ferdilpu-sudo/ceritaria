@@ -1,6 +1,6 @@
 # Ceritaria
 
-Ceritaria adalah PWA mobile-first untuk katalog dan menonton mini series. Video episode menggunakan embed YouTube privacy-enhanced sebagai sumber utama, dengan dukungan Facebook untuk konten legacy. Metadata, editorial, autentikasi admin, dan media gambar dikelola melalui Supabase.
+Ceritaria adalah PWA mobile-first untuk katalog dan menonton mini series. Video episode menggunakan TeleCloud sebagai sumber utama melalui public share stream, dengan dukungan YouTube dan Facebook untuk konten legacy. Metadata, editorial, autentikasi admin, dan media gambar dikelola melalui Supabase.
 
 ## Fitur
 
@@ -53,6 +53,7 @@ Jalankan migration berurutan di Supabase SQL Editor:
 7. `supabase/migrations/007_episode_engagement.sql`
 8. `supabase/migrations/008_community_polish.sql`
 9. `supabase/migrations/009_community_profile_avatar.sql`
+10. `supabase/migrations/010_telecloud_video_provider.sql`
 
 Buat user admin lewat Supabase Authentication, lalu tambahkan UUID-nya ke `public.admin_users` menggunakan `supabase/admin-bootstrap.sql.example` sebagai template.
 
