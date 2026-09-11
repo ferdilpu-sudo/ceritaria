@@ -1,5 +1,5 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
-export type VideoProvider = "youtube" | "facebook";
+export type VideoProvider = "telecloud" | "youtube" | "facebook";
 
 export interface Database {
   public: {
