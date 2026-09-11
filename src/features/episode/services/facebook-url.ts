@@ -50,17 +50,36 @@ export function isFacebookWatchUrl(value: string) {
   }
 }
 
+function getFacebookVideoId(value: string) {
+  try {
+    const url = new URL(value);
+
+    if (isFacebookWatchUrl(value)) {
+      const id = url.searchParams.get("v")?.trim();
+      return id && /^\d+$/.test(id) ? id : null;
+    }
+
+    const match = url.pathname.match(/^\/[^/]+\/videos\/(\d+)\/?$/i);
+    if (match?.[1]) return match[1];
+
+    const reelMatch = url.pathname.match(/^\/reel\/(\d+)\/?$/i);
+    if (reelMatch?.[1]) return reelMatch[1];
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export function normalizeFacebookVideoUrl(value: string) {
   const validUrl = facebookPermalinkSchema.parse(value);
-  const url = new URL(validUrl);
+  const videoId = getFacebookVideoId(validUrl);
 
-  if (isFacebookWatchUrl(validUrl)) {
-    const videoId = url.searchParams.get("v")?.trim();
-    if (videoId && /^[A-Za-z0-9._-]+$/.test(videoId)) {
-      return `https://www.facebook.com/video.php?v=${encodeURIComponent(videoId)}`;
-    }
+  if (videoId) {
+    return `https://www.facebook.com/reel/${videoId}/`;
   }
 
+  const url = new URL(validUrl);
   url.hash = "";
   for (const key of ["mibextid", "rdid", "share_url", "sfnsn", "__cft__", "__tn__"]) {
     url.searchParams.delete(key);
@@ -70,6 +89,12 @@ export function normalizeFacebookVideoUrl(value: string) {
 
 export function buildFacebookEmbedUrl(permalink: string) {
   const normalizedUrl = normalizeFacebookVideoUrl(permalink);
-  const params = new URLSearchParams({ href: normalizedUrl, show_text: "false", width: "480" });
+  const params = new URLSearchParams({
+    height: "476",
+    href: normalizedUrl,
+    show_text: "false",
+    width: "267",
+    t: "0",
+  });
   return `https://www.facebook.com/plugins/video.php?${params.toString()}`;
 }
