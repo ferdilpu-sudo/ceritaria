@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/security/require-admin";
 import { episodeFormSchema, splitLineList } from "@/features/admin/services/schemas";
 import { zodFieldErrors } from "@/features/admin/services/form-errors";
 import { resolveFacebookVideoUrl } from "@/features/episode/services/facebook-resolver";
+import { normalizeTeleCloudVideoUrl } from "@/features/episode/services/telecloud-url";
 import type { ActionResult } from "@/features/admin/types/action-result";
 
 function readBoolean(formData: FormData, key: string) {
@@ -22,7 +23,7 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
       shortSynopsis: String(formData.get("shortSynopsis") || ""),
       recap: String(formData.get("recap") || ""),
       highlights: String(formData.get("highlights") || ""),
-      videoProvider: String(formData.get("videoProvider") || "facebook"),
+      videoProvider: String(formData.get("videoProvider") || "telecloud"),
       videoUrl: String(formData.get("videoUrl") || ""),
       thumbnailUrl: String(formData.get("thumbnailUrl") || ""),
       durationSeconds: String(formData.get("durationSeconds") || ""),
@@ -41,6 +42,10 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
 
     const values = parsed.data;
     let normalizedVideoUrl = values.videoUrl;
+
+    if (values.videoProvider === "telecloud") {
+      normalizedVideoUrl = normalizeTeleCloudVideoUrl(values.videoUrl);
+    }
 
     if (values.videoProvider === "facebook") {
       try {
