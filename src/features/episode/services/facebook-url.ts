@@ -57,7 +57,7 @@ export function normalizeFacebookVideoUrl(value: string) {
   if (isFacebookWatchUrl(validUrl)) {
     const videoId = url.searchParams.get("v")?.trim();
     if (videoId && /^[A-Za-z0-9._-]+$/.test(videoId)) {
-      return `https://www.facebook.com/reel/${videoId}/`;
+      return `https://www.facebook.com/video.php?v=${encodeURIComponent(videoId)}`;
     }
   }
 
