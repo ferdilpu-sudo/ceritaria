@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { buildFacebookEmbedUrl, isFacebookShareUrl } from "@/features/episode/services/facebook-url";
+import { buildTeleCloudShareUrl, getTeleCloudStreamUrl } from "@/features/episode/services/telecloud-url";
 import { buildYouTubeEmbedUrl } from "@/features/episode/services/youtube-url";
 import type { VideoProvider } from "@/types/database.types";
 
@@ -16,7 +17,7 @@ interface PreviewFrameProps {
 }
 
 function resolveEmbedUrl(provider: VideoProvider, videoUrl: string) {
-  if (!videoUrl.trim()) return null;
+  if (!videoUrl.trim() || provider === "telecloud") return null;
 
   try {
     return provider === "youtube"
@@ -55,10 +56,12 @@ function PreviewFrame({ embedUrl, providerName }: PreviewFrameProps) {
 }
 
 export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
+  const isTeleCloud = provider === "telecloud";
   const isYouTube = provider === "youtube";
   const isFacebookShare = provider === "facebook" && isFacebookShareUrl(videoUrl);
+  const teleCloudStreamUrl = isTeleCloud ? getTeleCloudStreamUrl(videoUrl) : null;
   const embedUrl = isFacebookShare ? null : resolveEmbedUrl(provider, videoUrl);
-  const providerName = isYouTube ? "YouTube" : "Facebook";
+  const providerName = isTeleCloud ? "TeleCloud" : isYouTube ? "YouTube" : "Facebook";
 
   if (!videoUrl.trim()) {
     return (
@@ -83,14 +86,16 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
     );
   }
 
-  if (!embedUrl) {
+  if (!embedUrl && !teleCloudStreamUrl) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
         <p className="text-sm font-black text-red-700">Link video belum bisa dibaca</p>
         <p className="mt-2 text-sm text-red-600">
-          {isYouTube
-            ? "Coba buka video di YouTube lalu salin kembali link videonya."
-            : "Pastikan video Facebook dapat dibuka oleh publik, lalu salin kembali link videonya."}
+          {isTeleCloud
+            ? "Gunakan link share publik TeleCloud yang berbentuk https://tele.flyonz.web.id/s/..."
+            : isYouTube
+              ? "Coba buka video di YouTube lalu salin kembali link videonya."
+              : "Pastikan video Facebook dapat dibuka oleh publik, lalu salin kembali link videonya."}
         </p>
       </div>
     );
@@ -104,26 +109,36 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
           <p className="mt-1 text-xs text-[var(--muted)]">Putar sebentar untuk memastikan video yang dipilih sudah benar.</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className={`rounded-full border px-3 py-1 text-xs font-bold ${isYouTube ? "border-red-200 bg-red-50 text-red-700" : "border-sky-200 bg-sky-50 text-sky-700"}`}>
+          <span className={`rounded-full border px-3 py-1 text-xs font-bold ${isTeleCloud ? "border-emerald-200 bg-emerald-50 text-emerald-700" : isYouTube ? "border-red-200 bg-red-50 text-red-700" : "border-sky-200 bg-sky-50 text-sky-700"}`}>
             {providerName}
           </span>
           <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">✓ Link terbaca</span>
         </div>
       </div>
 
-      {!isYouTube && (
+      {provider === "facebook" && (
         <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-xs text-sky-700">
           Facebook aktif sebagai sumber video Ceritaria. Gunakan video atau Reel yang dapat ditonton publik.
         </div>
       )}
 
+      {isTeleCloud && (
+        <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-700">
+          Link share TeleCloud akan disimpan sebagai endpoint streaming publik /stream.
+        </div>
+      )}
+
       <div className="mx-auto w-full max-w-[300px]">
-        <PreviewFrame key={embedUrl} embedUrl={embedUrl} providerName={providerName} />
+        {teleCloudStreamUrl ? (
+          <video className="aspect-[9/16] w-full rounded-[22px] border border-zinc-200 bg-black shadow-lg" src={teleCloudStreamUrl} controls playsInline preload="metadata" />
+        ) : (
+          <PreviewFrame key={embedUrl} embedUrl={embedUrl!} providerName={providerName} />
+        )}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] pt-4 text-xs">
         <span className="font-bold text-emerald-700">✓ Video siap digunakan</span>
-        <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-lg px-2 py-3 font-bold text-[var(--muted)] hover:text-[var(--text)]">
+        <a href={teleCloudStreamUrl ? buildTeleCloudShareUrl(videoUrl) : videoUrl} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-lg px-2 py-3 font-bold text-[var(--muted)] hover:text-[var(--text)]">
           Buka videonya ↗
         </a>
       </div>
