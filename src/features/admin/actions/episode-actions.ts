@@ -3,6 +3,7 @@
 import { requireAdmin } from "@/lib/security/require-admin";
 import { episodeFormSchema, splitLineList } from "@/features/admin/services/schemas";
 import { zodFieldErrors } from "@/features/admin/services/form-errors";
+import { resolveFacebookVideoUrl } from "@/features/episode/services/facebook-resolver";
 import type { ActionResult } from "@/features/admin/types/action-result";
 
 function readBoolean(formData: FormData, key: string) {
@@ -21,7 +22,7 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
       shortSynopsis: String(formData.get("shortSynopsis") || ""),
       recap: String(formData.get("recap") || ""),
       highlights: String(formData.get("highlights") || ""),
-      videoProvider: String(formData.get("videoProvider") || "youtube"),
+      videoProvider: String(formData.get("videoProvider") || "facebook"),
       videoUrl: String(formData.get("videoUrl") || ""),
       thumbnailUrl: String(formData.get("thumbnailUrl") || ""),
       durationSeconds: String(formData.get("durationSeconds") || ""),
@@ -39,6 +40,22 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
     }
 
     const values = parsed.data;
+    let normalizedVideoUrl = values.videoUrl;
+
+    if (values.videoProvider === "facebook") {
+      try {
+        normalizedVideoUrl = await resolveFacebookVideoUrl(values.videoUrl);
+      } catch {
+        return {
+          ok: false,
+          message: "Link share Facebook belum bisa diubah ke link video final.",
+          fieldErrors: {
+            videoUrl: "Buka link Facebook tersebut di browser, lalu salin URL Reel/video final setelah halaman terbuka.",
+          },
+        };
+      }
+    }
+
     const id = values.id ?? crypto.randomUUID();
     const { data: existing } = values.id
       ? await supabase.from("episodes").select("published_at").eq("id", id).maybeSingle()
@@ -54,7 +71,7 @@ export async function saveEpisodeAction(formData: FormData): Promise<ActionResul
       recap: values.recap,
       highlights: splitLineList(values.highlights),
       video_provider: values.videoProvider,
-      video_url: values.videoUrl,
+      video_url: normalizedVideoUrl,
       thumbnail_url: values.thumbnailUrl,
       duration_seconds: values.durationSeconds,
       is_published: values.isPublished,
