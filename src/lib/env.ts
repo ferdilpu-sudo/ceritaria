@@ -17,8 +17,6 @@ export function getPublicEnv() {
 export function getOptionalPublicEnv() {
   return {
     contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL || null,
-    adsenseClientId: process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || null,
-    adsenseSlotContent: process.env.NEXT_PUBLIC_ADSENSE_SLOT_CONTENT || null,
     gaId: process.env.NEXT_PUBLIC_GA_ID || null,
   };
 }
