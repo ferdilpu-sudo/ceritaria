@@ -15,7 +15,7 @@ Ceritaria adalah PWA mobile-first untuk katalog dan menonton mini series. Video 
 - First-party analytics: visitor realtime, pageview, visitor unik, top pages, device, referrer, dan event player.
 - Supabase Auth, Postgres RLS, Storage, dan soft delete.
 - SEO: metadata, canonical, OpenGraph, JSON-LD, sitemap, robots.
-- Integrasi opsional Google AdSense dan GA4 melalui environment variables.
+- Google AdSense terpasang pada halaman publik dengan publisher configuration terpusat; GA4 tetap opsional melalui environment variable.
 - Production deployment di Cloudflare Workers; media gambar menggunakan Cloudflare R2.
 
 ## Stack
@@ -71,8 +71,6 @@ Opsional:
 
 ```env
 NEXT_PUBLIC_CONTACT_EMAIL=
-NEXT_PUBLIC_ADSENSE_CLIENT_ID=
-NEXT_PUBLIC_ADSENSE_SLOT_CONTENT=
 NEXT_PUBLIC_GA_ID=
 ```
 
