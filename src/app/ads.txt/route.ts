@@ -1,11 +1,8 @@
-const defaultAdsenseClientId = "ca-pub-6803477745163482";
+import { ADSENSE_CERTIFICATION_AUTHORITY_ID, ADSENSE_PUBLISHER_ID } from "@/lib/adsense-config";
 
 export function GET() {
-  const client = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || defaultAdsenseClientId;
-  const publisher = client.replace(/^ca-/, "");
-
   return new Response(
-    `google.com, ${publisher}, DIRECT, f08c47fec0942fa0\n`,
+    `google.com, ${ADSENSE_PUBLISHER_ID}, DIRECT, ${ADSENSE_CERTIFICATION_AUTHORITY_ID}\n`,
     {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
