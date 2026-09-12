@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AdsterraBanner } from "@/components/ads/AdsterraBanner";
 import { EpisodeComments } from "@/features/community/components/EpisodeComments";
 import { EpisodeEngagement } from "@/features/community/components/EpisodeEngagement";
 import { EpisodeCard } from "@/features/episode/components/EpisodeCard";
@@ -90,7 +89,6 @@ export default async function EpisodePage({ params, searchParams }: PageProps) {
         </main>
       </div>
 
-      <div className="mx-auto mt-8 max-w-3xl sm:mt-10"><AdsterraBanner /></div>
       {related.length > 0 && <section className="mt-10 border-t border-[var(--border)] pt-7 sm:mt-14 sm:pt-10"><div className="mb-4 flex max-w-4xl items-end justify-between gap-4 sm:mb-5"><div><p className="text-[10px] font-black tracking-[0.18em] text-red-400 sm:text-xs sm:tracking-[0.16em]">LANJUT NONTON</p><h2 className="mt-1 text-[22px] font-black sm:text-2xl">Episode Lainnya</h2></div><Link href={`/series/${series.slug}`} className="min-h-11 rounded-lg px-2 py-3 text-sm font-bold text-zinc-400 transition hover:text-white">Semua →</Link></div><div className="mobile-scrollbar -mx-4 flex max-w-4xl snap-x snap-mandatory flex-nowrap gap-3 overflow-x-auto px-4 pb-4 sm:mx-0 sm:flex-wrap sm:gap-x-5 sm:gap-y-8 sm:overflow-visible sm:px-0">{related.map((item) => <EpisodeCard key={item.id} episode={item} seriesSlug={series.slug} variant="related" />)}</div></section>}
     </div>
   );
