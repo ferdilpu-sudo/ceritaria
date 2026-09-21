@@ -1,6 +1,5 @@
 "use client";
 
-import { FacebookXfbmlFrame } from "@/features/episode/components/FacebookXfbmlFrame";
 import { facebookPermalinkSchema, isFacebookShareUrl } from "@/features/episode/services/facebook-url";
 import { buildTeleCloudShareUrl, getTeleCloudStreamUrl } from "@/features/episode/services/telecloud-url";
 import { buildYouTubeEmbedUrl } from "@/features/episode/services/youtube-url";
@@ -37,6 +36,26 @@ function YouTubePreviewFrame({ embedUrl }: { embedUrl: string }) {
   );
 }
 
+function FacebookPreviewNotice({ videoUrl }: { videoUrl: string }) {
+  return (
+    <div className="rounded-[22px] border border-sky-200 bg-sky-50 p-5 text-center shadow-sm">
+      <p className="text-sm font-black text-sky-900">Link Facebook siap digunakan</p>
+      <p className="mt-2 text-sm leading-6 text-sky-700">
+        Preview embed Facebook dinonaktifkan karena beberapa Reel dapat terlihat valid tetapi
+        tetap ditolak saat diputar di situs lain.
+      </p>
+      <a
+        href={videoUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-sky-700 px-4 py-3 text-sm font-black text-white hover:bg-sky-800"
+      >
+        Buka dan cek di Facebook ↗
+      </a>
+    </div>
+  );
+}
+
 export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
   const isTeleCloud = provider === "telecloud";
   const isYouTube = provider === "youtube";
@@ -57,7 +76,7 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
       <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface-2)] p-6 text-center">
         <p className="text-sm font-bold text-[var(--text)]">Video belum dimasukkan</p>
         <p className="mt-2 text-sm text-[var(--muted)]">
-          Tempel link video di atas. Setelah itu videonya akan tampil di sini untuk kamu periksa.
+          Tempel link video di atas. Setelah itu sumber videonya akan diperiksa di sini.
         </p>
       </div>
     );
@@ -69,7 +88,6 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
         <p className="text-sm font-black text-sky-800">Link share Facebook dikenali</p>
         <p className="mt-2 text-sm leading-6 text-sky-700">
           Saat episode disimpan, Ceritaria akan mengubah link share ini ke permalink Reel/video final secara otomatis.
-          Preview akan normal setelah link final tersimpan.
         </p>
         <a
           href={videoUrl}
@@ -102,8 +120,10 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4 sm:p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-black text-[var(--text)]">Cek video</p>
-          <p className="mt-1 text-xs text-[var(--muted)]">Putar sebentar untuk memastikan video yang dipilih sudah benar.</p>
+          <p className="text-sm font-black text-[var(--text)]">Cek sumber video</p>
+          <p className="mt-1 text-xs text-[var(--muted)]">
+            Pastikan sumber yang dipilih dapat dibuka sebelum episode dipublikasikan.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <span className={`rounded-full border px-3 py-1 text-xs font-bold ${isTeleCloud ? "border-emerald-200 bg-emerald-50 text-emerald-700" : isYouTube ? "border-red-200 bg-red-50 text-red-700" : "border-sky-200 bg-sky-50 text-sky-700"}`}>
@@ -114,12 +134,6 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
           </span>
         </div>
       </div>
-
-      {isFacebook && (
-        <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-xs text-sky-700">
-          Facebook Reel/video dirender dengan player resmi Meta. Konten harus berstatus Public agar dapat diputar.
-        </div>
-      )}
 
       {isTeleCloud && (
         <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-700">
@@ -139,16 +153,12 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
         ) : youtubeEmbedUrl ? (
           <YouTubePreviewFrame embedUrl={youtubeEmbedUrl} />
         ) : (
-          <FacebookXfbmlFrame
-            permalink={videoUrl}
-            width={300}
-            className="relative aspect-[9/16] overflow-hidden rounded-[22px] border border-zinc-200 bg-black shadow-lg"
-          />
+          <FacebookPreviewNotice videoUrl={videoUrl} />
         )}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] pt-4 text-xs">
-        <span className="font-bold text-emerald-700">✓ Video siap digunakan</span>
+        <span className="font-bold text-emerald-700">✓ Sumber video siap digunakan</span>
         <a
           href={teleCloudStreamUrl ? buildTeleCloudShareUrl(videoUrl) : videoUrl}
           target="_blank"
