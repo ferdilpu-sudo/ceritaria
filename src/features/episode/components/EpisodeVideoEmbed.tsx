@@ -1,5 +1,6 @@
 import { FacebookVideoEmbed } from "@/features/episode/components/FacebookVideoEmbed";
 import { YouTubeVideoEmbed } from "@/features/episode/components/YouTubeVideoEmbed";
+import { getFacebookEmbedStatus } from "@/features/episode/services/facebook-oembed";
 import { facebookPermalinkSchema } from "@/features/episode/services/facebook-url";
 import { getYouTubeVideoId } from "@/features/episode/services/youtube-url";
 import type { VideoProvider } from "@/types/database.types";
@@ -12,7 +13,7 @@ interface EpisodeVideoEmbedProps {
   episodeId: string;
 }
 
-export function EpisodeVideoEmbed({
+export async function EpisodeVideoEmbed({
   provider,
   videoUrl,
   thumbnailUrl,
@@ -34,12 +35,15 @@ export function EpisodeVideoEmbed({
   }
 
   if (isFacebook) {
+    const embedStatus = await getFacebookEmbedStatus(videoUrl);
+
     return (
       <FacebookVideoEmbed
         permalink={videoUrl}
         thumbnailUrl={thumbnailUrl}
         title={title}
         episodeId={episodeId}
+        embedStatus={embedStatus}
       />
     );
   }
