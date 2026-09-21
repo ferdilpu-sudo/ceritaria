@@ -10,6 +10,8 @@ import { AdminFormActions } from "@/features/admin/components/AdminFormActions";
 import { AdminFormSection } from "@/features/admin/components/AdminFormSection";
 import { EpisodePreviewSidebar } from "@/features/admin/components/EpisodePreviewSidebar";
 import { VideoPreview } from "@/features/admin/components/VideoPreview";
+import { isFacebookUrl } from "@/features/episode/services/facebook-url";
+import { getYouTubeVideoId } from "@/features/episode/services/youtube-url";
 import { useImageFilePreview } from "@/features/admin/hooks/useImageFilePreview";
 import { useUnsavedChangesGuard } from "@/features/admin/hooks/useUnsavedChangesGuard";
 import { uploadAdminImageDirect } from "@/features/admin/services/upload-admin-image";
@@ -73,6 +75,20 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
   useEffect(() => {
     if (!initial && !slugManual) setValue("slug", buildEpisodeSlug(episodeNumber, title), { shouldDirty: Boolean(title) });
   }, [episodeNumber, initial, setValue, slugManual, title]);
+  useEffect(() => {
+    const value = videoUrl.trim();
+    if (!value) return;
+
+    const detectedProvider: VideoProvider | null = getYouTubeVideoId(value)
+      ? "youtube"
+      : isFacebookUrl(value)
+        ? "facebook"
+        : null;
+
+    if (detectedProvider && detectedProvider !== videoProvider) {
+      setValue("videoProvider", detectedProvider, { shouldDirty: true, shouldValidate: true });
+    }
+  }, [setValue, videoProvider, videoUrl]);
 
   const submit = handleSubmit(async (values) => {
     setSaving(true); setMessage(null); clearErrors();
@@ -138,10 +154,10 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
             )}
           </AdminFormSection>
 
-          <AdminAdvancedSection guideId="episode-advanced" title="Pengaturan Tambahan" description="Biasanya tidak perlu diubah. Buka hanya jika kamu ingin mengatur alamat halaman, memakai video Facebook lama, atau mengubah tampilan di Google." defaultOpen={Boolean(errors.slug || errors.thumbnailUrl || initial?.video_provider === "facebook" || initial?.seo_title || initial?.seo_description)}>
+          <AdminAdvancedSection guideId="episode-advanced" title="Pengaturan Tambahan" description="Biasanya tidak perlu diubah. Buka hanya jika kamu ingin mengatur alamat halaman, memilih sumber video secara manual, atau mengubah tampilan di Google." defaultOpen={Boolean(errors.slug || errors.thumbnailUrl || initial?.video_provider === "facebook" || initial?.seo_title || initial?.seo_description)}>
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={`${label} sm:col-span-2`}>Alamat halaman<input className={field} {...slugRegister} onChange={(event) => { void slugRegister.onChange(event); setSlugManual(true); }} />{errors.slug && <small className="mt-1 block text-red-600">{errors.slug.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Sudah dibuat otomatis dari nomor episode dan judul. Sebaiknya jangan diubah jika tidak perlu.</small></label>
-              <label className={label}>Video berasal dari<select className={field} {...register("videoProvider")}><option value="youtube">YouTube</option><option value="facebook">Facebook lama</option></select></label>
+              <label className={label}>Video berasal dari<select className={field} {...register("videoProvider")}><option value="youtube">YouTube</option><option value="facebook">Facebook / Reel</option></select></label>
               <label className={label}>Link thumbnail{optional}<input type="url" className={field} placeholder="https://..." {...register("thumbnailUrl")} />{errors.thumbnailUrl && <small className="mt-1 block text-red-600">{errors.thumbnailUrl.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Kosongkan jika thumbnail sudah diunggah dari perangkat.</small></label>
               <label className={label}>Judul untuk Google{optional}<input className={field} placeholder="Jika kosong, judul episode akan digunakan." {...register("seoTitle", { maxLength: 200 })} /></label>
               <label className={label}>Deskripsi untuk Google{optional}<textarea rows={3} className={field} placeholder="Ringkasan yang ingin ditampilkan di hasil pencarian." {...register("seoDescription", { maxLength: 320 })} /></label>
