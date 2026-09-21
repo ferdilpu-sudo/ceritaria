@@ -2,16 +2,18 @@ import { z } from "zod";
 
 const allowedHosts = new Set(["facebook.com", "www.facebook.com", "m.facebook.com"]);
 
+export function isFacebookUrl(value: string) {
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "https:" && allowedHosts.has(url.hostname.toLowerCase()) && url.pathname !== "/";
+  } catch {
+    return false;
+  }
+}
+
 export const facebookPermalinkSchema = z
   .url("URL Facebook tidak valid")
-  .refine((value) => {
-    try {
-      const url = new URL(value);
-      return url.protocol === "https:" && allowedHosts.has(url.hostname.toLowerCase()) && url.pathname !== "/";
-    } catch {
-      return false;
-    }
-  }, "Gunakan permalink video Facebook Public dengan HTTPS");
+  .refine(isFacebookUrl, "Gunakan permalink video Facebook Public dengan HTTPS");
 
 export function buildFacebookEmbedUrl(permalink: string) {
   const validUrl = facebookPermalinkSchema.parse(permalink);
