@@ -98,7 +98,7 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
 
       {!isYouTube && (
         <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
-          Untuk episode baru, sebaiknya gunakan YouTube. Pilihan Facebook disediakan untuk video lama.
+          Facebook Reel didukung selama videonya dapat dibuka publik. Jika preview kosong, periksa kembali pengaturan audiens di Facebook.
         </div>
       )}
 
