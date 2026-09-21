@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { buildFacebookEmbedUrl } from "@/features/episode/services/facebook-url";
+import Script from "next/script";
+import { useEffect, useRef, useState } from "react";
+import { facebookPermalinkSchema } from "@/features/episode/services/facebook-url";
 import { buildYouTubeEmbedUrl, getYouTubeVideoId } from "@/features/episode/services/youtube-url";
 import type { VideoProvider } from "@/types/database.types";
 
@@ -15,13 +16,24 @@ interface PreviewFrameProps {
   providerName: string;
 }
 
-function resolveEmbedUrl(provider: VideoProvider, videoUrl: string) {
+type FacebookSdkWindow = Window & {
+  FB?: {
+    XFBML?: {
+      parse: (element?: HTMLElement) => void;
+    };
+  };
+};
+
+function parseFacebookEmbed(element: HTMLElement | null) {
+  if (!element) return;
+  (window as FacebookSdkWindow).FB?.XFBML?.parse(element);
+}
+
+function resolveYouTubeEmbedUrl(videoUrl: string) {
   if (!videoUrl.trim()) return null;
 
   try {
-    return provider === "youtube"
-      ? buildYouTubeEmbedUrl(videoUrl)
-      : buildFacebookEmbedUrl(videoUrl);
+    return buildYouTubeEmbedUrl(videoUrl);
   } catch {
     return null;
   }
@@ -54,10 +66,44 @@ function PreviewFrame({ embedUrl, providerName }: PreviewFrameProps) {
   );
 }
 
+function FacebookPreviewFrame({ permalink }: { permalink: string }) {
+  const embedRootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => parseFacebookEmbed(embedRootRef.current), 0);
+    return () => window.clearTimeout(timer);
+  }, [permalink]);
+
+  return (
+    <>
+      <div
+        ref={embedRootRef}
+        className="relative aspect-[9/16] overflow-hidden rounded-[22px] border border-zinc-200 bg-black shadow-lg"
+      >
+        <div
+          className="fb-video h-full w-full"
+          data-href={permalink}
+          data-width="300"
+          data-show-text="false"
+          data-allowfullscreen="true"
+        />
+      </div>
+      <Script
+        id="facebook-sdk"
+        src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v25.0"
+        strategy="afterInteractive"
+        onReady={() => parseFacebookEmbed(embedRootRef.current)}
+      />
+    </>
+  );
+}
+
 export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
-  const embedUrl = resolveEmbedUrl(provider, videoUrl);
   const isYouTube = provider === "youtube";
   const providerName = isYouTube ? "YouTube" : "Facebook";
+  const youtubeEmbedUrl = isYouTube ? resolveYouTubeEmbedUrl(videoUrl) : null;
+  const isFacebookValid = !isYouTube && facebookPermalinkSchema.safeParse(videoUrl).success;
+  const isValid = isYouTube ? youtubeEmbedUrl !== null : isFacebookValid;
   const videoId = isYouTube ? getYouTubeVideoId(videoUrl) : null;
 
   if (!videoUrl.trim()) {
@@ -69,14 +115,14 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
     );
   }
 
-  if (!embedUrl) {
+  if (!isValid) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
         <p className="text-sm font-black text-red-700">URL {providerName} belum valid</p>
         <p className="mt-2 text-sm text-red-600">
           {isYouTube
             ? "Gunakan link watch, youtu.be, Shorts, live, atau embed dengan HTTPS."
-            : "Gunakan permalink video Facebook Public dengan HTTPS."}
+            : "Gunakan permalink Reel atau video Facebook Public dengan HTTPS."}
         </p>
       </div>
     );
@@ -99,12 +145,16 @@ export function VideoPreview({ provider, videoUrl }: VideoPreviewProps) {
 
       {!isYouTube && (
         <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
-          Facebook dipertahankan untuk konten legacy. Episode baru sebaiknya memakai YouTube.
+          Facebook Reel/video dirender dengan Meta SDK. Pastikan konten berstatus Public agar player dapat dimuat.
         </div>
       )}
 
       <div className="mx-auto w-full max-w-[300px]">
-        <PreviewFrame key={embedUrl} embedUrl={embedUrl} providerName={providerName} />
+        {isYouTube && youtubeEmbedUrl ? (
+          <PreviewFrame key={youtubeEmbedUrl} embedUrl={youtubeEmbedUrl} providerName={providerName} />
+        ) : (
+          <FacebookPreviewFrame permalink={videoUrl} />
+        )}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] pt-4 text-xs">
