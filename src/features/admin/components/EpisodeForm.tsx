@@ -32,7 +32,7 @@ interface EpisodeFormProps {
 
 const field = "mt-2 w-full min-w-0 max-w-full rounded-xl border border-[var(--border)] bg-white px-3.5 py-3 text-[var(--text)] shadow-sm placeholder:text-zinc-400 focus:border-red-300";
 const label = "min-w-0 text-sm font-bold text-[var(--text)]";
-const optional = <span className="font-normal text-[var(--muted)]"> (opsional)</span>;
+const optional = <span className="font-normal text-[var(--muted)]"> (opsional saat draft)</span>;
 
 export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: EpisodeFormProps) {
   const router = useRouter();
@@ -55,6 +55,9 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
   const seriesId = useWatch({ control, name: "seriesId" }) ?? "";
   const episodeNumber = useWatch({ control, name: "episodeNumber" }) ?? 1;
   const title = useWatch({ control, name: "title" }) ?? "";
+  const shortSynopsis = useWatch({ control, name: "shortSynopsis" }) ?? "";
+  const recap = useWatch({ control, name: "recap" }) ?? "";
+  const highlights = useWatch({ control, name: "highlights" }) ?? "";
   const videoProvider = useWatch({ control, name: "videoProvider" }) ?? "telecloud";
   const videoUrl = useWatch({ control, name: "videoUrl" }) ?? "";
   const thumbnailUrl = useWatch({ control, name: "thumbnailUrl" }) ?? "";
@@ -71,6 +74,8 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
     : videoProvider === "youtube"
       ? "https://youtu.be/..."
       : "https://www.facebook.com/share/v/... atau https://www.facebook.com/reel/...";
+  const highlightCount = highlights.split(/\r?\n/).map((item) => item.trim()).filter(Boolean).length;
+  const editorialReady = shortSynopsis.trim().length >= 80 && recap.trim().length >= 500 && highlightCount >= 3;
 
   useUnsavedChangesGuard(isDirty && !saving);
   useEffect(() => {
@@ -110,16 +115,16 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
       {message && <p role="alert" className="max-w-full break-words rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{message}</p>}
       <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
         <div className="min-w-0 space-y-5">
-          <AdminFormSection guideId="episode-info" title="Informasi Episode" description="Pilih series tempat episode ini berada, lalu tulis judulnya. Nomor episode berikutnya akan terisi otomatis.">
+          <AdminFormSection guideId="episode-info" title="Informasi Episode" description="Pilih series, tulis judul, lalu beri ringkasan yang menjelaskan apa yang benar-benar terjadi di episode ini.">
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={label}>Masuk ke Series <span className="text-red-600">*</span><select className={field} {...register("seriesId", { required: "Pilih series terlebih dahulu" })}>{series.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select>{errors.seriesId && <small className="mt-1 block text-red-600">{errors.seriesId.message}</small>}</label>
               <label className={label}>Episode ke- <span className="text-red-600">*</span><input type="number" min="1" className={field} {...register("episodeNumber", { required: "Nomor episode wajib diisi", valueAsNumber: true, min: 1 })} />{errors.episodeNumber && <small className="mt-1 block text-red-600">{errors.episodeNumber.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Sudah diisi otomatis. Ubah hanya jika urutannya memang berbeda.</small></label>
               <label className={`${label} sm:col-span-2`}>Judul Episode <span className="text-red-600">*</span><input className={field} placeholder="Contoh: Hari Pertama Ana Bekerja" {...register("title", { required: "Judul wajib diisi", maxLength: 200 })} />{errors.title && <small className="mt-1 block text-red-600">{errors.title.message}</small>}</label>
-              <label className={`${label} sm:col-span-2`}>Ringkasan singkat{optional}<textarea rows={2} className={field} placeholder="Ceritakan isi episode ini dalam satu atau dua kalimat." {...register("shortSynopsis", { maxLength: 320 })} /></label>
+              <label className={`${label} sm:col-span-2`}>Ringkasan singkat{optional}<textarea rows={3} className={field} placeholder="Jelaskan kejadian utama episode ini dalam dua atau tiga kalimat." {...register("shortSynopsis", { maxLength: 320 })} />{errors.shortSynopsis && <small className="mt-1 block text-red-600">{errors.shortSynopsis.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Untuk episode tayang: minimal 80 karakter. Saat ini {shortSynopsis.trim().length} karakter.</small></label>
             </div>
           </AdminFormSection>
 
-          <AdminFormSection guideId="episode-media" title="Video & Thumbnail" description="Tempel link video yang sudah kamu upload, cek preview-nya, lalu pilih thumbnail. Gambar akan diringankan otomatis saat diunggah.">
+          <AdminFormSection guideId="episode-media" title="Video & Thumbnail" description="Tempel link video yang sudah kamu upload, cek sumbernya, lalu pilih thumbnail. Gambar akan diringankan otomatis saat diunggah.">
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={`${label} sm:col-span-2`}>Link Video {videoProviderLabel} <span className="text-red-600">*</span><input type="url" className={field} placeholder={videoPlaceholder} {...register("videoUrl", { required: "Link video wajib diisi" })} />{errors.videoUrl && <small className="mt-1 block text-red-600">{errors.videoUrl.message}</small>}</label>
               <div className="sm:col-span-2"><VideoPreview provider={videoProvider} videoUrl={videoUrl} /></div>
@@ -128,15 +133,21 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
             </div>
           </AdminFormSection>
 
-          <AdminAdvancedSection guideId="episode-editorial" title="Ringkasan Cerita & Momen Penting" description="Tidak wajib. Buka bagian ini kalau kamu ingin memberi rangkuman cerita tambahan untuk penonton." defaultOpen={Boolean(initial?.recap || initial?.highlights.length)}>
+          <AdminFormSection guideId="episode-editorial" title="Ringkasan Cerita & Momen Penting" description="Bagian ini menjadi isi editorial utama halaman episode. Draft boleh kosong, tetapi episode yang ditayangkan harus memiliki konteks cerita yang cukup.">
             <div className="grid min-w-0 gap-5">
-              <label className={label}>Ringkasan cerita{optional}<textarea rows={6} className={field} placeholder="Tuliskan rangkuman kejadian dalam episode ini." {...register("recap", { maxLength: 20000 })} /></label>
-              <label className={label}>Momen penting{optional}<textarea rows={4} className={field} placeholder={"Ana datang ke studio\nManajer memanggil Ana\nAna dikeluarkan dari proyek"} {...register("highlights", { maxLength: 4000 })} /><small className="mt-1 block font-normal text-[var(--muted)]">Tulis satu kejadian penting di setiap baris.</small></label>
+              <label className={label}>Ringkasan cerita{optional}<textarea rows={10} className={field} placeholder="Ceritakan alur episode dengan urut: situasi awal, konflik, keputusan karakter, perubahan penting, dan penutup episode. Hindari sekadar mengulang judul." {...register("recap", { maxLength: 20000 })} />{errors.recap && <small className="mt-1 block text-red-600">{errors.recap.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Untuk episode tayang: minimal 500 karakter. Saat ini {recap.trim().length} karakter.</small></label>
+              <label className={label}>Momen penting{optional}<textarea rows={5} className={field} placeholder={"Ana datang ke studio\nManajer memanggil Ana\nAna dikeluarkan dari proyek"} {...register("highlights", { maxLength: 4000 })} />{errors.highlights && <small className="mt-1 block text-red-600">{errors.highlights.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Tulis satu kejadian penting per baris. Untuk episode tayang: minimal 3 momen. Saat ini {highlightCount}.</small></label>
             </div>
-          </AdminAdvancedSection>
+          </AdminFormSection>
 
-          <AdminFormSection guideId="episode-publish" title="Tayangkan Episode" description="Kalau episode belum selesai diperiksa, biarkan pilihan ini mati. Aktifkan saat episode sudah siap ditonton.">
+          <AdminFormSection guideId="episode-publish" title="Tayangkan Episode" description="Episode publik harus punya video dan informasi cerita yang cukup agar halaman tetap berguna walau penonton belum memutar video.">
             <label className="flex min-h-14 min-w-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-5 w-5 shrink-0 accent-red-600" {...register("isPublished")} /><span className="min-w-0 break-words">Tampilkan ke penonton</span></label>
+            {published && (
+              <div className={`mt-3 rounded-xl border px-4 py-3 text-sm leading-6 ${editorialReady ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-amber-200 bg-amber-50 text-amber-800"}`}>
+                <strong>{editorialReady ? "✓ Konten editorial siap tayang." : "Konten belum siap tayang."}</strong>{" "}
+                {editorialReady ? "Ringkasan singkat, recap, dan momen penting sudah memenuhi standar internal Ceritaria." : "Lengkapi ringkasan minimal 80 karakter, recap minimal 500 karakter, dan minimal 3 momen penting."}
+              </div>
+            )}
             {published && !seriesIsPublished && (
               <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-5 text-amber-800">
                 Series <strong>{selectedSeriesTitle || "yang dipilih"}</strong> masih belum ditampilkan ke penonton. Episode ini akan tersimpan sebagai siap tayang, tetapi baru bisa ditonton setelah series-nya ikut ditampilkan.
@@ -161,8 +172,8 @@ export function EpisodeForm({ series, initial, nextEpisodeBySeries = {} }: Episo
         saving={saving}
         disabled={series.length === 0}
         published={published}
-        publishedReady={seriesIsPublished}
-        publishedMessage={seriesIsPublished ? "Akan langsung tampil untuk penonton" : "Episode siap tayang, tetapi series-nya masih belum ditampilkan"}
+        publishedReady={seriesIsPublished && editorialReady}
+        publishedMessage={seriesIsPublished && editorialReady ? "Akan langsung tampil untuk penonton" : "Lengkapi standar editorial dan pastikan series sudah ditayangkan"}
         submitLabel={initial ? "Simpan Perubahan" : "Simpan Episode"}
       />
     </form>
