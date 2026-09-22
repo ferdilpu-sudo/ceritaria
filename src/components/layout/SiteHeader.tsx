@@ -41,11 +41,16 @@ export function SiteHeader({ hideOnMobile = false }: { hideOnMobile?: boolean })
           <SearchIcon />
         </Link>
 
-        <form action="/search" className="hidden items-center gap-2 sm:flex">
-          <label htmlFor="header-search" className="sr-only">Cari series atau episode</label>
-          <input id="header-search" name="q" type="search" placeholder="Cari..." className="w-52 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm" />
-          <button className="min-h-11 rounded-xl bg-[var(--primary)] px-4 text-sm font-bold hover:bg-[var(--primary-hover)]">Cari</button>
-        </form>
+        <div className="hidden items-center gap-4 sm:flex">
+          <Link href="/cerita" className="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-bold text-zinc-300 transition hover:bg-white/[0.04] hover:text-white">
+            Panduan Cerita
+          </Link>
+          <form action="/search" className="flex items-center gap-2">
+            <label htmlFor="header-search" className="sr-only">Cari series atau episode</label>
+            <input id="header-search" name="q" type="search" placeholder="Cari..." className="w-52 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm" />
+            <button className="min-h-11 rounded-xl bg-[var(--primary)] px-4 text-sm font-bold hover:bg-[var(--primary-hover)]">Cari</button>
+          </form>
+        </div>
       </div>
     </header>
   );
