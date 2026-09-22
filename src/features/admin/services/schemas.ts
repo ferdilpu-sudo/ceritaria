@@ -7,6 +7,12 @@ const slug = z.string().trim().min(2, "Alamat halaman terlalu pendek").max(160, 
 const optionalUrl = z.union([z.literal(""), z.url()]).transform((value) => value || null);
 const optionalText = (max: number) => z.string().trim().max(max).transform((value) => value || null);
 
+const SERIES_SHORT_MIN = 80;
+const SERIES_SYNOPSIS_MIN = 600;
+const EPISODE_SHORT_MIN = 80;
+const EPISODE_RECAP_MIN = 500;
+const EPISODE_HIGHLIGHTS_MIN = 3;
+
 function parseDuration(value: string) {
   if (/^\d+$/.test(value)) return Number(value);
   if (!/^\d{1,3}:[0-5]\d$/.test(value)) return Number.NaN;
@@ -32,6 +38,28 @@ export const seriesFormSchema = z.object({
   isPublished: z.boolean(),
   seoTitle: optionalText(200),
   seoDescription: optionalText(320),
+}).superRefine((value, ctx) => {
+  if (!value.isPublished) return;
+
+  if (!value.shortSynopsis || value.shortSynopsis.length < SERIES_SHORT_MIN) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["shortSynopsis"],
+      message: `Series yang ditayangkan perlu ringkasan singkat yang informatif, minimal ${SERIES_SHORT_MIN} karakter.`,
+    });
+  }
+
+  if (!value.synopsis || value.synopsis.length < SERIES_SYNOPSIS_MIN) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["synopsis"],
+      message: `Lengkapi sinopsis sebelum tayang, minimal ${SERIES_SYNOPSIS_MIN} karakter agar halaman series punya konteks cerita yang cukup.`,
+    });
+  }
+
+  if (splitCommaList(value.genres).length === 0) {
+    ctx.addIssue({ code: "custom", path: ["genres"], message: "Tambahkan minimal satu genre sebelum series ditayangkan." });
+  }
 });
 
 export const episodeFormSchema = z.object({
@@ -65,6 +93,32 @@ export const episodeFormSchema = z.object({
         : "Link video Facebook belum dikenali. Pastikan videonya dapat dibuka publik.";
 
     ctx.addIssue({ code: "custom", path: ["videoUrl"], message });
+  }
+
+  if (!value.isPublished) return;
+
+  if (!value.shortSynopsis || value.shortSynopsis.length < EPISODE_SHORT_MIN) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["shortSynopsis"],
+      message: `Episode yang ditayangkan perlu ringkasan singkat minimal ${EPISODE_SHORT_MIN} karakter.`,
+    });
+  }
+
+  if (!value.recap || value.recap.length < EPISODE_RECAP_MIN) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["recap"],
+      message: `Lengkapi ringkasan cerita episode minimal ${EPISODE_RECAP_MIN} karakter sebelum ditayangkan.`,
+    });
+  }
+
+  if (splitLineList(value.highlights).length < EPISODE_HIGHLIGHTS_MIN) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["highlights"],
+      message: `Tambahkan minimal ${EPISODE_HIGHLIGHTS_MIN} momen penting, satu kejadian per baris.`,
+    });
   }
 });
 
