@@ -24,7 +24,7 @@ type Values = {
 
 const field = "mt-2 w-full min-w-0 max-w-full rounded-xl border border-[var(--border)] bg-white px-3.5 py-3 text-[var(--text)] shadow-sm placeholder:text-zinc-400 focus:border-red-300";
 const label = "min-w-0 text-sm font-bold text-[var(--text)]";
-const optional = <span className="font-normal text-[var(--muted)]"> (opsional)</span>;
+const optional = <span className="font-normal text-[var(--muted)]"> (opsional saat draft)</span>;
 
 export function SeriesForm({ initial }: { initial?: SeriesRow }) {
   const router = useRouter();
@@ -43,6 +43,8 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
   });
   const title = useWatch({ control, name: "title" }) ?? "";
   const slug = useWatch({ control, name: "slug" }) ?? "";
+  const shortSynopsis = useWatch({ control, name: "shortSynopsis" }) ?? "";
+  const synopsis = useWatch({ control, name: "synopsis" }) ?? "";
   const genres = useWatch({ control, name: "genres" }) ?? "";
   const coverUrl = useWatch({ control, name: "coverUrl" }) ?? "";
   const heroUrl = useWatch({ control, name: "heroUrl" }) ?? "";
@@ -51,6 +53,7 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
   const coverRegister = register("coverFile");
   const heroRegister = register("heroFile");
   const slugRegister = register("slug", { required: "Alamat halaman wajib tersedia", pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/ });
+  const editorialReady = shortSynopsis.trim().length >= 80 && synopsis.trim().length >= 600 && genres.split(",").some((item) => item.trim().length > 0);
 
   useUnsavedChangesGuard(isDirty && !saving);
   useEffect(() => {
@@ -88,12 +91,12 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
       {message && <p role="alert" className="max-w-full break-words rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{message}</p>}
       <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
         <div className="min-w-0 space-y-5">
-          <AdminFormSection guideId="series-info" title="Informasi Series" description="Tulis nama series dan informasi singkat yang akan dibaca penonton. Alamat halamannya akan dibuat otomatis.">
+          <AdminFormSection guideId="series-info" title="Informasi Series" description="Tulis nama, premis, dan konteks cerita yang benar-benar membantu penonton memahami series. Alamat halamannya akan dibuat otomatis.">
             <div className="grid min-w-0 gap-5 sm:grid-cols-2">
               <label className={`${label} sm:col-span-2`}>Judul Series <span className="text-red-600">*</span><input className={field} placeholder="Contoh: Ana & Max" {...register("title", { required: "Judul wajib diisi", maxLength: 200 })} />{errors.title && <small className="mt-1 block text-red-600">{errors.title.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Alamat halaman akan dibuat otomatis dari judul.</small></label>
-              <label className={`${label} sm:col-span-2`}>Ringkasan singkat{optional}<textarea rows={2} className={field} placeholder="Ceritakan inti series ini dalam satu atau dua kalimat." {...register("shortSynopsis", { maxLength: 320 })} /></label>
-              <label className={`${label} sm:col-span-2`}>Sinopsis lengkap{optional}<textarea rows={5} className={field} placeholder="Tuliskan cerita atau premis series dengan lebih lengkap." {...register("synopsis", { maxLength: 8000 })} /></label>
-              <label className={`${label} sm:col-span-2`}>Genre{optional}<input className={field} placeholder="Drama, Survival, Romance" {...register("genres")} /><small className="mt-1 block font-normal text-[var(--muted)]">Kalau lebih dari satu, pisahkan dengan koma.</small></label>
+              <label className={`${label} sm:col-span-2`}>Ringkasan singkat{optional}<textarea rows={3} className={field} placeholder="Jelaskan premis dan konflik utama dalam dua atau tiga kalimat." {...register("shortSynopsis", { maxLength: 320 })} />{errors.shortSynopsis && <small className="mt-1 block text-red-600">{errors.shortSynopsis.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Untuk series tayang: minimal 80 karakter. Saat ini {shortSynopsis.trim().length} karakter.</small></label>
+              <label className={`${label} sm:col-span-2`}>Sinopsis lengkap{optional}<textarea rows={10} className={field} placeholder="Tuliskan premis, tokoh utama, konflik, hubungan antarkarakter, dan arah cerita tanpa sekadar mengulang ringkasan singkat." {...register("synopsis", { maxLength: 8000 })} />{errors.synopsis && <small className="mt-1 block text-red-600">{errors.synopsis.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Untuk series tayang: minimal 600 karakter. Saat ini {synopsis.trim().length} karakter.</small></label>
+              <label className={`${label} sm:col-span-2`}>Genre{optional}<input className={field} placeholder="Drama, Survival, Romance" {...register("genres")} />{errors.genres && <small className="mt-1 block text-red-600">{errors.genres.message}</small>}<small className="mt-1 block font-normal text-[var(--muted)]">Minimal satu genre saat tayang. Kalau lebih dari satu, pisahkan dengan koma.</small></label>
             </div>
           </AdminFormSection>
 
@@ -104,11 +107,17 @@ export function SeriesForm({ initial }: { initial?: SeriesRow }) {
             </div>
           </AdminFormSection>
 
-          <AdminFormSection guideId="series-publish" title="Tayangkan Series" description="Kalau series masih ingin diperiksa, jangan tampilkan dulu. Kamu juga bisa memilih series yang ingin lebih ditonjolkan di beranda.">
+          <AdminFormSection guideId="series-publish" title="Tayangkan Series" description="Series publik sekarang punya standar editorial minimum agar halaman tidak hanya menjadi katalog video tipis.">
             <div className="grid min-w-0 gap-3 sm:grid-cols-2">
               <label className="flex min-h-14 min-w-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-5 w-5 shrink-0 accent-red-600" {...register("isFeatured")} /><span className="min-w-0 break-words">Tampilkan sebagai series unggulan</span></label>
               <label className="flex min-h-14 min-w-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 font-bold text-[var(--text)]"><input type="checkbox" className="h-5 w-5 shrink-0 accent-red-600" {...register("isPublished")} /><span className="min-w-0 break-words">Tampilkan ke penonton</span></label>
             </div>
+            {published && (
+              <div className={`mt-3 rounded-xl border px-4 py-3 text-sm leading-6 ${editorialReady ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-amber-200 bg-amber-50 text-amber-800"}`}>
+                <strong>{editorialReady ? "✓ Konten editorial siap tayang." : "Konten belum siap tayang."}</strong>{" "}
+                {editorialReady ? "Ringkasan, sinopsis, dan genre sudah memenuhi standar internal Ceritaria." : "Lengkapi ringkasan minimal 80 karakter, sinopsis minimal 600 karakter, dan minimal satu genre."}
+              </div>
+            )}
           </AdminFormSection>
 
           <AdminAdvancedSection guideId="series-advanced" title="Pengaturan Tambahan" description="Biasanya tidak perlu diubah. Buka hanya jika ingin mengganti alamat halaman, memakai gambar dari link internet, atau mengatur tampilan di Google." defaultOpen={Boolean(errors.slug || initial?.seo_title || initial?.seo_description)}>
