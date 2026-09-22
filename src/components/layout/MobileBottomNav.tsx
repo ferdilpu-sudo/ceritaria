@@ -2,20 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const items = [
   { href: "/", label: "Beranda", key: "home" },
-  { href: "/#semua-series", label: "Series", key: "series" },
+  { href: "/cerita", label: "Cerita", key: "series" },
   { href: "/search", label: "Cari", key: "search" },
   { href: "/lanjut", label: "Lanjut", key: "continue" },
 ] as const;
 
 type NavKey = (typeof items)[number]["key"];
 
-function isActive(pathname: string, hash: string, key: NavKey) {
-  if (key === "home") return pathname === "/" && hash !== "#semua-series";
-  if (key === "series") return pathname.startsWith("/series") || (pathname === "/" && hash === "#semua-series");
+function isActive(pathname: string, key: NavKey) {
+  if (key === "home") return pathname === "/";
+  if (key === "series") return pathname.startsWith("/series") || pathname.startsWith("/cerita");
   if (key === "search") return pathname.startsWith("/search");
   return pathname.startsWith("/lanjut");
 }
@@ -37,26 +36,17 @@ function NavIcon({ name }: { name: NavKey }) {
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const [hash, setHash] = useState("");
-
-  useEffect(() => {
-    const syncHash = () => setHash(window.location.hash);
-    syncHash();
-    window.addEventListener("hashchange", syncHash);
-    return () => window.removeEventListener("hashchange", syncHash);
-  }, [pathname]);
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#0b0b0f]/95 pb-[max(env(safe-area-inset-bottom),0.35rem)] pt-1.5 backdrop-blur-xl sm:hidden" aria-label="Navigasi utama mobile">
       <div className="mx-auto grid max-w-md grid-cols-4 px-2">
         {items.map((item) => {
-          const active = isActive(pathname, hash, item.key);
+          const active = isActive(pathname, item.key);
           return (
             <Link
               key={item.key}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              onClick={() => setHash(item.key === "series" ? "#semua-series" : "")}
               className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-bold transition active:scale-95 ${active ? "text-white" : "text-zinc-400"}`}
             >
               <span className={`grid h-8 w-11 place-items-center rounded-full transition ${active ? "bg-red-600/15 text-red-400" : ""}`}>
