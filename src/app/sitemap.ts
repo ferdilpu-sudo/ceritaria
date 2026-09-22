@@ -8,10 +8,10 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { NEXT_PUBLIC_SITE_URL } = getPublicEnv();
   const [series, episodes] = await Promise.all([getPublishedSeries(1000), getLatestEpisodes(1000)]);
-  const staticPages: MetadataRoute.Sitemap = ["", "/about", "/contact", "/privacy", "/terms"].map((path) => ({
+  const staticPages: MetadataRoute.Sitemap = ["", "/cerita", "/about", "/contact", "/privacy", "/terms"].map((path) => ({
     url: `${NEXT_PUBLIC_SITE_URL}${path}`,
-    changeFrequency: path === "" ? "daily" : "monthly",
-    priority: path === "" ? 1 : 0.4,
+    changeFrequency: path === "" ? "daily" : path === "/cerita" ? "weekly" : "monthly",
+    priority: path === "" ? 1 : path === "/cerita" ? 0.85 : 0.4,
   }));
   const seriesPages: MetadataRoute.Sitemap = series.map((item) => ({
     url: `${NEXT_PUBLIC_SITE_URL}/series/${item.slug}`,
