@@ -38,6 +38,8 @@ export default async function SeriesPage({ params }: PageProps) {
   const first = episodes[0];
   const latest = episodes.at(-1);
   const heroImage = series.hero_url ?? series.cover_url;
+  const synopsis = series.synopsis ?? series.short_synopsis;
+  const synopsisParagraphs = synopsis?.split(/\n\n+/).map((paragraph) => paragraph.trim()).filter(Boolean) ?? [];
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "TVSeries",
@@ -68,7 +70,7 @@ export default async function SeriesPage({ params }: PageProps) {
         </div>
 
         <div className="px-4 pt-3">
-          {series.synopsis && <p className="line-clamp-4 text-[13px] leading-[1.55rem] text-zinc-300">{series.synopsis}</p>}
+          {(series.short_synopsis ?? series.synopsis) && <p className="text-[13px] leading-[1.55rem] text-zinc-300">{series.short_synopsis ?? series.synopsis}</p>}
           <div className="mt-4 grid grid-cols-2 gap-3">
             {first && <Link href={`/series/${series.slug}/${first.slug}`} className="flex min-h-13 items-center justify-center gap-2 rounded-2xl bg-[var(--primary)] px-4 text-sm font-black text-white shadow-lg shadow-red-950/20 active:scale-[0.98]"><span aria-hidden="true">▶</span> Mulai</Link>}
             {latest && latest.id !== first?.id && <Link href={`/series/${series.slug}/${latest.slug}`} className="surface flex min-h-13 items-center justify-center rounded-2xl px-4 text-sm font-black text-zinc-100 active:scale-[0.98]">Terbaru</Link>}
@@ -84,7 +86,7 @@ export default async function SeriesPage({ params }: PageProps) {
           <p className="text-xs font-black tracking-[0.16em] text-red-400">SERIES</p>
           <h1 className="mt-2 text-4xl font-black leading-tight sm:text-5xl">{series.title}</h1>
           {series.genres.length > 0 && <p className="mt-3 text-sm muted">{series.genres.join(" • ")}</p>}
-          {series.synopsis && <div className="prose-ceritaria mt-6"><p>{series.synopsis}</p></div>}
+          {(series.short_synopsis ?? series.synopsis) && <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">{series.short_synopsis ?? series.synopsis}</p>}
           <div className="mt-6 flex flex-wrap gap-3">
             {first && <Link href={`/series/${series.slug}/${first.slug}`} className="inline-flex min-h-12 items-center rounded-xl bg-[var(--primary)] px-5 font-bold">Mulai Episode 1</Link>}
             {latest && latest.id !== first?.id && <Link href={`/series/${series.slug}/${latest.slug}`} className="inline-flex min-h-12 items-center rounded-xl surface px-5 font-bold">Episode Terbaru</Link>}
@@ -92,10 +94,36 @@ export default async function SeriesPage({ params }: PageProps) {
         </section>
       </div>
 
+      <section className="mt-8 grid gap-5 sm:mt-12 lg:grid-cols-[minmax(0,1fr)_280px]" aria-labelledby="story-guide-title">
+        <article className="surface rounded-3xl border border-[var(--border)] p-5 sm:p-7">
+          <p className="text-[10px] font-black tracking-[0.18em] text-red-400 sm:text-xs">PANDUAN CERITA</p>
+          <h2 id="story-guide-title" className="mt-2 text-2xl font-black sm:text-3xl">Tentang {series.title}</h2>
+          {synopsisParagraphs.length > 0 ? (
+            <div className="prose-ceritaria mt-5 max-w-3xl">
+              {synopsisParagraphs.map((paragraph, index) => <p key={`${series.id}-synopsis-${index}`}>{paragraph}</p>)}
+            </div>
+          ) : (
+            <p className="mt-4 leading-7 text-zinc-400">Sinopsis lengkap untuk series ini sedang disiapkan.</p>
+          )}
+        </article>
 
-      <section id="daftar-episode" className="mt-7 scroll-mt-20 sm:mt-12 sm:scroll-mt-24">
+        <aside className="surface rounded-3xl border border-[var(--border)] p-5 sm:p-6" aria-label="Informasi series">
+          <h2 className="text-lg font-black">Panduan cepat</h2>
+          <dl className="mt-4 space-y-4 text-sm">
+            <div><dt className="text-zinc-500">Genre</dt><dd className="mt-1 font-bold text-zinc-200">{series.genres.length > 0 ? series.genres.join(", ") : "Belum dicantumkan"}</dd></div>
+            <div><dt className="text-zinc-500">Episode tersedia</dt><dd className="mt-1 font-bold text-zinc-200">{episodes.length} episode</dd></div>
+            <div><dt className="text-zinc-500">Urutan menonton</dt><dd className="mt-1 leading-6 text-zinc-300">Mulai dari episode pertama agar perkembangan konflik dan karakter tetap mudah diikuti.</dd></div>
+          </dl>
+          <Link href="/cerita" className="mt-5 inline-flex min-h-11 items-center text-sm font-black text-red-300 hover:text-red-200">Lihat panduan series lain →</Link>
+        </aside>
+      </section>
+
+      <section id="daftar-episode" className="mt-8 scroll-mt-20 sm:mt-12 sm:scroll-mt-24">
         <div className="mb-5 flex items-end justify-between gap-4">
-          <h2 className="text-[22px] font-black sm:text-2xl">Daftar Episode</h2>
+          <div>
+            <p className="text-[10px] font-black tracking-[0.16em] text-red-400 sm:text-xs">LANJUTKAN CERITA</p>
+            <h2 className="mt-1 text-[22px] font-black sm:text-2xl">Daftar Episode</h2>
+          </div>
           <span className="text-xs text-zinc-500">{episodes.length} episode</span>
         </div>
         {episodes.length ? (
