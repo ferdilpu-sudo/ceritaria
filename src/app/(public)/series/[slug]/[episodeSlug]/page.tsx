@@ -52,6 +52,8 @@ export default async function EpisodePage({ params, searchParams }: PageProps) {
 
   const { series, episode, allEpisodes, previous, next } = context;
   const related = allEpisodes.filter((item) => item.id !== episode.id).slice(Math.max(0, episode.episode_number - 3), episode.episode_number + 2).slice(0, 5);
+  const recapParagraphs = episode.recap?.split(/\n\n+/).map((paragraph) => paragraph.trim()).filter(Boolean) ?? [];
+  const seriesContext = series.short_synopsis ?? series.synopsis;
   const { NEXT_PUBLIC_SITE_URL } = getPublicEnv();
   const jsonLd = {
     "@context": "https://schema.org", "@type": "TVEpisode", name: episode.title, episodeNumber: episode.episode_number,
@@ -81,11 +83,40 @@ export default async function EpisodePage({ params, searchParams }: PageProps) {
           <h1 className="mt-2 text-[1.8rem] font-black leading-tight sm:text-4xl lg:text-[2.6rem]">{episode.title}</h1>
           {episode.short_synopsis && <p className="mt-3 text-sm leading-6 text-zinc-300 sm:mt-5 sm:max-w-2xl sm:text-lg sm:leading-7">{episode.short_synopsis}</p>}
           <div className="mt-5 sm:mt-6"><EpisodeNavigation seriesSlug={series.slug} previous={previous} next={next} /></div>
-          <EpisodeEngagement episodeId={episode.id} />
-          <EpisodeComments episodeId={episode.id} />
 
-          {episode.recap && <section className="mt-8 border-t border-[var(--border)] pt-7 sm:mt-10 sm:pt-8"><h2 className="text-xl font-black sm:text-2xl">Recap Episode</h2><div className="prose-ceritaria mt-4 max-w-2xl">{episode.recap.split(/\n\n+/).map((paragraph, index) => <p key={`${episode.id}-${index}`}>{paragraph}</p>)}</div></section>}
-          {episode.highlights.length > 0 && <section className="mt-8 sm:mt-9"><h2 className="text-xl font-black sm:text-2xl">Momen Penting</h2><ul className="mt-4 space-y-2.5 sm:space-y-3">{episode.highlights.map((item, index) => <li key={item} className="surface flex items-start gap-3 rounded-2xl px-4 py-3.5 leading-6 sm:rounded-xl"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-red-950 text-xs font-black text-red-300">{index + 1}</span><span>{item}</span></li>)}</ul></section>}
+          {recapParagraphs.length > 0 && (
+            <section className="mt-8 border-t border-[var(--border)] pt-7 sm:mt-10 sm:pt-8" aria-labelledby="episode-recap-title">
+              <p className="text-[10px] font-black tracking-[0.18em] text-red-400 sm:text-xs">RINGKASAN EDITORIAL</p>
+              <h2 id="episode-recap-title" className="mt-1 text-xl font-black sm:text-2xl">Ringkasan Cerita Episode</h2>
+              <div className="prose-ceritaria mt-4 max-w-2xl">
+                {recapParagraphs.map((paragraph, index) => <p key={`${episode.id}-recap-${index}`}>{paragraph}</p>)}
+              </div>
+            </section>
+          )}
+
+          {episode.highlights.length > 0 && (
+            <section className="mt-8 sm:mt-9" aria-labelledby="episode-highlights-title">
+              <h2 id="episode-highlights-title" className="text-xl font-black sm:text-2xl">Momen Penting Episode</h2>
+              <p className="mt-2 text-sm leading-6 text-zinc-400">Poin berikut merangkum kejadian yang paling memengaruhi perkembangan cerita di episode ini.</p>
+              <ul className="mt-4 space-y-2.5 sm:space-y-3">
+                {episode.highlights.map((item, index) => <li key={`${episode.id}-highlight-${index}`} className="surface flex items-start gap-3 rounded-2xl px-4 py-3.5 leading-6 sm:rounded-xl"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-red-950 text-xs font-black text-red-300">{index + 1}</span><span>{item}</span></li>)}
+              </ul>
+            </section>
+          )}
+
+          {seriesContext && (
+            <section className="mt-8 rounded-2xl border border-[var(--border)] bg-white/[0.025] p-5 sm:mt-10 sm:p-6" aria-labelledby="series-context-title">
+              <p className="text-[10px] font-black tracking-[0.16em] text-red-400 sm:text-xs">KONTEKS SERIES</p>
+              <h2 id="series-context-title" className="mt-1 text-lg font-black">Tentang {series.title}</h2>
+              <p className="mt-3 text-sm leading-7 text-zinc-300">{seriesContext}</p>
+              <Link href={`/series/${series.slug}`} className="mt-4 inline-flex min-h-11 items-center text-sm font-black text-red-300 hover:text-red-200">Baca sinopsis lengkap dan daftar episode →</Link>
+            </section>
+          )}
+
+          <div className="mt-8 border-t border-[var(--border)] pt-6 sm:mt-10">
+            <EpisodeEngagement episodeId={episode.id} />
+            <EpisodeComments episodeId={episode.id} />
+          </div>
         </main>
       </div>
 
