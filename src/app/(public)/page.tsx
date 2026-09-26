@@ -44,35 +44,35 @@ export default async function HomePage() {
         </section>
       )}
 
-      <section className="mt-10 overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-5 sm:mt-14 sm:p-8" aria-labelledby="about-ceritaria-title">
-        <div className="grid gap-6 lg:grid-cols-[1.35fr_.65fr] lg:items-end">
-          <div>
-            <p className="text-[10px] font-black tracking-[0.18em] text-red-400 sm:text-xs">LEBIH DARI SEKADAR PLAYER</p>
-            <h2 id="about-ceritaria-title" className="mt-2 text-2xl font-black sm:text-3xl">Ikuti cerita tanpa kehilangan konteks</h2>
-            <div className="prose-ceritaria mt-4 max-w-3xl">
-              <p>
-                Ceritaria menyusun mini drama dalam urutan episode yang jelas. Setiap series memiliki sinopsis yang menjelaskan premis dan konflik utamanya,
-                sementara halaman episode dapat memuat ringkasan cerita serta momen penting yang membantu penonton mengingat perkembangan alur.
-              </p>
-              <p>
-                Kamu bisa mulai dari episode pertama, melanjutkan tontonan terakhir, membaca ringkasan sebelum menonton, atau membuka panduan cerita untuk
-                memahami series yang belum pernah kamu ikuti. Video adalah bagian utama pengalaman, tetapi cerita dan konteksnya tetap bisa dibaca langsung di Ceritaria.
-              </p>
-            </div>
-          </div>
-          <Link href="/cerita" className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-black text-white transition hover:bg-white/[0.08]">
-            Baca Panduan Cerita →
-          </Link>
-        </div>
-      </section>
-
       <section id="semua-series" className="scroll-mt-20 pt-8 sm:scroll-mt-24 sm:pt-12" aria-labelledby="all-series-title">
-        <HomeSectionHeader eyebrow="JELAJAHI CERITA" title="Semua Series" actionHref="/cerita" actionLabel="Baca panduan" />
+        <HomeSectionHeader eyebrow="JELAJAHI CERITA" title="Semua Series" actionHref="/cerita" actionLabel="Lihat katalog" />
         {series.length > 0 ? (
           <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-x-5 sm:gap-y-8 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-10">
             {series.map((item) => <HomeSeriesCard key={item.id} series={item} />)}
           </div>
         ) : <p className="muted">Belum ada series yang dipublikasikan.</p>}
+      </section>
+
+      <section className="mt-12 overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-5 sm:mt-16 sm:p-8" aria-labelledby="story-context-title">
+        <div className="grid gap-6 lg:grid-cols-[1.35fr_.65fr] lg:items-end">
+          <div>
+            <p className="text-[10px] font-black tracking-[0.18em] text-red-400 sm:text-xs">IKUTI CERITANYA</p>
+            <h2 id="story-context-title" className="mt-2 text-2xl font-black sm:text-3xl">Jangan kehilangan alur</h2>
+            <div className="prose-ceritaria mt-4 max-w-3xl">
+              <p>
+                Setiap series Ceritaria punya sinopsis, urutan episode, dan konteks cerita yang membantu kamu memahami konflik sebelum mulai menonton.
+                Di halaman episode, ringkasan dan momen penting tersedia untuk mengingat perkembangan alur tanpa harus mengulang semuanya dari awal.
+              </p>
+              <p>
+                Pilih cerita baru dari katalog, lanjutkan episode terakhir di perangkat ini, atau baca kembali konteks series saat ada detail yang terlupa.
+                Semua disusun supaya perjalanan dari satu episode ke episode berikutnya tetap mudah diikuti.
+              </p>
+            </div>
+          </div>
+          <Link href="/cerita" className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-black text-white transition hover:bg-white/[0.08]">
+            Jelajahi Semua Series →
+          </Link>
+        </div>
       </section>
     </div>
   );
