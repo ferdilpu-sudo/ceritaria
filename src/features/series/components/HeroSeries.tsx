@@ -11,14 +11,20 @@ function PlayIcon() {
   );
 }
 
-export function HeroSeries({ series }: { series: PublicSeries }) {
+interface HeroSeriesProps {
+  series: PublicSeries;
+  eyebrow?: string;
+  priority?: boolean;
+}
+
+export function HeroSeries({ series, eyebrow = "SERIES UNGGULAN", priority = false }: HeroSeriesProps) {
   const image = series.hero_url ?? series.cover_url;
 
   return (
     <section className="surface relative min-h-[56dvh] overflow-hidden rounded-none border-x-0 sm:min-h-[410px] sm:rounded-[28px] sm:border lg:min-h-[430px]">
       {image ? (
         <div className="absolute inset-0">
-          <MediaImage src={image} alt={`Visual utama ${series.title}`} priority sizes="100vw" className="object-cover object-center" />
+          <MediaImage src={image} alt={`Visual utama ${series.title}`} priority={priority} sizes="100vw" className="object-cover object-center" />
         </div>
       ) : (
         <SeriesFallbackVisual seed={`${series.slug}|${series.title}`} genres={series.genres} className="absolute inset-0" />
@@ -28,7 +34,7 @@ export function HeroSeries({ series }: { series: PublicSeries }) {
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent" />
 
       <div className="relative flex min-h-[56dvh] max-w-4xl flex-col justify-end p-5 pb-7 sm:min-h-[410px] sm:p-9 lg:min-h-[430px] lg:p-10">
-        <p className="mb-2 text-[10px] font-black tracking-[0.2em] text-red-400 sm:mb-3 sm:text-[11px]">SERIES UNGGULAN</p>
+        <p className="mb-2 text-[10px] font-black tracking-[0.2em] text-red-400 sm:mb-3 sm:text-[11px]">{eyebrow}</p>
         <h1 className="max-w-4xl text-[2.15rem] font-black leading-[1.02] tracking-[-0.025em] sm:text-5xl lg:text-6xl">{series.title}</h1>
 
         {series.genres.length > 0 && <p className="mt-2 text-[11px] font-semibold text-zinc-300 sm:hidden">{series.genres.join(" • ")}</p>}
