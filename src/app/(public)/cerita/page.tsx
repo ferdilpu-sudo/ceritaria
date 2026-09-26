@@ -7,8 +7,8 @@ import { getPublishedSeries } from "@/features/series/services/public-series";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Panduan Cerita",
-  description: "Baca sinopsis lengkap, genre, dan panduan mengikuti mini series original di Ceritaria.",
+  title: "Series",
+  description: "Jelajahi semua mini series Ceritaria, baca sinopsis, genre, dan pilih cerita yang ingin kamu ikuti.",
   alternates: { canonical: "/cerita" },
 };
 
@@ -18,16 +18,16 @@ export default async function StoryGuidePage() {
   return (
     <div className="shell py-8 sm:py-12">
       <header className="mx-auto max-w-3xl text-center">
-        <p className="text-xs font-black tracking-[0.18em] text-red-400">PANDUAN CERITA</p>
-        <h1 className="mt-2 text-3xl font-black sm:text-5xl">Kenali ceritanya sebelum menonton</h1>
+        <p className="text-xs font-black tracking-[0.18em] text-red-400">SERIES CERITARIA</p>
+        <h1 className="mt-2 text-3xl font-black sm:text-5xl">Temukan cerita yang ingin kamu ikuti</h1>
         <p className="mt-4 text-sm leading-7 text-zinc-300 sm:text-base">
-          Halaman ini merangkum premis, konflik, dan genre setiap series Ceritaria. Gunakan panduan ini untuk memilih cerita,
-          memahami latar sebelum memulai episode pertama, atau mengingat kembali alur saat melanjutkan tontonan.
+          Jelajahi semua series Ceritaria dari satu tempat. Baca premis, konflik, dan genre untuk memilih cerita baru,
+          lalu buka series untuk mulai dari episode pertama atau melanjutkan alur yang sudah kamu ikuti.
         </p>
       </header>
 
       {series.length > 0 ? (
-        <section className="mt-10 space-y-6 sm:mt-14" aria-label="Panduan semua series">
+        <section className="mt-10 space-y-6 sm:mt-14" aria-label="Semua series Ceritaria">
           {series.map((item) => {
             const synopsis = item.synopsis ?? item.short_synopsis;
             return (
@@ -55,7 +55,7 @@ export default async function StoryGuidePage() {
                     <p className="mt-4 text-sm leading-6 text-zinc-400">Sinopsis lengkap sedang disiapkan.</p>
                   )}
                   <Link href={`/series/${item.slug}`} className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-black text-white">
-                    Buka series dan daftar episode →
+                    Lihat series dan episode →
                   </Link>
                 </div>
               </article>
@@ -63,7 +63,7 @@ export default async function StoryGuidePage() {
           })}
         </section>
       ) : (
-        <div className="surface mx-auto mt-10 max-w-2xl rounded-3xl p-8 text-center text-zinc-400">Belum ada panduan series yang dipublikasikan.</div>
+        <div className="surface mx-auto mt-10 max-w-2xl rounded-3xl p-8 text-center text-zinc-400">Belum ada series yang dipublikasikan.</div>
       )}
     </div>
   );
