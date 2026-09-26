@@ -51,8 +51,19 @@ export function HeroSeriesCarousel({ series }: HeroSeriesCarouselProps) {
     <section className="relative" aria-label="Pilihan series Ceritaria" aria-roledescription="carousel">
       <div
         ref={trackRef}
+        tabIndex={0}
         onScroll={syncActiveSlide}
-        className="mobile-scrollbar flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
+        onKeyDown={(event) => {
+          if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            scrollToIndex(activeIndex - 1);
+          }
+          if (event.key === "ArrowRight") {
+            event.preventDefault();
+            scrollToIndex(activeIndex + 1);
+          }
+        }}
+        className="mobile-scrollbar flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain focus-visible:outline-offset-4"
       >
         {series.map((item, index) => (
           <div
@@ -75,23 +86,24 @@ export function HeroSeriesCarousel({ series }: HeroSeriesCarouselProps) {
         {activeIndex + 1} / {series.length}
       </span>
 
-      <button
-        type="button"
-        onClick={() => scrollToIndex(activeIndex - 1)}
-        className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md transition hover:bg-black/75 active:scale-95 sm:grid"
-        aria-label="Series sebelumnya"
-      >
-        <ArrowIcon direction="left" />
-      </button>
-
-      <button
-        type="button"
-        onClick={() => scrollToIndex(activeIndex + 1)}
-        className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md transition hover:bg-black/75 active:scale-95 sm:grid"
-        aria-label="Series berikutnya"
-      >
-        <ArrowIcon direction="right" />
-      </button>
+      <div className="absolute bottom-6 right-6 z-20 hidden gap-2 sm:flex">
+        <button
+          type="button"
+          onClick={() => scrollToIndex(activeIndex - 1)}
+          className="grid h-12 w-12 place-items-center rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md transition hover:bg-black/75 active:scale-95"
+          aria-label="Series sebelumnya"
+        >
+          <ArrowIcon direction="left" />
+        </button>
+        <button
+          type="button"
+          onClick={() => scrollToIndex(activeIndex + 1)}
+          className="grid h-12 w-12 place-items-center rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md transition hover:bg-black/75 active:scale-95"
+          aria-label="Series berikutnya"
+        >
+          <ArrowIcon direction="right" />
+        </button>
+      </div>
 
       <div className="flex items-center justify-center gap-1 px-3 pt-2 sm:pt-3">
         {series.map((item, index) => (
