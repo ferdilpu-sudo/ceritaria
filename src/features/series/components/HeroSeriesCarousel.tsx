@@ -73,7 +73,7 @@ export function HeroSeriesCarousel({ series }: HeroSeriesCarouselProps) {
 
       <div className="pointer-events-none absolute right-4 top-4 z-20 flex items-center gap-2 sm:right-6 sm:top-6">
         <span className="rounded-full border border-white/15 bg-black/55 px-3 py-1.5 text-[11px] font-black tabular-nums text-white backdrop-blur-md">
-          {activeIndex + 1} / {series.length}
+          <span className="sm:hidden">Geser · </span>{activeIndex + 1} / {series.length}
         </span>
 
         <div className="pointer-events-auto hidden gap-2 sm:flex">
@@ -102,10 +102,12 @@ export function HeroSeriesCarousel({ series }: HeroSeriesCarouselProps) {
             key={item.id}
             type="button"
             onClick={() => scrollToIndex(index)}
-            className={`h-2.5 rounded-full border border-white/25 shadow-sm transition-all ${activeIndex === index ? "w-7 bg-white" : "w-2.5 bg-white/40 hover:bg-white/70"}`}
+            className="grid h-8 w-8 place-items-center rounded-full"
             aria-label={`Tampilkan ${item.title}`}
             aria-current={activeIndex === index ? "true" : undefined}
-          />
+          >
+            <span className={`h-2.5 rounded-full border border-white/25 shadow-sm transition-all ${activeIndex === index ? "w-6 bg-white" : "w-2.5 bg-white/40 hover:bg-white/70"}`} />
+          </button>
         ))}
       </div>
 
