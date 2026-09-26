@@ -43,7 +43,7 @@ export function SiteHeader({ hideOnMobile = false }: { hideOnMobile?: boolean })
 
         <div className="hidden items-center gap-4 sm:flex">
           <Link href="/cerita" className="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-bold text-zinc-300 transition hover:bg-white/[0.04] hover:text-white">
-            Panduan Cerita
+            Series
           </Link>
           <form action="/search" className="flex items-center gap-2">
             <label htmlFor="header-search" className="sr-only">Cari series atau episode</label>
