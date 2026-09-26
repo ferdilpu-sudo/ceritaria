@@ -3,10 +3,10 @@ import Link from "next/link";
 import { HomeEpisodeCard } from "@/features/home/components/HomeEpisodeCard";
 import { HomeSectionHeader } from "@/features/home/components/HomeSectionHeader";
 import { HomeSeriesCard } from "@/features/home/components/HomeSeriesCard";
-import { HeroSeries } from "@/features/series/components/HeroSeries";
+import { HeroSeriesCarousel } from "@/features/series/components/HeroSeriesCarousel";
 import { ContinueWatchingSection } from "@/features/watch-history/components/ContinueWatchingSection";
 import { getLatestEpisodes } from "@/features/episode/services/public-episodes";
-import { getFeaturedSeries, getPublishedSeries } from "@/features/series/services/public-series";
+import { getPublishedSeries } from "@/features/series/services/public-series";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -16,17 +16,19 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [featured, series, episodes] = await Promise.all([
-    getFeaturedSeries(),
+  const [series, episodes] = await Promise.all([
     getPublishedSeries(24),
     getLatestEpisodes(12),
   ]);
-  const hero = featured ?? series[0] ?? null;
+  const heroSeries = [
+    ...series.filter((item) => item.is_featured),
+    ...series.filter((item) => !item.is_featured),
+  ].slice(0, 5);
 
   return (
     <div className="shell pb-8 pt-0 sm:pb-20 sm:pt-10 lg:pt-12">
-      {hero ? (
-        <div className="-mx-4 sm:mx-0"><HeroSeries series={hero} /></div>
+      {heroSeries.length > 0 ? (
+        <div className="-mx-4 sm:mx-0"><HeroSeriesCarousel series={heroSeries} /></div>
       ) : (
         <div className="surface rounded-3xl p-10 text-center"><h1 className="text-3xl font-black">CERITARIA</h1><p className="mt-3 muted">Belum ada series yang dipublikasikan.</p></div>
       )}
