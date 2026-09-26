@@ -71,42 +71,39 @@ export function HeroSeriesCarousel({ series }: HeroSeriesCarouselProps) {
         ))}
       </div>
 
-      <div className="pointer-events-none absolute right-4 top-4 z-20 flex items-center gap-2 sm:right-6 sm:top-6">
-        <span className="rounded-full border border-white/15 bg-black/55 px-3 py-1.5 text-[11px] font-black tabular-nums text-white backdrop-blur-md">
-          <span className="sm:hidden">Geser · </span>{activeIndex + 1} / {series.length}
-        </span>
+      <span className="pointer-events-none absolute right-4 top-4 z-20 rounded-full border border-white/15 bg-black/55 px-3 py-1.5 text-[11px] font-black tabular-nums text-white backdrop-blur-md sm:right-6 sm:top-6">
+        {activeIndex + 1} / {series.length}
+      </span>
 
-        <div className="pointer-events-auto hidden gap-2 sm:flex">
-          <button
-            type="button"
-            onClick={() => scrollToIndex(activeIndex - 1)}
-            className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-md transition hover:bg-black/75 active:scale-95"
-            aria-label="Series sebelumnya"
-          >
-            <ArrowIcon direction="left" />
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToIndex(activeIndex + 1)}
-            className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-md transition hover:bg-black/75 active:scale-95"
-            aria-label="Series berikutnya"
-          >
-            <ArrowIcon direction="right" />
-          </button>
-        </div>
-      </div>
+      <button
+        type="button"
+        onClick={() => scrollToIndex(activeIndex - 1)}
+        className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md transition hover:bg-black/75 active:scale-95 sm:grid"
+        aria-label="Series sebelumnya"
+      >
+        <ArrowIcon direction="left" />
+      </button>
 
-      <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 sm:bottom-4">
+      <button
+        type="button"
+        onClick={() => scrollToIndex(activeIndex + 1)}
+        className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md transition hover:bg-black/75 active:scale-95 sm:grid"
+        aria-label="Series berikutnya"
+      >
+        <ArrowIcon direction="right" />
+      </button>
+
+      <div className="flex items-center justify-center gap-1 px-3 pt-2 sm:pt-3">
         {series.map((item, index) => (
           <button
             key={item.id}
             type="button"
             onClick={() => scrollToIndex(index)}
-            className="grid h-8 w-8 place-items-center rounded-full"
+            className="grid h-9 w-9 place-items-center rounded-full"
             aria-label={`Tampilkan ${item.title}`}
             aria-current={activeIndex === index ? "true" : undefined}
           >
-            <span className={`h-2.5 rounded-full border border-white/25 shadow-sm transition-all ${activeIndex === index ? "w-6 bg-white" : "w-2.5 bg-white/40 hover:bg-white/70"}`} />
+            <span className={`h-2 rounded-full transition-all ${activeIndex === index ? "w-6 bg-white" : "w-2 bg-zinc-600 hover:bg-zinc-400"}`} />
           </button>
         ))}
       </div>
