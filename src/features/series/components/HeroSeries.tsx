@@ -42,7 +42,7 @@ export function HeroSeries({ series, eyebrow = "SERIES UNGGULAN", priority = fal
 
         <div className="mt-4 sm:mt-6">
           <Link href={`/series/${series.slug}`} className="inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[var(--primary)] px-5 font-black text-white shadow-lg shadow-red-950/20 transition active:scale-[0.98] sm:min-h-12 sm:w-auto sm:rounded-xl sm:hover:bg-[var(--primary-hover)]">
-            <PlayIcon /> Mulai Series
+            <PlayIcon /> Lihat Series
           </Link>
         </div>
       </div>
