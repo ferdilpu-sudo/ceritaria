@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const links = [
-  ["Panduan Cerita", "/cerita"], ["Tentang", "/about"], ["Kontak", "/contact"], ["Privasi", "/privacy"], ["Ketentuan", "/terms"],
+  ["Series", "/cerita"], ["Tentang", "/about"], ["Kontak", "/contact"], ["Privasi", "/privacy"], ["Ketentuan", "/terms"],
 ] as const;
 
 export function SiteFooter({ mobileNavInset = true }: { mobileNavInset?: boolean }) {
