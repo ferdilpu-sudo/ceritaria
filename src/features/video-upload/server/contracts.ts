@@ -79,3 +79,15 @@ export type VideoUploadStatusResponse = {
   partSizeBytes: number | null;
   partCount: number | null;
 };
+
+export const attachVideoAssetParamsSchema = z.object({
+  episodeId: z.uuid(),
+  assetId: z.uuid(),
+});
+
+export type AttachVideoAssetResponse = {
+  episodeId: string;
+  assetId: string;
+  status: "ATTACHED";
+  replacedAssetId: string | null;
+};
