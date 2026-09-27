@@ -1,6 +1,7 @@
 import "server-only";
 import type { User } from "@supabase/supabase-js";
 import { createBearerSupabaseClient } from "@/lib/supabase/bearer";
+import { parseBearerToken } from "@/lib/security/bearer-token";
 
 export class ApiAuthorizationError extends Error {
   constructor(
@@ -10,13 +11,6 @@ export class ApiAuthorizationError extends Error {
     super(message);
     this.name = "ApiAuthorizationError";
   }
-}
-
-export function parseBearerToken(headerValue: string | null): string | null {
-  if (!headerValue) return null;
-  const match = /^Bearer\s+(.+)$/i.exec(headerValue.trim());
-  const token = match?.[1]?.trim();
-  return token || null;
 }
 
 export async function requireApiAdmin(request: Request) {

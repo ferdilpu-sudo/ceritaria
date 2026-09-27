@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseBearerToken } from "@/lib/security/require-api-admin";
+import { parseBearerToken } from "@/lib/security/bearer-token";
 
 describe("API bearer parsing", () => {
   it("accepts a case-insensitive Bearer scheme", () => {
