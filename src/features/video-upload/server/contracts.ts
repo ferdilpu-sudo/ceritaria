@@ -65,3 +65,17 @@ export type FinalizeVideoUploadResponse = {
 export type CancelVideoUploadResponse = {
   status: "CANCELLED";
 };
+
+export type VideoUploadStatusResponse = {
+  sessionId: string;
+  assetId: string;
+  mode: "SINGLE" | "MULTIPART";
+  sessionStatus: string;
+  assetStatus: string;
+  expiresAt: string;
+  expired: boolean;
+  expectedSizeBytes: number;
+  actualSizeBytes: number | null;
+  partSizeBytes: number | null;
+  partCount: number | null;
+};
