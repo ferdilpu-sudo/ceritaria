@@ -1,5 +1,12 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 export type VideoProvider = "youtube" | "facebook";
+export type VideoAssetStatus =
+  | "PENDING" | "UPLOADING" | "UPLOADED" | "VERIFYING"
+  | "READY" | "FAILED" | "CANCELLED" | "REPLACED";
+export type VideoUploadMode = "SINGLE" | "MULTIPART";
+export type VideoUploadSessionStatus =
+  | "CREATED" | "UPLOADING" | "COMPLETING" | "UPLOADED"
+  | "VERIFYING" | "READY" | "CANCELLED" | "FAILED" | "EXPIRED";
 
 export interface Database {
   public: {
@@ -34,6 +41,70 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["analytics_events"]["Insert"]>;
+        Relationships: [];
+      };
+      video_assets: {
+        Row: {
+          id: string;
+          episode_id: string;
+          status: VideoAssetStatus;
+          object_key: string;
+          mime_type: string;
+          expected_size_bytes: number;
+          actual_size_bytes: number | null;
+          etag: string | null;
+          checksum_sha256: string | null;
+          created_by: string;
+          ready_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          episode_id: string;
+          status?: VideoAssetStatus;
+          object_key: string;
+          mime_type: string;
+          expected_size_bytes: number;
+          actual_size_bytes?: number | null;
+          etag?: string | null;
+          checksum_sha256?: string | null;
+          created_by: string;
+          ready_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["video_assets"]["Insert"]>;
+        Relationships: [];
+      };
+      video_upload_sessions: {
+        Row: {
+          id: string;
+          asset_id: string;
+          mode: VideoUploadMode;
+          status: VideoUploadSessionStatus;
+          r2_upload_id: string | null;
+          part_size_bytes: number | null;
+          part_count: number | null;
+          expires_at: string;
+          created_by: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          asset_id: string;
+          mode: VideoUploadMode;
+          status?: VideoUploadSessionStatus;
+          r2_upload_id?: string | null;
+          part_size_bytes?: number | null;
+          part_count?: number | null;
+          expires_at: string;
+          created_by: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["video_upload_sessions"]["Insert"]>;
         Relationships: [];
       };
       series: {
@@ -151,3 +222,6 @@ export interface Database {
 
 export type SeriesRow = Database["public"]["Tables"]["series"]["Row"];
 export type EpisodeRow = Database["public"]["Tables"]["episodes"]["Row"];
+
+export type VideoAssetRow = Database["public"]["Tables"]["video_assets"]["Row"];
+export type VideoUploadSessionRow = Database["public"]["Tables"]["video_upload_sessions"]["Row"];
