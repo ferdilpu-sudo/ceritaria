@@ -213,6 +213,29 @@ export interface Database {
         };
         Returns: undefined;
       };
+      cancel_video_upload_records: {
+        Args: { p_session_id: string };
+        Returns: undefined;
+      };
+      fail_video_upload_records: {
+        Args: { p_session_id: string };
+        Returns: undefined;
+      };
+      finalize_video_upload_records: {
+        Args: {
+          p_session_id: string;
+          p_actual_size_bytes: number;
+          p_etag?: string | null;
+        };
+        Returns: undefined;
+      };
+      mark_video_upload_uploaded: {
+        Args: {
+          p_session_id: string;
+          p_etag?: string | null;
+        };
+        Returns: undefined;
+      };
       get_analytics_dashboard: {
         Args: { p_days?: number; p_timezone?: string };
         Returns: Json;

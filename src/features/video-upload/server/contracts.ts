@@ -38,3 +38,30 @@ export type AuthorizeVideoPartResponse = {
   sizeBytes: number;
   url: string;
 };
+
+const completedPartSchema = z.object({
+  partNumber: z.number().int().min(1).max(10_000),
+  etag: z.string().min(1).max(256),
+});
+
+export const completeVideoUploadRequestSchema = z.object({
+  parts: z.array(completedPartSchema).min(1).max(10_000),
+});
+
+export type CompleteVideoUploadRequest =
+  z.infer<typeof completeVideoUploadRequestSchema>;
+
+export type CompleteVideoUploadResponse = {
+  status: "UPLOADED";
+};
+
+export type FinalizeVideoUploadResponse = {
+  assetId: string;
+  status: "READY";
+  sizeBytes: number;
+  etag: string | null;
+};
+
+export type CancelVideoUploadResponse = {
+  status: "CANCELLED";
+};
