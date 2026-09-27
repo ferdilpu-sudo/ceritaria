@@ -1,5 +1,5 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
-export type VideoProvider = "youtube" | "facebook";
+export type VideoProvider = "youtube" | "facebook" | "r2";
 export type VideoAssetStatus =
   | "PENDING" | "UPLOADING" | "UPLOADED" | "VERIFYING"
   | "READY" | "FAILED" | "CANCELLED" | "REPLACED";
@@ -158,7 +158,8 @@ export interface Database {
           recap: string | null;
           highlights: string[];
           video_provider: VideoProvider;
-          video_url: string;
+          video_url: string | null;
+          video_asset_id: string | null;
           thumbnail_url: string | null;
           duration_seconds: number | null;
           is_published: boolean;
@@ -179,7 +180,8 @@ export interface Database {
           recap?: string | null;
           highlights?: string[];
           video_provider?: VideoProvider;
-          video_url: string;
+          video_url?: string | null;
+          video_asset_id?: string | null;
           thumbnail_url?: string | null;
           duration_seconds?: number | null;
           is_published?: boolean;
@@ -235,6 +237,13 @@ export interface Database {
           p_etag?: string | null;
         };
         Returns: undefined;
+      };
+      attach_ready_video_asset: {
+        Args: {
+          target_episode_id: string;
+          target_asset_id: string;
+        };
+        Returns: string | null;
       };
       get_analytics_dashboard: {
         Args: { p_days?: number; p_timezone?: string };
