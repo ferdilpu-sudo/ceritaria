@@ -1,10 +1,10 @@
 import "server-only";
 import { createPublicClient } from "@/lib/supabase/public";
-import type { PublicEpisode, EpisodeWithSeries } from "@/features/episode/types/episode";
+import type { PublicEpisode, PublicEpisodeDetail, EpisodeWithSeries } from "@/features/episode/types/episode";
 
 const publicEpisodeColumns = [
   "id", "series_id", "episode_number", "slug", "title", "short_synopsis", "recap", "highlights",
-  "video_provider", "video_url", "thumbnail_url", "duration_seconds", "published_at", "seo_title", "seo_description",
+  "video_provider", "video_url", "video_asset_id", "thumbnail_url", "duration_seconds", "published_at", "seo_title", "seo_description",
 ].join(",");
 
 export async function getPublishedEpisodesForSeries(seriesId: string): Promise<PublicEpisode[]> {
@@ -22,7 +22,10 @@ export async function getPublishedEpisodesForSeries(seriesId: string): Promise<P
   return (data ?? []) as unknown as PublicEpisode[];
 }
 
-export async function getPublishedEpisode(seriesId: string, slug: string): Promise<PublicEpisode | null> {
+export async function getPublishedEpisode(
+  seriesId: string,
+  slug: string,
+): Promise<PublicEpisodeDetail | null> {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("episodes")
@@ -35,7 +38,25 @@ export async function getPublishedEpisode(seriesId: string, slug: string): Promi
     .maybeSingle();
 
   if (error) throw new Error(`Gagal memuat episode: ${error.message}`);
-  return data as unknown as PublicEpisode | null;
+  const episode = data as unknown as PublicEpisode | null;
+  if (!episode) return null;
+
+  if (episode.video_provider !== "r2" || !episode.video_asset_id) {
+    return { ...episode, videoAssetObjectKey: null };
+  }
+
+  const { data: asset, error: assetError } = await supabase
+    .from("video_assets")
+    .select("object_key,status")
+    .eq("id", episode.video_asset_id)
+    .eq("status", "READY")
+    .maybeSingle();
+
+  if (assetError) throw new Error(`Gagal memuat asset video: ${assetError.message}`);
+  return {
+    ...episode,
+    videoAssetObjectKey: asset?.object_key ?? null,
+  };
 }
 
 export async function getLatestEpisodes(limit = 12): Promise<EpisodeWithSeries[]> {

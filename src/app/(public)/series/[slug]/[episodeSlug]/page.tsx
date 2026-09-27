@@ -104,6 +104,7 @@ export default async function EpisodePage({ params }: PageProps) {
           <EpisodeVideoEmbed
             provider={episode.video_provider}
             videoUrl={episode.video_url}
+            videoAssetObjectKey={episode.videoAssetObjectKey}
             thumbnailUrl={episode.thumbnail_url}
             title={episode.title}
             episodeId={episode.id}

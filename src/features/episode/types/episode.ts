@@ -12,6 +12,7 @@ export type PublicEpisode = Pick<
   | "highlights"
   | "video_provider"
   | "video_url"
+  | "video_asset_id"
   | "thumbnail_url"
   | "duration_seconds"
   | "published_at"
@@ -23,3 +24,7 @@ export interface EpisodeWithSeries extends PublicEpisode {
   seriesSlug: string;
   seriesTitle: string;
 }
+
+export type PublicEpisodeDetail = PublicEpisode & {
+  videoAssetObjectKey: string | null;
+};

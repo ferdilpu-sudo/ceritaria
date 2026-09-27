@@ -1,5 +1,7 @@
 import { FacebookVideoEmbed } from "@/features/episode/components/FacebookVideoEmbed";
 import { YouTubeVideoEmbed } from "@/features/episode/components/YouTubeVideoEmbed";
+import { R2VideoEmbed } from "@/features/episode/components/R2VideoEmbed";
+import { buildR2VideoUrl } from "@/lib/r2/delivery";
 import { getFacebookEmbedStatus } from "@/features/episode/services/facebook-oembed";
 import { facebookPermalinkSchema } from "@/features/episode/services/facebook-url";
 import { getYouTubeVideoId } from "@/features/episode/services/youtube-url";
@@ -7,7 +9,8 @@ import type { VideoProvider } from "@/types/database.types";
 
 interface EpisodeVideoEmbedProps {
   provider: VideoProvider;
-  videoUrl: string;
+  videoUrl: string | null;
+  videoAssetObjectKey: string | null;
   thumbnailUrl: string | null;
   title: string;
   episodeId: string;
@@ -16,14 +19,27 @@ interface EpisodeVideoEmbedProps {
 export async function EpisodeVideoEmbed({
   provider,
   videoUrl,
+  videoAssetObjectKey,
   thumbnailUrl,
   title,
   episodeId,
 }: EpisodeVideoEmbedProps) {
-  const isYouTube = getYouTubeVideoId(videoUrl) !== null;
-  const isFacebook = facebookPermalinkSchema.safeParse(videoUrl).success;
+  if (provider === "r2" && videoAssetObjectKey) {
+    return (
+      <R2VideoEmbed
+        videoUrl={buildR2VideoUrl(videoAssetObjectKey)}
+        thumbnailUrl={thumbnailUrl}
+        title={title}
+      />
+    );
+  }
 
-  if (isYouTube) {
+  const isYouTube = videoUrl ? getYouTubeVideoId(videoUrl) !== null : false;
+  const isFacebook = videoUrl
+    ? facebookPermalinkSchema.safeParse(videoUrl).success
+    : false;
+
+  if (isYouTube && videoUrl) {
     return (
       <YouTubeVideoEmbed
         videoUrl={videoUrl}
@@ -34,7 +50,7 @@ export async function EpisodeVideoEmbed({
     );
   }
 
-  if (isFacebook) {
+  if (isFacebook && videoUrl) {
     const embedStatus = await getFacebookEmbedStatus(videoUrl);
 
     return (
