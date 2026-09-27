@@ -2,17 +2,24 @@ import "server-only";
 import { z } from "zod";
 
 const mib = 1024 * 1024;
+const gib = 1024 * mib;
+const tib = 1024 * gib;
+const sevenDaysSeconds = 7 * 24 * 60 * 60;
 
 const r2ConfigSchema = z.object({
   R2_ACCOUNT_ID: z.string().min(1),
   R2_ACCESS_KEY_ID: z.string().min(1),
   R2_SECRET_ACCESS_KEY: z.string().min(1),
   R2_VIDEO_BUCKET: z.string().min(1),
-  R2_MAX_VIDEO_BYTES: z.coerce.number().int().positive(),
-  R2_SINGLE_UPLOAD_THRESHOLD_BYTES: z.coerce.number().int().positive().default(100 * mib),
-  R2_MULTIPART_PART_SIZE_BYTES: z.coerce.number().int().min(5 * mib).default(16 * mib),
-  R2_UPLOAD_URL_TTL_SECONDS: z.coerce.number().int().min(1).max(604800).default(900),
-  R2_UPLOAD_SESSION_TTL_SECONDS: z.coerce.number().int().positive().default(86400),
+  R2_MAX_VIDEO_BYTES: z.coerce.number().int().positive().max(5 * tib),
+  R2_SINGLE_UPLOAD_THRESHOLD_BYTES: z.coerce
+    .number().int().positive().max(5 * gib).default(100 * mib),
+  R2_MULTIPART_PART_SIZE_BYTES: z.coerce
+    .number().int().min(5 * mib).max(5 * gib).default(16 * mib),
+  R2_UPLOAD_URL_TTL_SECONDS: z.coerce
+    .number().int().min(1).max(sevenDaysSeconds).default(900),
+  R2_UPLOAD_SESSION_TTL_SECONDS: z.coerce
+    .number().int().min(1).max(sevenDaysSeconds).default(86400),
 });
 
 export type R2Config = {

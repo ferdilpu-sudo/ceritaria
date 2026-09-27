@@ -196,6 +196,23 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
+      create_video_upload_records: {
+        Args: {
+          p_asset_id: string;
+          p_session_id: string;
+          p_episode_id: string;
+          p_object_key: string;
+          p_mime_type: string;
+          p_expected_size_bytes: number;
+          p_checksum_sha256?: string | null;
+          p_mode: VideoUploadMode;
+          p_r2_upload_id?: string | null;
+          p_part_size_bytes?: number | null;
+          p_part_count?: number | null;
+          p_expires_at: string;
+        };
+        Returns: undefined;
+      };
       get_analytics_dashboard: {
         Args: { p_days?: number; p_timezone?: string };
         Returns: Json;
