@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createVideoUploadRequestSchema } from "@/features/video-upload/server/contracts";
+import { createVideoUploadRequestSchema, videoAssetPreviewParamsSchema } from "@/features/video-upload/server/contracts";
 import { buildVideoObjectKey } from "@/features/video-upload/server/object-key";
 
 describe("video upload request contract", () => {
@@ -21,6 +21,17 @@ describe("video upload request contract", () => {
         mimeType: "video/quicktime",
         sizeBytes: 12_345,
       }),
+    ).toThrow();
+  });
+
+  it("validates READY asset preview identifiers", () => {
+    expect(() =>
+      videoAssetPreviewParamsSchema.parse({
+        assetId: "11111111-1111-4111-8111-111111111111",
+      }),
+    ).not.toThrow();
+    expect(() =>
+      videoAssetPreviewParamsSchema.parse({ assetId: "not-a-uuid" }),
     ).toThrow();
   });
 

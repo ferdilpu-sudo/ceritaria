@@ -91,3 +91,14 @@ export type AttachVideoAssetResponse = {
   status: "ATTACHED";
   replacedAssetId: string | null;
 };
+
+export const videoAssetPreviewParamsSchema = z.object({
+  assetId: z.uuid(),
+});
+
+export type VideoAssetPreviewResponse = {
+  assetId: string;
+  status: "READY";
+  url: string;
+  expiresInSeconds: number;
+};

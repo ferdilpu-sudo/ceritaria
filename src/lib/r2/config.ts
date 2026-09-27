@@ -18,6 +18,8 @@ const r2ConfigSchema = z.object({
     .number().int().min(5 * mib).max(5 * gib).default(16 * mib),
   R2_UPLOAD_URL_TTL_SECONDS: z.coerce
     .number().int().min(1).max(sevenDaysSeconds).default(900),
+  R2_PREVIEW_URL_TTL_SECONDS: z.coerce
+    .number().int().min(1).max(sevenDaysSeconds).default(900),
   R2_UPLOAD_SESSION_TTL_SECONDS: z.coerce
     .number().int().min(1).max(sevenDaysSeconds).default(86400),
 });
@@ -31,6 +33,7 @@ export type R2Config = {
   singleUploadThresholdBytes: number;
   multipartPartSizeBytes: number;
   uploadUrlTtlSeconds: number;
+  previewUrlTtlSeconds: number;
   uploadSessionTtlSeconds: number;
 };
 
@@ -44,6 +47,7 @@ export function getR2Config(): R2Config {
     R2_SINGLE_UPLOAD_THRESHOLD_BYTES: process.env.R2_SINGLE_UPLOAD_THRESHOLD_BYTES,
     R2_MULTIPART_PART_SIZE_BYTES: process.env.R2_MULTIPART_PART_SIZE_BYTES,
     R2_UPLOAD_URL_TTL_SECONDS: process.env.R2_UPLOAD_URL_TTL_SECONDS,
+    R2_PREVIEW_URL_TTL_SECONDS: process.env.R2_PREVIEW_URL_TTL_SECONDS,
     R2_UPLOAD_SESSION_TTL_SECONDS: process.env.R2_UPLOAD_SESSION_TTL_SECONDS,
   });
 
@@ -56,6 +60,7 @@ export function getR2Config(): R2Config {
     singleUploadThresholdBytes: parsed.R2_SINGLE_UPLOAD_THRESHOLD_BYTES,
     multipartPartSizeBytes: parsed.R2_MULTIPART_PART_SIZE_BYTES,
     uploadUrlTtlSeconds: parsed.R2_UPLOAD_URL_TTL_SECONDS,
+    previewUrlTtlSeconds: parsed.R2_PREVIEW_URL_TTL_SECONDS,
     uploadSessionTtlSeconds: parsed.R2_UPLOAD_SESSION_TTL_SECONDS,
   };
 }
