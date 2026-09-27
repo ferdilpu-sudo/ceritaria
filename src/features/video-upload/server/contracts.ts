@@ -25,3 +25,16 @@ export type CreateVideoUploadResponse = {
         partCount: number;
       };
 };
+
+export const authorizeVideoPartRequestSchema = z.object({
+  partNumber: z.number().int().min(1).max(10_000),
+});
+
+export type AuthorizeVideoPartRequest =
+  z.infer<typeof authorizeVideoPartRequestSchema>;
+
+export type AuthorizeVideoPartResponse = {
+  partNumber: number;
+  sizeBytes: number;
+  url: string;
+};
