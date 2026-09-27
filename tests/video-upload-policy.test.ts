@@ -18,6 +18,7 @@ function config(overrides: Partial<R2Config> = {}): R2Config {
     singleUploadThresholdBytes: 100 * mib,
     multipartPartSizeBytes: 16 * mib,
     uploadUrlTtlSeconds: 900,
+    previewUrlTtlSeconds: 900,
     uploadSessionTtlSeconds: 86400,
     ...overrides,
   };
