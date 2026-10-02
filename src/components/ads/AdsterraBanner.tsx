@@ -1,22 +1,12 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 const DESKTOP_QUERY = "(min-width: 640px)";
 
-const bannerConfig = {
-  mobile: {
-    key: "459814d0e0d9dc6611affced468294e7",
-    width: 320,
-    height: 50,
-    src: "https://www.highrevenueformat.com/459814d0e0d9dc6611affced468294e7/invoke.js",
-  },
-  desktop: {
-    key: "3ed9626dc5b7a7aaecdd1d4cec28bbb6",
-    width: 728,
-    height: 90,
-    src: "https://www.highrevenueformat.com/3ed9626dc5b7a7aaecdd1d4cec28bbb6/invoke.js",
-  },
+const bannerSize = {
+  mobile: { width: 320, height: 50 },
+  desktop: { width: 728, height: 90 },
 } as const;
 
 function subscribeToDesktop(callback: () => void) {
@@ -33,45 +23,55 @@ function getServerSnapshot() {
   return false;
 }
 
-function createBannerDocument(config: (typeof bannerConfig)[keyof typeof bannerConfig]) {
-  const options = JSON.stringify({
-    key: config.key,
-    format: "iframe",
-    height: config.height,
-    width: config.width,
-    params: {},
-  }).replace(/</g, "\\u003c");
-
-  return `<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent}body{display:flex;align-items:center;justify-content:center}</style>
-</head>
-<body>
-<script>window.atOptions=${options};</script>
-<script src="${config.src}"></script>
-</body>
-</html>`;
-}
-
 export function AdsterraBanner({ label = "Iklan" }: { label?: string }) {
   const desktop = useSyncExternalStore(subscribeToDesktop, getDesktopSnapshot, getServerSnapshot);
-  const config = desktop ? bannerConfig.desktop : bannerConfig.mobile;
+  const size = desktop ? "desktop" : "mobile";
+  const dimensions = bannerSize[size];
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  const [ready, setReady] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
+
+  useEffect(() => {
+    setReady(false);
+    setTimedOut(false);
+
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.source !== frameRef.current?.contentWindow) return;
+      if (event.data?.type !== "ceritaria-adsterra-banner-ready") return;
+      if (event.data?.size !== size) return;
+      setReady(true);
+    };
+
+    const timeout = window.setTimeout(() => setTimedOut(true), 6000);
+    window.addEventListener("message", onMessage);
+
+    return () => {
+      window.clearTimeout(timeout);
+      window.removeEventListener("message", onMessage);
+    };
+  }, [size]);
+
+  if (timedOut && !ready) return null;
 
   return (
-    <aside className="my-8 overflow-hidden text-center sm:my-10" aria-label={label}>
-      <p className="mb-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-zinc-600">{label}</p>
-      <div className="mx-auto flex max-w-full justify-center overflow-hidden">
+    <aside
+      className={ready ? "my-8 overflow-hidden text-center sm:my-10" : "h-0 overflow-hidden"}
+      aria-label={ready ? label : undefined}
+      aria-hidden={!ready}
+    >
+      {ready && <p className="mb-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-zinc-600">{label}</p>}
+      <div className="mx-auto flex max-w-full justify-center overflow-hidden bg-transparent">
         <iframe
-          key={config.key}
+          ref={frameRef}
+          key={size}
           title={label}
-          srcDoc={createBannerDocument(config)}
-          width={config.width}
-          height={config.height}
-          className="max-w-full border-0 bg-transparent"
+          src={`/adsterra/banner?size=${size}`}
+          width={dimensions.width}
+          height={dimensions.height}
+          className={`max-w-full border-0 bg-transparent transition-opacity ${ready ? "opacity-100" : "opacity-0"}`}
           referrerPolicy="strict-origin-when-cross-origin"
+          scrolling="no"
         />
       </div>
     </aside>
