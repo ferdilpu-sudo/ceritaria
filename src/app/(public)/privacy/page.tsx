@@ -10,14 +10,16 @@ export default function PrivacyPage() {
         </p>
         <p>
           CERITARIA dapat menggunakan layanan pihak ketiga seperti penyedia video,
-          Google Analytics, dan jaringan periklanan Adsterra. Ketika layanan tersebut aktif
-          atau digunakan, penyedia terkait dapat menggunakan cookie, web beacon, alamat IP,
-          atau pengenal lain sesuai kebijakan mereka.
+          Google Analytics, serta jaringan periklanan Adsterra dan PopAds. Ketika layanan
+          tersebut aktif atau digunakan, penyedia terkait dapat menggunakan cookie, web beacon,
+          alamat IP, atau pengenal lain sesuai kebijakan mereka.
         </p>
         <p>
-          Iklan di CERITARIA dapat disediakan oleh Adsterra atau mitra periklanannya.
-          Penyedia iklan dapat memproses informasi teknis dan menggunakan teknologi
-          pengukuran untuk menayangkan, membatasi frekuensi, serta mengukur performa iklan.
+          Iklan di CERITARIA dapat disediakan oleh Adsterra, PopAds, atau mitra
+          periklanan mereka. Format iklan dapat mencakup banner, native ads, serta jendela
+          atau tab iklan yang dipicu oleh interaksi pengguna. Penyedia iklan dapat memproses
+          informasi teknis dan menggunakan teknologi pengukuran untuk menayangkan,
+          membatasi frekuensi, serta mengukur performa iklan.
         </p>
         <p>
           CERITARIA tidak menjual data pribadi pengguna. Data administratif dan data operasional
