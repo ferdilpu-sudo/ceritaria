@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AdsterraBanner } from "@/components/ads/AdsterraBanner";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { EpisodeCard } from "@/features/episode/components/EpisodeCard";
 import { getPublishedEpisodesForSeries } from "@/features/episode/services/public-episodes";
@@ -117,6 +118,8 @@ export default async function SeriesPage({ params }: PageProps) {
           <Link href="/cerita" className="mt-5 inline-flex min-h-11 items-center text-sm font-black text-red-300 hover:text-red-200">Lihat panduan series lain →</Link>
         </aside>
       </section>
+
+      <AdsterraBanner />
 
       <section id="daftar-episode" className="mt-8 scroll-mt-20 sm:mt-12 sm:scroll-mt-24">
         <div className="mb-5 flex items-end justify-between gap-4">
