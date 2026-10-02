@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { RegisterServiceWorker } from "@/components/pwa/RegisterServiceWorker";
-import { ADSENSE_CLIENT_ID } from "@/lib/adsense-config";
 
 const metadataBase = process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL) : undefined;
 
@@ -11,9 +10,6 @@ export const metadata: Metadata = {
   description: "Platform mini series drama Ceritaria.",
   icons: { icon: "/pwa/icon-192", apple: "/pwa/icon-192" },
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Ceritaria" },
-  other: {
-    "google-adsense-account": ADSENSE_CLIENT_ID,
-  },
 };
 
 export const viewport: Viewport = {
