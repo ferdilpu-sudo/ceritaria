@@ -72,6 +72,10 @@ export function AdsterraBanner({ label = "Iklan" }: { label?: string }) {
           className={`max-w-full border-0 bg-transparent transition-opacity ${ready ? "opacity-100" : "opacity-0"}`}
           referrerPolicy="strict-origin-when-cross-origin"
           scrolling="no"
+          onLoad={() => {
+            const document = frameRef.current?.contentDocument;
+            if (document?.querySelector("iframe, img, a[href]")) setReady(true);
+          }}
         />
       </div>
     </aside>
