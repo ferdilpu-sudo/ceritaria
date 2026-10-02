@@ -11,7 +11,7 @@ import { getPublishedSeries } from "@/features/series/services/public-series";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Ceritaria",
+  title: { absolute: "Ceritaria" },
   description: "Mini series drama original dengan sinopsis, ringkasan episode, momen penting, dan panduan cerita agar mudah diikuti dari awal sampai akhir.",
   alternates: { canonical: "/" },
 };
