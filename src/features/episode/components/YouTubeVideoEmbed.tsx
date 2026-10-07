@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { MediaImage } from "@/components/ui/MediaImage";
+import { getMediaOrientation, type MediaOrientation } from "@/features/episode/services/media-orientation";
 import { loadYouTubeIframeApi, type YouTubePlayer } from "@/features/episode/services/youtube-iframe-api";
 import { buildYouTubeEmbedUrl } from "@/features/episode/services/youtube-url";
 import { emitWatchProgress } from "@/features/watch-history/services/watch-progress-events";
@@ -21,6 +22,24 @@ interface Props {
   nextHref?: string;
   nextTitle?: string;
 }
+
+const frameClass: Record<MediaOrientation, string> = {
+  portrait: "aspect-[9/16]",
+  landscape: "aspect-video",
+  square: "aspect-square",
+};
+
+const widthClass: Record<MediaOrientation, string> = {
+  portrait: "sm:max-w-[380px]",
+  landscape: "sm:max-w-none lg:max-w-[980px]",
+  square: "sm:max-w-[640px]",
+};
+
+const imageSizes: Record<MediaOrientation, string> = {
+  portrait: "(max-width: 639px) 100vw, 380px",
+  landscape: "(max-width: 639px) 100vw, (max-width: 1199px) calc(100vw - 32px), 980px",
+  square: "(max-width: 639px) 100vw, 640px",
+};
 
 function progressOf(player: YouTubePlayer) {
   const duration = player.getDuration();
@@ -47,6 +66,20 @@ export function YouTubeVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, se
   const [ended, setEnded] = useState(false);
   const [countdown, setCountdown] = useState(6);
   const [autoNext, setAutoNext] = useState(true);
+  const [orientation, setOrientation] = useState<MediaOrientation>("portrait");
+
+  useEffect(() => {
+    if (!thumbnailUrl) return;
+
+    const image = new Image();
+    image.onload = () => setOrientation(getMediaOrientation(image.naturalWidth, image.naturalHeight));
+    image.src = thumbnailUrl;
+
+    return () => {
+      image.onload = null;
+      image.src = "";
+    };
+  }, [thumbnailUrl]);
 
   useEffect(() => {
     if (!loaded || !iframeRef.current) return;
@@ -110,11 +143,14 @@ export function YouTubeVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, se
   };
 
   return (
-    <div className="mx-auto w-full max-w-none sm:max-w-[380px] lg:mx-0">
-      <div className="relative aspect-[9/16] overflow-hidden rounded-none border-y border-white/10 bg-black sm:rounded-[26px] sm:border sm:shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
+    <div
+      data-video-orientation={orientation}
+      className={`mx-auto w-full max-w-none lg:mx-0 ${widthClass[orientation]}`}
+    >
+      <div className={`relative overflow-hidden rounded-none border-y border-white/10 bg-black sm:rounded-[26px] sm:border sm:shadow-[0_24px_80px_rgba(0,0,0,0.38)] ${frameClass[orientation]}`}>
         {!loaded ? (
           <>
-            <MediaImage src={thumbnailUrl} alt={`Thumbnail ${title}`} sizes="(max-width: 639px) 100vw, 380px" />
+            <MediaImage src={thumbnailUrl} alt={`Thumbnail ${title}`} sizes={imageSizes[orientation]} />
             <div className="absolute inset-0 bg-black/30" />
             <button type="button" onClick={startPlayback} className="absolute left-1/2 top-1/2 min-h-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white px-6 font-black text-black shadow-2xl">▶ Putar episode</button>
           </>
