@@ -9,6 +9,8 @@ const bannerSize = {
   desktop: { width: 728, height: 90 },
 } as const;
 
+type BannerSize = keyof typeof bannerSize;
+
 function subscribeToDesktop(callback: () => void) {
   const query = window.matchMedia(DESKTOP_QUERY);
   query.addEventListener("change", callback);
@@ -23,18 +25,13 @@ function getServerSnapshot() {
   return false;
 }
 
-export function AdsterraBanner({ label = "Iklan" }: { label?: string }) {
-  const desktop = useSyncExternalStore(subscribeToDesktop, getDesktopSnapshot, getServerSnapshot);
-  const size = desktop ? "desktop" : "mobile";
+function AdsterraBannerFrame({ size, label }: { size: BannerSize; label: string }) {
   const dimensions = bannerSize[size];
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [ready, setReady] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {
-    setReady(false);
-    setTimedOut(false);
-
     const onMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
       if (event.source !== frameRef.current?.contentWindow) return;
@@ -64,7 +61,6 @@ export function AdsterraBanner({ label = "Iklan" }: { label?: string }) {
       <div className="mx-auto flex max-w-full justify-center overflow-hidden bg-transparent">
         <iframe
           ref={frameRef}
-          key={size}
           title={label}
           src={`/adsterra/banner?size=${size}`}
           width={dimensions.width}
@@ -80,4 +76,11 @@ export function AdsterraBanner({ label = "Iklan" }: { label?: string }) {
       </div>
     </aside>
   );
+}
+
+export function AdsterraBanner({ label = "Iklan" }: { label?: string }) {
+  const desktop = useSyncExternalStore(subscribeToDesktop, getDesktopSnapshot, getServerSnapshot);
+  const size: BannerSize = desktop ? "desktop" : "mobile";
+
+  return <AdsterraBannerFrame key={size} size={size} label={label} />;
 }
