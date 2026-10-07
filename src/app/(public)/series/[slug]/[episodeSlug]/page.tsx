@@ -74,12 +74,12 @@ export default async function EpisodePage({ params, searchParams }: PageProps) {
         <Link href="/" className="transition hover:text-white">Beranda</Link><span className="text-zinc-700">/</span><Link href={`/series/${series.slug}`} className="transition hover:text-white">{series.title}</Link><span className="text-zinc-700">/</span><span className="text-zinc-300">Episode {episode.episode_number}</span>
       </nav>
 
-      <div className="grid gap-5 sm:gap-8 lg:grid-cols-[minmax(300px,380px)_minmax(0,1fr)] lg:gap-12 xl:gap-16">
-        <div className="-mx-4 sm:mx-0 lg:sticky lg:top-24 lg:self-start">
+      <div className="episode-watch-layout grid gap-5 sm:gap-8 lg:grid-cols-[minmax(300px,380px)_minmax(0,1fr)] lg:gap-12 xl:gap-16">
+        <div className="episode-player-column -mx-4 sm:mx-0 lg:sticky lg:top-24 lg:self-start">
           <EpisodeVideoEmbed provider={episode.video_provider} videoUrl={episode.video_url} thumbnailUrl={episode.thumbnail_url} title={episode.title} episodeId={episode.id} seriesSlug={series.slug} episodeSlug={episode.slug} autoStart={query.play === "1"} nextHref={nextHref} nextTitle={next?.title} />
         </div>
 
-        <main className="min-w-0 max-w-3xl">
+        <main className="episode-copy-column min-w-0 max-w-3xl">
           <p className="text-[10px] font-black tracking-[0.2em] text-red-400 sm:text-xs sm:tracking-[0.18em]">EPISODE {episode.episode_number}</p>
           <h1 className="mt-2 text-[1.8rem] font-black leading-tight sm:text-4xl lg:text-[2.6rem]">{episode.title}</h1>
           {episode.short_synopsis && <p className="mt-3 text-sm leading-6 text-zinc-300 sm:mt-5 sm:max-w-2xl sm:text-lg sm:leading-7">{episode.short_synopsis}</p>}
