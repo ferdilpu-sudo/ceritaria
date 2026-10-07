@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { MediaImage } from "@/components/ui/MediaImage";
+import { getMediaOrientation, type MediaOrientation } from "@/features/episode/services/media-orientation";
 import { buildTeleCloudShareUrl, normalizeTeleCloudVideoUrl } from "@/features/episode/services/telecloud-url";
 import { emitWatchProgress } from "@/features/watch-history/services/watch-progress-events";
 import { getResumeProgress } from "@/features/watch-history/services/watch-history";
@@ -21,6 +22,24 @@ interface Props {
   nextTitle?: string;
 }
 
+const frameClass: Record<MediaOrientation, string> = {
+  portrait: "aspect-[9/16]",
+  landscape: "aspect-video",
+  square: "aspect-square",
+};
+
+const widthClass: Record<MediaOrientation, string> = {
+  portrait: "sm:max-w-[380px]",
+  landscape: "sm:max-w-none lg:max-w-[980px]",
+  square: "sm:max-w-[640px]",
+};
+
+const imageSizes: Record<MediaOrientation, string> = {
+  portrait: "(max-width: 639px) 100vw, 380px",
+  landscape: "(max-width: 639px) 100vw, (max-width: 1199px) calc(100vw - 32px), 980px",
+  square: "(max-width: 639px) 100vw, 640px",
+};
+
 function progressOf(video: HTMLVideoElement) {
   return video.duration > 0 ? Math.min(100, Math.max(0, (video.currentTime / video.duration) * 100)) : 0;
 }
@@ -34,8 +53,29 @@ export function TeleCloudVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, 
   const [ended, setEnded] = useState(false);
   const [countdown, setCountdown] = useState(6);
   const [autoNext, setAutoNext] = useState(true);
+  const [orientation, setOrientation] = useState<MediaOrientation>("portrait");
   const streamUrl = normalizeTeleCloudVideoUrl(videoUrl);
   const shareUrl = buildTeleCloudShareUrl(videoUrl);
+
+  useEffect(() => {
+    const probe = document.createElement("video");
+    const syncOrientation = () => {
+      setOrientation(getMediaOrientation(probe.videoWidth, probe.videoHeight));
+    };
+
+    probe.preload = "metadata";
+    probe.muted = true;
+    probe.playsInline = true;
+    probe.addEventListener("loadedmetadata", syncOrientation);
+    probe.src = streamUrl;
+    probe.load();
+
+    return () => {
+      probe.removeEventListener("loadedmetadata", syncOrientation);
+      probe.removeAttribute("src");
+      probe.load();
+    };
+  }, [streamUrl]);
 
   useEffect(() => {
     if (!ended || !nextHref || !autoNext) return;
@@ -57,11 +97,14 @@ export function TeleCloudVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, 
   };
 
   return (
-    <div className="mx-auto w-full max-w-none sm:max-w-[380px] lg:mx-0">
-      <div className="relative aspect-[9/16] overflow-hidden rounded-none border-y border-white/10 bg-black sm:rounded-[26px] sm:border sm:shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
+    <div
+      data-video-orientation={orientation}
+      className={`mx-auto w-full max-w-none lg:mx-0 ${widthClass[orientation]}`}
+    >
+      <div className={`relative overflow-hidden rounded-none border-y border-white/10 bg-black sm:rounded-[26px] sm:border sm:shadow-[0_24px_80px_rgba(0,0,0,0.38)] ${frameClass[orientation]}`}>
         {!loaded ? (
           <>
-            <MediaImage src={thumbnailUrl} alt={`Thumbnail ${title}`} sizes="(max-width: 639px) 100vw, 380px" />
+            <MediaImage src={thumbnailUrl} alt={`Thumbnail ${title}`} sizes={imageSizes[orientation]} />
             <div className="absolute inset-0 bg-black/30" />
             <button type="button" onClick={startPlayback} className="absolute left-1/2 top-1/2 min-h-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white px-6 font-black text-black shadow-2xl">▶ Putar episode</button>
           </>
@@ -78,6 +121,7 @@ export function TeleCloudVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, 
               autoPlay
               onLoadedMetadata={(event) => {
                 const video = event.currentTarget;
+                setOrientation(getMediaOrientation(video.videoWidth, video.videoHeight));
                 const progress = getResumeProgress(seriesSlug, episodeSlug);
                 if (progress > 0 && progress < 98 && video.duration > 0) video.currentTime = (video.duration * progress) / 100;
               }}
