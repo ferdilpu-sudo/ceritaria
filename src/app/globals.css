@@ -138,3 +138,23 @@ button, a, input, textarea, select { outline-offset: 3px; }
     max-width: 100%;
   }
 }
+
+@media (min-width: 1024px) {
+  .episode-watch-layout:has([data-video-orientation="landscape"]),
+  .episode-watch-layout:has([data-video-orientation="square"]) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .episode-watch-layout:has([data-video-orientation="landscape"]) .episode-player-column,
+  .episode-watch-layout:has([data-video-orientation="square"]) .episode-player-column {
+    position: static;
+    top: auto;
+  }
+
+  .episode-watch-layout:has([data-video-orientation="landscape"]) .episode-copy-column,
+  .episode-watch-layout:has([data-video-orientation="square"]) .episode-copy-column {
+    width: 100%;
+    max-width: 48rem;
+  }
+}
