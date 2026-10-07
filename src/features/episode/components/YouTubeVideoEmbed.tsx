@@ -77,7 +77,7 @@ export function YouTubeVideoEmbed({ videoUrl, thumbnailUrl, title, episodeId, se
 
     return () => {
       image.onload = null;
-      image.src = "";
+      image.removeAttribute("src");
     };
   }, [thumbnailUrl]);
 
